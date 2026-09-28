@@ -1,0 +1,29 @@
+{
+  "name": "ai2kit-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ai2Kit \u2014 AI-built site to Elementor converter (monorepo)",
+  "license": "GPL-2.0-or-later",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "pnpm --filter @ai2kit/engine test && pnpm --filter @ai2kit/admin-ui test",
+    "build": "pnpm --filter @ai2kit/admin-ui build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "wp-env": "wp-env",
+    "release": "node scripts/release.mjs",
+    "test:php": "cd plugin/ai2kit && vendor/bin/phpunit",
+    "test:php:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/ai2kit vendor/bin/phpunit -c phpunit-integration.xml.dist",
+    "e2e": "for f in static-landing.zip lovable-spa-dist.zip ai-tailwind.html; do node tests/e2e/convert.mjs --file tests/fixtures/source/$f --out tests/e2e/output/${f%%.*} --min 90 || exit 1; done",
+    "deps": "bash scripts/fetch-deps.sh"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^10.0.0",
+    "pixelmatch": "6.0.0",
+    "playwright": "1.49.1",
+    "pngjs": "7.0.0"
+  }
+}

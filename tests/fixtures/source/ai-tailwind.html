@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harbor Coffee — Roasted in small batches</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .font-display { font-family: 'Fraunces', serif; }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+  <header class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+    <a href="#" class="font-display text-2xl font-extrabold text-amber-900">Harbor</a>
+    <nav class="hidden md:flex gap-8 text-sm font-medium text-stone-600">
+      <a href="#menu">Menu</a><a href="#story">Our story</a><a href="#visit">Visit</a>
+    </nav>
+    <a href="#visit" class="rounded-full bg-amber-900 px-5 py-2 text-sm font-semibold text-white">Order online</a>
+  </header>
+
+  <section class="max-w-6xl mx-auto px-6 pt-12 pb-20 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <p class="uppercase tracking-widest text-xs font-bold text-amber-700 mb-4">Since 2014 · Portland</p>
+      <h1 class="font-display text-5xl md:text-6xl font-extrabold leading-tight text-stone-900 mb-6">Coffee roasted in small batches, for slow mornings.</h1>
+      <p class="text-lg text-stone-600 mb-8">Single-origin beans, roasted every Tuesday and delivered to your door within 48 hours.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#menu" class="rounded-full bg-amber-900 px-6 py-3 font-semibold text-white">Shop beans</a>
+        <a href="#story" class="rounded-full border border-stone-300 px-6 py-3 font-semibold text-stone-800">Our story</a>
+      </div>
+    </div>
+    <div class="aspect-[4/3] rounded-3xl bg-gradient-to-br from-amber-200 via-orange-100 to-stone-100 shadow-xl"></div>
+  </section>
+
+  <section id="menu" class="bg-white py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="font-display text-4xl font-extrabold text-stone-900 text-center mb-12">This week's roasts</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="rounded-2xl border border-stone-200 p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Ethiopia</p>
+          <h3 class="mt-2 text-xl font-bold">Yirgacheffe</h3>
+          <p class="mt-2 text-stone-600">Bright, floral, with notes of bergamot and honey.</p>
+          <p class="mt-4 text-lg font-bold text-stone-900">$18</p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Colombia</p>
+          <h3 class="mt-2 text-xl font-bold">Huila</h3>
+          <p class="mt-2 text-stone-600">Balanced and sweet, with caramel and red apple.</p>
+          <p class="mt-4 text-lg font-bold text-stone-900">$16</p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 p-6">
+          <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Guatemala</p>
+          <h3 class="mt-2 text-xl font-bold">Antigua</h3>
+          <p class="mt-2 text-stone-600">Rich cocoa, toasted almond and a smooth finish.</p>
+          <p class="mt-4 text-lg font-bold text-stone-900">$17</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="story" class="py-20">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <h2 class="font-display text-4xl font-extrabold text-stone-900 mb-6">A tiny roastery with big standards</h2>
+      <p class="text-lg text-stone-600 leading-relaxed">We buy directly from farmers we've met, pay well above fair-trade prices, and roast only what we can sell fresh. That's it. That's the whole secret.</p>
+    </div>
+  </section>
+
+  <section id="visit" class="bg-amber-900 text-amber-50 py-16">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div>
+        <h2 class="font-display text-3xl font-extrabold">Come say hi</h2>
+        <p class="mt-2 text-amber-100">412 Water St, Portland · Open daily 7am–4pm</p>
+      </div>
+      <a href="#" class="rounded-full bg-amber-50 px-6 py-3 font-semibold text-amber-900">Get directions</a>
+    </div>
+  </section>
+
+  <footer class="max-w-6xl mx-auto px-6 py-8 text-sm text-stone-500 flex justify-between">
+    <span>© 2026 Harbor Coffee Roasters</span><span>Made with Claude</span>
+  </footer>
+</body>
+</html>

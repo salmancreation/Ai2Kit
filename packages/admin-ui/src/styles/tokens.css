@@ -1,0 +1,157 @@
+/*
+ * Ai2Kit design tokens — DESIGN.md §3, verbatim. Scoped under .ai2kit-app so
+ * nothing leaks into wp-admin or Elementor. Components consume the semantic
+ * tokens (--a2k-bg-*, --a2k-text-*, …) only, never the primitives.
+ */
+
+/* 3.1 Color — primitives */
+.ai2kit-app {
+	/* Ink (neutrals) */
+	--a2k-ink-0:   #FFFFFF;
+	--a2k-ink-25:  #F8F9FB;
+	--a2k-ink-50:  #F2F4F7;
+	--a2k-ink-100: #E6E9EF;
+	--a2k-ink-200: #D0D5DD;
+	--a2k-ink-300: #A9B0BC;
+	--a2k-ink-400: #7D8594;
+	--a2k-ink-500: #5B6372;
+	--a2k-ink-600: #434A57;
+	--a2k-ink-700: #2F3540;
+	--a2k-ink-800: #1D222B;
+	--a2k-ink-900: #11151C;
+
+	/* Violet (brand) */
+	--a2k-violet-50:  #F3F0FF;
+	--a2k-violet-100: #E6E0FF;
+	--a2k-violet-200: #CCC0FF;
+	--a2k-violet-300: #A996FF;
+	--a2k-violet-400: #8A70FF;
+	--a2k-violet-500: #6D4AFF;
+	--a2k-violet-600: #5A36EB;
+	--a2k-violet-700: #4827C4;
+	--a2k-violet-800: #371D96;
+	--a2k-violet-900: #24145F;
+
+	/* Status */
+	--a2k-green-50:  #ECFDF3; --a2k-green-500: #12B76A; --a2k-green-700: #027A48;
+	--a2k-amber-50:  #FFFAEB; --a2k-amber-500: #F79009; --a2k-amber-700: #B54708;
+	--a2k-red-50:    #FEF3F2; --a2k-red-500:   #F04438; --a2k-red-700:   #B42318;
+	--a2k-blue-50:   #EFF8FF; --a2k-blue-500:  #2E90FA; --a2k-blue-700:  #175CD3;
+}
+
+/* 3.2 Color — semantic (light, default) */
+.ai2kit-app {
+	--a2k-bg-canvas:        var(--a2k-ink-25);
+	--a2k-bg-surface:       var(--a2k-ink-0);
+	--a2k-bg-subtle:        var(--a2k-ink-50);
+	--a2k-bg-inverse:       var(--a2k-ink-900);
+	--a2k-bg-brand:         var(--a2k-violet-500);
+	--a2k-bg-brand-hover:   var(--a2k-violet-600);
+	--a2k-bg-brand-subtle:  var(--a2k-violet-50);
+
+	--a2k-text-primary:     var(--a2k-ink-900);
+	--a2k-text-secondary:   var(--a2k-ink-500);
+	--a2k-text-tertiary:    var(--a2k-ink-400);
+	--a2k-text-inverse:     var(--a2k-ink-0);
+	--a2k-text-brand:       var(--a2k-violet-600);
+	--a2k-text-on-brand:    var(--a2k-ink-0);
+
+	--a2k-border-default:   var(--a2k-ink-100);
+	--a2k-border-strong:    var(--a2k-ink-200);
+	--a2k-border-focus:     var(--a2k-violet-500);
+
+	--a2k-status-success-bg: var(--a2k-green-50);  --a2k-status-success-fg: var(--a2k-green-700);
+	--a2k-status-warning-bg: var(--a2k-amber-50);  --a2k-status-warning-fg: var(--a2k-amber-700);
+	--a2k-status-danger-bg:  var(--a2k-red-50);    --a2k-status-danger-fg:  var(--a2k-red-700);
+	--a2k-status-info-bg:    var(--a2k-blue-50);   --a2k-status-info-fg:    var(--a2k-blue-700);
+
+	/* Fidelity score scale */
+	--a2k-score-high:  var(--a2k-green-500);
+	--a2k-score-mid:   var(--a2k-amber-500);
+	--a2k-score-low:   var(--a2k-red-500);
+}
+
+/* 3.3 Color — dark mode (explicit choice, or System + OS preference) */
+.ai2kit-app[data-theme="dark"] {
+	--a2k-bg-canvas:       var(--a2k-ink-900);
+	--a2k-bg-surface:      var(--a2k-ink-800);
+	--a2k-bg-subtle:       var(--a2k-ink-700);
+	--a2k-bg-brand-subtle: color-mix(in srgb, var(--a2k-violet-500) 16%, transparent);
+	--a2k-text-primary:    var(--a2k-ink-25);
+	--a2k-text-secondary:  var(--a2k-ink-300);
+	--a2k-text-tertiary:   var(--a2k-ink-400);
+	--a2k-text-brand:      var(--a2k-violet-300);
+	--a2k-border-default:  var(--a2k-ink-700);
+	--a2k-border-strong:   var(--a2k-ink-600);
+	--a2k-status-success-bg: color-mix(in srgb, var(--a2k-green-500) 16%, transparent);  --a2k-status-success-fg: #6CE9A6;
+	--a2k-status-warning-bg: color-mix(in srgb, var(--a2k-amber-500) 16%, transparent);  --a2k-status-warning-fg: #FEC84B;
+	--a2k-status-danger-bg:  color-mix(in srgb, var(--a2k-red-500) 16%, transparent);    --a2k-status-danger-fg:  #FDA29B;
+	--a2k-status-info-bg:    color-mix(in srgb, var(--a2k-blue-500) 16%, transparent);   --a2k-status-info-fg:    #84CAFF;
+}
+
+/* 3.4 Typography — system stack: no external font requests (wp.org rule) */
+.ai2kit-app {
+	--a2k-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Bengali", Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--a2k-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+	--a2k-text-xs:   12px; --a2k-lh-xs:   16px;
+	--a2k-text-sm:   13px; --a2k-lh-sm:   20px;
+	--a2k-text-md:   14px; --a2k-lh-md:   22px;
+	--a2k-text-lg:   16px; --a2k-lh-lg:   24px;
+	--a2k-text-xl:   20px; --a2k-lh-xl:   28px;
+	--a2k-text-2xl:  24px; --a2k-lh-2xl:  32px;
+	--a2k-text-3xl:  30px; --a2k-lh-3xl:  38px;
+
+	--a2k-weight-regular: 400;
+	--a2k-weight-medium:  500;
+	--a2k-weight-semibold:600;
+	--a2k-weight-bold:    700;
+
+	--a2k-tracking-tight: -0.01em;
+}
+
+/* 3.5 Spacing (4px base) */
+.ai2kit-app {
+	--a2k-space-0: 0;    --a2k-space-1: 4px;  --a2k-space-2: 8px;   --a2k-space-3: 12px;
+	--a2k-space-4: 16px; --a2k-space-5: 20px; --a2k-space-6: 24px;  --a2k-space-8: 32px;
+	--a2k-space-10: 40px; --a2k-space-12: 48px; --a2k-space-16: 64px;
+}
+
+/* 3.6 Radius, border, shadow */
+.ai2kit-app {
+	--a2k-radius-sm: 6px;
+	--a2k-radius-md: 10px;
+	--a2k-radius-lg: 14px;
+	--a2k-radius-xl: 20px;
+	--a2k-radius-full: 999px;
+
+	--a2k-border-width: 1px;
+
+	--a2k-shadow-xs: 0 1px 2px rgba(16, 24, 40, .05);
+	--a2k-shadow-sm: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+	--a2k-shadow-md: 0 6px 16px -4px rgba(16, 24, 40, .10), 0 2px 6px -2px rgba(16, 24, 40, .05);
+	--a2k-shadow-lg: 0 16px 32px -8px rgba(16, 24, 40, .16);
+	--a2k-shadow-focus: 0 0 0 3px color-mix(in srgb, var(--a2k-violet-500) 35%, transparent);
+}
+
+/* 3.7 Motion */
+.ai2kit-app {
+	--a2k-duration-instant: 80ms;
+	--a2k-duration-fast:    150ms;
+	--a2k-duration-base:    220ms;
+	--a2k-duration-slow:    360ms;
+	--a2k-duration-crawl:   1200ms;
+
+	--a2k-ease-standard: cubic-bezier(.2, 0, 0, 1);
+	--a2k-ease-enter:    cubic-bezier(0, 0, .2, 1);
+	--a2k-ease-exit:     cubic-bezier(.4, 0, 1, 1);
+	--a2k-ease-spring:   cubic-bezier(.34, 1.56, .64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+	.ai2kit-app * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+/* 3.8 Layering (wp-admin bar is 99999 — stay below it) */
+.ai2kit-app {
+	--a2k-z-base: 1; --a2k-z-sticky: 10; --a2k-z-dropdown: 100; --a2k-z-overlay: 9990; --a2k-z-modal: 9991; --a2k-z-toast: 9992;
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- Runs inside wp-env. See CLAUDE.md for the command. -->
+<phpunit bootstrap="tests/integration/bootstrap.php" colors="true">
+	<testsuites>
+		<testsuite name="integration">
+			<directory suffix="Test.php">tests/integration</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>

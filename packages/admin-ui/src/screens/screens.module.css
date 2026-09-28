@@ -1,0 +1,26 @@
+.h2 { font-size: var(--a2k-text-xl); line-height: var(--a2k-lh-xl); font-weight: var(--a2k-weight-semibold); margin-bottom: var(--a2k-space-4) !important; }
+.sub { display: block; color: var(--a2k-text-secondary); font-size: var(--a2k-text-sm); margin-bottom: var(--a2k-space-3) !important; }
+.warn { color: var(--a2k-status-warning-fg); font-weight: var(--a2k-weight-medium); margin-top: var(--a2k-space-3) !important; }
+.settings { display: flex; flex-direction: column; gap: var(--a2k-space-4); max-width: 760px; }
+.fields { display: flex; flex-direction: column; gap: var(--a2k-space-5); }
+
+.tableCard { padding: 0; overflow-x: auto; }
+.skeletons { display: flex; flex-direction: column; gap: var(--a2k-space-3); padding: var(--a2k-space-6); }
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: start; font-size: var(--a2k-text-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--a2k-text-tertiary); font-weight: var(--a2k-weight-semibold); padding: var(--a2k-space-3) var(--a2k-space-4); border-bottom: var(--a2k-border-width) solid var(--a2k-border-default); }
+.table td { padding: var(--a2k-space-3) var(--a2k-space-4); border-bottom: var(--a2k-border-width) solid var(--a2k-border-default); vertical-align: middle; }
+.table tr:last-child td { border-bottom: 0; }
+.table td strong { display: block; }
+.table .sub { margin: 0 !important; }
+.pageLink { display: block; }
+.actions { text-align: end; white-space: nowrap; }
+.report { margin: 0; display: flex; flex-direction: column; gap: var(--a2k-space-2); }
+.report li { display: flex; align-items: center; gap: var(--a2k-space-3); margin: 0; color: var(--a2k-text-primary); }
+.report li span:first-child { flex: 1; }
+
+.faq { margin: 0; display: flex; flex-direction: column; gap: var(--a2k-space-4); }
+.faq dt { font-weight: var(--a2k-weight-semibold); }
+.faq dd { margin: var(--a2k-space-1) 0 0; color: var(--a2k-text-secondary); }
+.proList { margin: 0 0 var(--a2k-space-4); display: flex; flex-direction: column; gap: var(--a2k-space-2); }
+.proList li { display: flex; align-items: center; gap: var(--a2k-space-2); margin: 0; }
+.proList svg { color: var(--a2k-text-brand); }

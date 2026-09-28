@@ -1,0 +1,26 @@
+{
+  "name": "@ai2kit/admin-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ai2Kit wp-admin app (React via @wordpress/element).",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "wp-scripts build index=./src/index.tsx --output-path=../../plugin/ai2kit/build",
+    "start": "wp-scripts start index=./src/index.tsx --output-path=../../plugin/ai2kit/build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai2kit/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@wordpress/api-fetch": "^7.10.0",
+    "@wordpress/element": "^6.10.0",
+    "@wordpress/i18n": "^5.10.0",
+    "@wordpress/scripts": "^30.3.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9"
+  }
+}

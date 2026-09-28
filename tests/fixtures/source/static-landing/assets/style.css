@@ -1,0 +1,58 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a;background:#fff;line-height:1.5}
+a{color:inherit;text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:0;background:rgba(255,255,255,.9);border-bottom:1px solid #e2e8f0;z-index:10}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}
+.links{display:flex;gap:32px;font-size:15px;color:#475569}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;font-weight:600;font-size:15px}
+.btn-primary{background:#7c3aed;color:#fff}
+.btn-outline{border:1px solid #cbd5e1;color:#0f172a}
+.btn svg{width:16px;height:16px}
+.hero{background:linear-gradient(180deg,#faf5ff 0%,#ffffff 100%);padding:96px 0 80px;text-align:center}
+.badge{display:inline-block;background:#ede9fe;color:#6d28d9;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;margin-bottom:24px}
+.hero h1{font-size:60px;line-height:1.08;letter-spacing:-1.5px;font-weight:800;max-width:860px;margin:0 auto 20px}
+.hero p.lead{font-size:20px;color:#475569;max-width:640px;margin:0 auto 36px}
+.cta-row{display:flex;gap:14px;justify-content:center;margin-bottom:56px}
+.hero img{width:100%;max-width:1000px;border-radius:20px;box-shadow:0 30px 60px -20px rgba(76,29,149,.35)}
+section.features{padding:96px 0;background:#f8fafc}
+.section-head{text-align:center;max-width:680px;margin:0 auto 56px}
+.section-head h2{font-size:40px;letter-spacing:-.8px;line-height:1.15;margin-bottom:14px}
+.section-head p{color:#64748b;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.icon{width:44px;height:44px;border-radius:12px;background:#ede9fe;color:#7c3aed;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.icon svg{width:22px;height:22px}
+.card h3{font-size:20px;margin-bottom:8px}
+.card p{color:#64748b;font-size:15px}
+section.pricing{padding:96px 0}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+.plan{border:1px solid #e2e8f0;border-radius:18px;padding:32px}
+.plan.featured{border:2px solid #7c3aed;box-shadow:0 20px 40px -20px rgba(124,58,237,.4)}
+.plan h3{font-size:18px;color:#475569;margin-bottom:10px}
+.price{font-size:44px;font-weight:800;letter-spacing:-1px;margin-bottom:20px}
+.price span{font-size:16px;color:#64748b;font-weight:500}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.plan li{display:flex;gap:10px;align-items:center;font-size:15px}
+.plan li svg{width:18px;height:18px;color:#16a34a;flex:none}
+.plan .btn{width:100%;justify-content:center}
+section.testimonials{padding:96px 0;background:#0f172a;color:#fff}
+section.testimonials .section-head p{color:#94a3b8}
+.quotes{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.quote{background:#1e293b;border-radius:16px;padding:32px}
+.quote p{font-size:18px;margin-bottom:20px;color:#e2e8f0}
+.who{display:flex;gap:14px;align-items:center}
+.who img{width:48px;height:48px;border-radius:50%}
+.who span{display:block;color:#94a3b8;font-size:14px}
+section.signup{padding:96px 0}
+.signup-box{background:linear-gradient(135deg,#7c3aed 0%,#2563eb 100%);border-radius:24px;padding:64px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:32px}
+.signup-box h2{font-size:36px;letter-spacing:-.6px;margin-bottom:8px}
+.signup-box p{color:#e9d5ff}
+form{display:flex;gap:10px}
+form input{padding:14px 16px;border-radius:10px;border:0;width:280px;font-size:15px}
+form button{padding:14px 22px;border-radius:10px;border:0;background:#0f172a;color:#fff;font-weight:600;font-size:15px}
+footer{border-top:1px solid #e2e8f0;padding:40px 0;color:#64748b;font-size:14px}
+.foot{display:flex;justify-content:space-between;align-items:center}
+@media (max-width:1024px){.grid,.plans{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:48px}}
+@media (max-width:767px){.links{display:none}.grid,.plans,.quotes{grid-template-columns:1fr}.hero{padding:64px 0 48px}.hero h1{font-size:36px}.cta-row{flex-direction:column;align-items:center}.signup-box{flex-direction:column;padding:40px 24px;text-align:center}form{flex-direction:column;width:100%}form input{width:100%}.foot{flex-direction:column;gap:12px}}

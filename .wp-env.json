@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": null,
+  "phpVersion": "8.2",
+  "plugins": [
+    "./plugin/ai2kit",
+    "./.deps/elementor"
+  ],
+  "themes": [
+    "./.deps/hello-elementor"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "SCRIPT_DEBUG": false
+  },
+  "mappings": {
+    "wp-content/ai2kit-tools": "./tests/tools",
+    "wp-content/ai2kit-fixtures": "./tests/fixtures"
+  }
+}

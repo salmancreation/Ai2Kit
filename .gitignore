@@ -1,0 +1,15 @@
+node_modules/
+coverage/
+dist/
+.DS_Store
+*.log
+.wp-env.override.json
+
+# Build output is generated; the release script copies it into the plugin ZIP.
+plugin/ai2kit/build/
+plugin/ai2kit/vendor/
+packages/*/dist/
+.phpunit.result.cache
+.phpunit.cache/
+.deps/
+tests/e2e/output/

@@ -1,0 +1,28 @@
+{
+  "name": "modinatheme/ai2kit",
+  "description": "Ai2Kit \u2014 AI-built site to Elementor converter.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6",
+    "yoast/phpunit-polyfills": "^2.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ModinaTheme\\Ai2Kit\\": "includes/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test:integration": "phpunit -c phpunit-integration.xml.dist"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "7.4.33"
+    }
+  }
+}
