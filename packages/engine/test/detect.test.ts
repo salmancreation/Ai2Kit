@@ -32,7 +32,7 @@ describe( 'source detection (FR-3)', () => {
 } );
 
 describe( 'fidelity score (FR-29)', () => {
-	const stats = ( o: Partial< Parameters< typeof scoreSection >[ 0 ] > ) => ( { relevant: 10, mapped: 10, leaves: 4, nativeLeaves: 4, fallbacks: 0, widgets: {}, warnings: [], ...o } );
+	const stats = ( o: Partial< Parameters< typeof scoreSection >[ 0 ] > ) => ( { relevant: 10, mapped: 10, leaves: 4, nativeLeaves: 4, fallbacks: 0, widgets: {}, warnings: [], unmapped: {}, penalty: 0, ...o } );
 	it( 'scores fully native, fully mapped sections at 100', () => {
 		expect( scoreSection( stats( {} ) ).score ).toBe( 100 );
 	} );

@@ -29,8 +29,8 @@ final class JobStore {
 	/**
 	 * Insert a job.
 	 *
-	 * @param array $data Columns.
-	 * @return array|null
+	 * @param array<string, mixed> $data Columns.
+	 * @return array<string, mixed>|null
 	 */
 	public static function create( array $data ) {
 		global $wpdb;
@@ -53,21 +53,20 @@ final class JobStore {
 	 * Get by UUID.
 	 *
 	 * @param string $uuid Job UUID.
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	public static function get( $uuid ) {
 		global $wpdb;
-		$table = self::table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE uuid = %s", $uuid ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE uuid = %s', self::table(), $uuid ), ARRAY_A );
 		return $row ? self::hydrate( $row ) : null;
 	}
 
 	/**
 	 * Update columns.
 	 *
-	 * @param string $uuid Job UUID.
-	 * @param array  $data Columns.
+	 * @param string               $uuid Job UUID.
+	 * @param array<string, mixed> $data Columns.
 	 * @return bool
 	 */
 	public static function update( $uuid, array $data ) {
@@ -89,13 +88,12 @@ final class JobStore {
 	 *
 	 * @param int $limit Max rows.
 	 * @param int $offset Offset.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function recent( $limit = 50, $offset = 0 ) {
 		global $wpdb;
-		$table = self::table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE status <> 'uploaded' OR created_at > %s ORDER BY id DESC LIMIT %d OFFSET %d", gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ), $limit, $offset ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE status <> 'uploaded' OR created_at > %s ORDER BY id DESC LIMIT %d OFFSET %d", self::table(), gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ), $limit, $offset ), ARRAY_A );
 		return array_map( array( __CLASS__, 'hydrate' ), (array) $rows );
 	}
 
@@ -103,21 +101,20 @@ final class JobStore {
 	 * Uploaded (never imported) jobs older than a cutoff, for cleanup.
 	 *
 	 * @param int $older_than Seconds.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function stale( $older_than ) {
 		global $wpdb;
-		$table = self::table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT uuid, status, keep_source FROM {$table} WHERE created_at < %s AND keep_source = 0", gmdate( 'Y-m-d H:i:s', time() - $older_than ) ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT uuid, status, keep_source FROM %i WHERE created_at < %s AND keep_source = 0', self::table(), gmdate( 'Y-m-d H:i:s', time() - $older_than ) ), ARRAY_A );
 		return (array) $rows;
 	}
 
 	/**
 	 * Decode JSON columns and cast types.
 	 *
-	 * @param array $row DB row.
-	 * @return array
+	 * @param array<string, mixed> $row DB row.
+	 * @return array<string, mixed>
 	 */
 	private static function hydrate( array $row ) {
 		$row['id']          = (int) $row['id'];

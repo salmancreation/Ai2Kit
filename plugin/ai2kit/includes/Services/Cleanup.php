@@ -18,6 +18,8 @@ final class Cleanup {
 
 	/**
 	 * Delete job folders older than 24 h unless the user chose to keep the source.
+	 *
+	 * @return void
 	 */
 	public static function run() {
 		foreach ( JobStore::stale( DAY_IN_SECONDS ) as $row ) {
@@ -40,6 +42,7 @@ final class Cleanup {
 	 * Remove one job's files.
 	 *
 	 * @param string $uuid Job UUID.
+	 * @return void
 	 */
 	public static function remove_job_files( $uuid ) {
 		try {

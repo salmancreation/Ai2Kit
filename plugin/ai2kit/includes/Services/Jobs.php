@@ -7,6 +7,8 @@
 
 namespace ModinaTheme\Ai2Kit\Services;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- IngestException messages become REST JSON errors rendered as text by the admin app; HTML-escaping would show entities.
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -17,9 +19,10 @@ final class Jobs {
 	/**
 	 * From an uploaded file ($_FILES entry).
 	 *
-	 * @param array $file Upload array.
-	 * @return array
+	 * @param array<string, mixed> $file Upload array.
+	 * @return array<string, mixed>
 	 * @throws IngestException On invalid input.
+	 * @throws \Throwable Rethrown after cleaning up the job folder.
 	 */
 	public static function from_upload( array $file ) {
 		if ( ! empty( $file['error'] ) ) {
@@ -82,8 +85,9 @@ final class Jobs {
 	 * From pasted HTML.
 	 *
 	 * @param string $html Markup.
-	 * @return array
+	 * @return array<string, mixed>
 	 * @throws IngestException On invalid input.
+	 * @throws \Throwable Rethrown after cleaning up the job folder.
 	 */
 	public static function from_html( $html ) {
 		if ( strlen( $html ) > 5 * MB_IN_BYTES ) {
@@ -124,7 +128,7 @@ final class Jobs {
 	 * @param string[] $files   Extracted files.
 	 * @param string[] $skipped Blocked files that were not extracted.
 	 * @param string   $title   Default title.
-	 * @return array
+	 * @return array<string, mixed>
 	 * @throws IngestException When no entry or scripts aren't allowed.
 	 */
 	private static function finish( $uuid, $dir, array $files, array $skipped, $title ) {
@@ -178,12 +182,12 @@ final class Jobs {
 			throw new IngestException( 'ai2kit_db', __( 'We couldn\'t save this conversion.', 'ai2kit' ), __( 'Deactivate and reactivate Ai2Kit to repair its database table.', 'ai2kit' ), 500 );
 		}
 
-		$view                = self::public_view( $job );
-		$view['files']       = array_slice( $files, 0, 400 );
-		$view['fileCount']   = count( $files );
-		$view['entryHtml']   = substr( $html, 0, 200000 );
-		$view['skipped']     = $skipped;
-		$view['rewrite']     = array(
+		$view               = self::public_view( $job );
+		$view['files']      = array_slice( $files, 0, 400 );
+		$view['fileCount']  = count( $files );
+		$view['entryHtml']  = substr( $html, 0, 200000 );
+		$view['skipped']    = $skipped;
+		$view['rewrite']    = array(
 			'fixed'   => $rewriter->rewritten,
 			'missing' => array_slice( $rewriter->missing, 0, 50 ),
 		);
@@ -194,8 +198,8 @@ final class Jobs {
 	/**
 	 * Shape a job row for the UI.
 	 *
-	 * @param array $job Row.
-	 * @return array
+	 * @param array<string, mixed> $job Row.
+	 * @return array<string, mixed>
 	 */
 	public static function public_view( array $job ) {
 		$files_exist = is_dir( Paths::job_dir( $job['uuid'] ) );
@@ -226,7 +230,8 @@ final class Jobs {
 	/**
 	 * Discard a job's files; forget it entirely when it was never imported.
 	 *
-	 * @param array $job Row.
+	 * @param array<string, mixed> $job Row.
+	 * @return void
 	 */
 	public static function discard( array $job ) {
 		Cleanup::remove_job_files( $job['uuid'] );
@@ -236,3 +241,4 @@ final class Jobs {
 		}
 	}
 }
+// phpcs:enable

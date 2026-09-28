@@ -22,7 +22,9 @@ export function buildIR( captured: CapturedNode, nextId: () => string ): IRNode 
 		children: [],
 	};
 	if ( captured.rects ) node.rects = captured.rects;
+	if ( captured.pseudo ) node.pseudo = captured.pseudo;
 	if ( c.content ) node.content = c.content;
+	if ( captured.inlineRules?.length ) node.content = { ...node.content, inlineRules: captured.inlineRules };
 	if ( c.fallbackReason ) {
 		node.fallback = { reason: c.fallbackReason, html: captured.frozen ?? '', css: '' };
 	}

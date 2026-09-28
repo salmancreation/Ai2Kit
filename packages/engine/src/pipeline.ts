@@ -2,12 +2,13 @@
  * Capture → analysis (IR, sections, tokens) → Elementor document + report.
  * Pure and deterministic for a given seed (PRD §11).
  */
-import type { Capture, IRNode, PatternType, SectionReport, TokenTable } from './ir/types';
+import type { Capture, IRNode, PatternType, ResidualRule, SectionReport, TokenTable } from './ir/types';
 import { buildIR, collapseWrappers } from './normalize/build';
 import { boxSection, boxSelf, findSections, labelSections } from './recognize/sections';
 import { detectRepeats } from './recognize/repeat';
 import { extractTokens, tokenIndex } from './tokens/tokens';
 import { emitSection, type V3Element, type NodeStats } from './emit/v3';
+import { emitSectionV4, type V4Element } from './emit/v4';
 import { overallScore, scoreSection } from './score/fidelity';
 import { createIdGenerator } from './util/ids';
 import { isTransparent } from './util/color';
@@ -27,10 +28,16 @@ export type ElementorDocument = {
 	title: string;
 	type: 'page';
 	page_settings: Record< string, unknown >;
-	content: V3Element[];
+	/** v3: containers + widgets. v4: atomic elements (styles as CSS, converted server-side) with v3 widgets mixed in. */
+	format: 'v3' | 'v4';
+	content: Array< V3Element | V4Element >;
+	/** Scoped CSS for styles no Elementor control expresses (validated and scoped server-side). */
+	residual: ResidualRule[];
 };
 
 export type EmitOptions = {
+	/** Elementor output format (PRD §8.3). Default v3. */
+	format?: 'v3' | 'v4';
 	modes?: Record< string, 'native' | 'html' >;
 	frozen?: Record< string, string >;
 	assets?: Record< string, { url: string; id?: number } >;
@@ -139,19 +146,25 @@ function patternsIn( n: IRNode ): PatternType[] {
 export function emit( analysis: Analysis, opts: EmitOptions = {} ): ConversionResult {
 	const nextId = createIdGenerator( `${ analysis.seed }:emit` );
 	const tokens = tokenIndex( analysis.tokens );
-	const content: V3Element[] = [];
+	const content: Array< V3Element | V4Element > = [];
+	const format = opts.format ?? 'v3';
+	const emitOne = format === 'v4' ? emitSectionV4 : emitSection;
 	const reports: SectionReport[] = [];
+	const residual: ResidualRule[] = [];
 
 	for ( const section of analysis.sections ) {
-		const { element, stats } = emitSection( section, { tokens, nextId, modes: opts.modes, frozen: opts.frozen, assets: opts.assets } );
+		const { element, stats } = emitOne( section, { tokens, nextId, modes: opts.modes, frozen: opts.frozen, assets: opts.assets, residual } );
 		if ( element ) content.push( element );
 		// Score the native mapping even when the section is shown as HTML, so the toggle is informed.
-		const nativeStats = opts.modes?.[ section.id ] === 'html' ? emitSection( section, { tokens, nextId: createIdGenerator( 'score' ) } ).stats : stats;
-		const score = scoreSection( nativeStats );
+		const nativeStats = opts.modes?.[ section.id ] === 'html' ? emitOne( section, { tokens, nextId: createIdGenerator( 'score' ) } ).stats : stats;
 		const patterns = patternsIn( section );
+		// Free keeps interactive blocks static: hidden panels are content the page lost.
+		if ( patterns.includes( 'accordion' ) || patterns.includes( 'tabs' ) ) nativeStats.penalty += 10;
+		if ( patterns.includes( 'carousel' ) ) nativeStats.penalty += 5;
 		if ( patterns.includes( 'accordion' ) ) nativeStats.warnings.push( 'Collapsed accordion answers aren\'t in the page until opened, so they weren\'t captured. Add them in Elementor, or use Pro to map a native Accordion.' );
 		if ( patterns.includes( 'tabs' ) ) nativeStats.warnings.push( 'Only the open tab was captured. Pro maps tabs to a native Tabs widget.' );
 		if ( patterns.includes( 'carousel' ) ) nativeStats.warnings.push( 'Carousel slides are kept as static content. Pro maps carousels to a native carousel.' );
+		const score = scoreSection( nativeStats );
 		reports.push( {
 			id: section.id,
 			label: section.label ?? 'Section',
@@ -174,7 +187,9 @@ export function emit( analysis: Analysis, opts: EmitOptions = {} ): ConversionRe
 			title: opts.title ?? analysis.title,
 			type: 'page',
 			page_settings: { template: 'elementor_canvas' },
+			format,
 			content,
+			residual,
 		},
 		sections: reports,
 		overall,

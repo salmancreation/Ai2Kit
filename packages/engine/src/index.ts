@@ -6,6 +6,7 @@ export { waitForStable, scrollThrough, injectSettleStyles } from './capture/wait
 export { analyze, emit, convert, suggestedModes } from './pipeline';
 export type { Analysis, ElementorDocument, EmitOptions, ConversionResult } from './pipeline';
 export type { V3Element } from './emit/v3';
+export type { V4Element, V4Css } from './emit/v4';
 export { detectSource } from './detect/source';
 export type { SourceInfo, SourceType } from './detect/source';
 export { scoreBand } from './score/fidelity';

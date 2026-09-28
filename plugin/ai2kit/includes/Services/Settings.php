@@ -19,17 +19,17 @@ final class Settings {
 	/**
 	 * Defaults.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function defaults() {
 		return array(
-			'theme'           => 'system',  // light | dark | system.
-			'output'          => 'page',    // page | template.
-			'format'          => 'auto',    // auto | v3 | v4.
-			'kitMode'         => 'merge',   // merge | replace.
-			'importRemote'    => true,      // Sideload remote images into the Media Library.
-			'keepSource'      => false,     // Keep job files past 24 h for re-runs.
-			'welcomeDone'     => false,
+			'theme'            => 'system',  // light | dark | system.
+			'output'           => 'page',    // page | template.
+			'format'           => 'auto',    // auto | v3 | v4.
+			'kitMode'          => 'merge',   // merge | replace.
+			'importRemote'     => true,      // Sideload remote images into the Media Library.
+			'keepSource'       => false,     // Keep job files past 24 h for re-runs.
+			'welcomeDone'      => false,
 			'diagnosticsOptIn' => false,
 		);
 	}
@@ -37,7 +37,7 @@ final class Settings {
 	/**
 	 * All settings merged with defaults.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function all() {
 		$stored = get_option( self::OPTION, array() );
@@ -58,8 +58,8 @@ final class Settings {
 	/**
 	 * Validate and save a partial update.
 	 *
-	 * @param array $input Raw input.
-	 * @return array Saved settings.
+	 * @param array<string, mixed> $input Raw input.
+	 * @return array<string, mixed> Saved settings.
 	 */
 	public static function update( array $input ) {
 		$current = self::all();

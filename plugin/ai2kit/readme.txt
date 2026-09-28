@@ -4,7 +4,7 @@ Tags: elementor, html to elementor, lovable, converter, ai website
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,8 @@ Ai2Kit turns websites built with AI tools into native, editable Elementor pages.
 = What you get =
 
 * Native Elementor containers and widgets: headings, text, buttons, images, icons, icon lists, videos, dividers and spacers.
+* Elementor 4 Atomic elements (v4) when the Atomic editor is on — or classic widgets (v3), your choice.
+* Styles no Elementor control covers (gradient text, rotations, blur) are kept as small CSS scoped to the converted page.
 * Responsive values for tablet and mobile, only where they differ.
 * Design tokens: your colors and fonts become Elementor Global Colors and Global Fonts (shadcn/ui themes are read directly).
 * Images imported into the Media Library, with duplicates detected.
@@ -75,6 +77,13 @@ Administrators. Sites that run JavaScript can only be converted by users allowed
 6. Done — edit your new page with Elementor.
 
 == Changelog ==
+
+= 0.2.0 =
+* New: Elementor 4 Atomic (v4) output, built with Elementor's own CSS converter and validators. Mixed with classic widgets where no atomic element exists.
+* New: styles without an Elementor control (gradient text, transforms, filters, system font stacks) are kept as CSS scoped to the page.
+* Improved: fidelity scores now reflect what's actually lost (collapsed accordions, substituted icons).
+* Improved: fonts that never loaded in the source are no longer applied; the rendered font is used.
+* Fixed: breakpoint captures recorded spurious font changes.
 
 = 0.1.0 =
 * First release: local conversion of HTML, template ZIPs and built SPA ZIPs into Elementor v3 containers and widgets, tokens, media, fidelity report and undo.

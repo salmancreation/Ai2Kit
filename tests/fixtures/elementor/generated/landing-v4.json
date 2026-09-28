@@ -1,0 +1,907 @@
+{
+	"document": {
+		"version": "0.4",
+		"title": "Test page",
+		"type": "page",
+		"page_settings": {
+			"template": "elementor_canvas"
+		},
+		"format": "v4",
+		"content": [
+			{
+				"id": "81ba715",
+				"elType": "e-flexbox",
+				"settings": {
+					"tag": {
+						"$$type": "string",
+						"value": "header"
+					}
+				},
+				"css": {
+					"desktop": "display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 0px; padding-top: 16px; padding-right: 32px; padding-bottom: 16px; padding-left: 32px; background-color: rgb(255, 255, 255);",
+					"mobile": "padding-right: 16px; padding-left: 16px;"
+				},
+				"elements": [
+					{
+						"id": "ec9b220",
+						"elType": "widget",
+						"widgetType": "e-paragraph",
+						"settings": {
+							"paragraph": {
+								"$$type": "escaped-html",
+								"value": "<a href=\"http://site.test/\">Acme</a>"
+							}
+						},
+						"css": {
+							"desktop": "font-family: Inter; font-size: 20px; font-weight: 700; line-height: 24px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+						},
+						"elements": []
+					},
+					{
+						"id": "92f0824",
+						"elType": "e-flexbox",
+						"settings": {
+							"tag": {
+								"$$type": "string",
+								"value": "nav"
+							}
+						},
+						"css": {
+							"desktop": "display: flex; flex-direction: row; flex-wrap: nowrap; column-gap: 24px; row-gap: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 21.8%; flex-shrink: 0;"
+						},
+						"elements": [
+							{
+								"id": "4cd6a0d",
+								"elType": "widget",
+								"widgetType": "e-paragraph",
+								"settings": {
+									"paragraph": {
+										"$$type": "escaped-html",
+										"value": "<a href=\"http://site.test/#features\">Features</a>"
+									}
+								},
+								"css": {
+									"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+								},
+								"elements": []
+							},
+							{
+								"id": "cecb557",
+								"elType": "widget",
+								"widgetType": "e-paragraph",
+								"settings": {
+									"paragraph": {
+										"$$type": "escaped-html",
+										"value": "<a href=\"http://site.test/#pricing\">Pricing</a>"
+									}
+								},
+								"css": {
+									"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+								},
+								"elements": []
+							}
+						],
+						"isInner": true
+					},
+					{
+						"id": "e97ab68",
+						"elType": "widget",
+						"widgetType": "e-button",
+						"settings": {
+							"text": {
+								"$$type": "escaped-html",
+								"value": "Sign up"
+							},
+							"link": {
+								"$$type": "link",
+								"value": {
+									"destination": {
+										"$$type": "url",
+										"value": "http://site.test/signup"
+									},
+									"isTargetBlank": {
+										"$$type": "boolean",
+										"value": false
+									}
+								}
+							}
+						},
+						"css": {
+							"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(255, 255, 255); padding-top: 12px; padding-right: 24px; padding-bottom: 12px; padding-left: 24px; background-color: rgb(124, 58, 237); border-radius: 8px 8px 8px 8px; border-width: 0px;"
+						},
+						"elements": []
+					}
+				],
+				"isInner": false
+			},
+			{
+				"id": "fcb102a",
+				"elType": "e-flexbox",
+				"settings": {
+					"tag": {
+						"$$type": "string",
+						"value": "section"
+					}
+				},
+				"css": {
+					"desktop": "display: flex; flex-direction: column; align-items: center; padding-top: 96px; padding-right: 16px; padding-bottom: 96px; padding-left: 16px; background-image: linear-gradient(135deg, rgb(124, 58, 237) 0%, rgb(46, 144, 250) 100%);",
+					"mobile": "padding-top: 56px; padding-bottom: 56px;"
+				},
+				"elements": [
+					{
+						"id": "95131ce",
+						"elType": "e-flexbox",
+						"settings": {},
+						"css": {
+							"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; align-items: center; column-gap: 0px; row-gap: 24px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 100%; max-width: 1200px;"
+						},
+						"elements": [
+							{
+								"id": "bd388f0",
+								"elType": "widget",
+								"widgetType": "e-paragraph",
+								"settings": {
+									"paragraph": {
+										"$$type": "escaped-html",
+										"value": "New · v2"
+									}
+								},
+								"css": {
+									"desktop": "font-family: Inter; font-size: 12px; font-weight: 400; line-height: 24px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px; padding-top: 4px; padding-right: 12px; padding-bottom: 4px; padding-left: 12px; background-color: rgb(237, 233, 254); border-radius: 999px 0px 0px 0px; width: auto;"
+								},
+								"elements": []
+							},
+							{
+								"id": "6ba1a79",
+								"elType": "widget",
+								"widgetType": "e-heading",
+								"settings": {
+									"tag": {
+										"$$type": "string",
+										"value": "h1"
+									},
+									"title": {
+										"$$type": "escaped-html",
+										"value": "Build <strong>faster</strong> with AI"
+									}
+								},
+								"css": {
+									"desktop": "font-family: Inter; font-size: 56px; font-weight: 800; line-height: 64px; letter-spacing: -1.2px; text-align: center; color: rgb(255, 255, 255); margin-top: 0px; margin-bottom: 0px;",
+									"mobile": "font-size: 36px; line-height: 40px;"
+								},
+								"elements": []
+							},
+							{
+								"id": "4435f70",
+								"elType": "widget",
+								"widgetType": "e-paragraph",
+								"settings": {
+									"paragraph": {
+										"$$type": "escaped-html",
+										"value": "Ship a site today."
+									}
+								},
+								"css": {
+									"desktop": "font-family: Inter; font-size: 18px; font-weight: 400; line-height: 24px; text-align: center; color: rgb(237, 233, 254); margin-top: 0px; margin-bottom: 0px;"
+								},
+								"elements": []
+							},
+							{
+								"id": "964a686",
+								"elType": "e-flexbox",
+								"settings": {},
+								"css": {
+									"desktop": "display: flex; flex-direction: row; flex-wrap: nowrap; column-gap: 16px; row-gap: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 400px; max-width: 100%;",
+									"mobile": "flex-direction: column;"
+								},
+								"elements": [
+									{
+										"id": "2a67bff",
+										"elType": "widget",
+										"widgetType": "button",
+										"settings": {
+											"text": "Get started",
+											"link": {
+												"url": "http://site.test/start",
+												"is_external": "",
+												"nofollow": "",
+												"custom_attributes": ""
+											},
+											"selected_icon": {
+												"value": "fas fa-arrow-right",
+												"library": "fa-solid"
+											},
+											"icon_align": "row-reverse",
+											"icon_indent": {
+												"unit": "px",
+												"size": 8,
+												"sizes": []
+											},
+											"__globals__": {
+												"typography_typography": "globals/typography?id=text",
+												"button_text_color": "globals/colors?id=a2k243e",
+												"background_color": "globals/colors?id=primary"
+											},
+											"background_background": "classic",
+											"border_radius": {
+												"unit": "px",
+												"top": "8",
+												"right": "8",
+												"bottom": "8",
+												"left": "8",
+												"isLinked": true
+											},
+											"text_padding": {
+												"unit": "px",
+												"top": "12",
+												"right": "24",
+												"bottom": "12",
+												"left": "24",
+												"isLinked": false
+											}
+										},
+										"elements": []
+									},
+									{
+										"id": "c68dd93",
+										"elType": "widget",
+										"widgetType": "e-button",
+										"settings": {
+											"text": {
+												"$$type": "escaped-html",
+												"value": "Docs"
+											},
+											"link": {
+												"$$type": "link",
+												"value": {
+													"destination": {
+														"$$type": "url",
+														"value": "http://site.test/docs"
+													},
+													"isTargetBlank": {
+														"$$type": "boolean",
+														"value": true
+													}
+												}
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(255, 255, 255); padding-top: 12px; padding-right: 24px; padding-bottom: 12px; padding-left: 24px; border-width: 1px 1px 1px 1px; border-style: solid; border-color: rgb(255, 255, 255); border-radius: 8px 8px 8px 8px; background-color: transparent;"
+										},
+										"elements": []
+									}
+								],
+								"isInner": true
+							},
+							{
+								"id": "f5b1b37",
+								"elType": "widget",
+								"widgetType": "e-image",
+								"settings": {
+									"image": {
+										"$$type": "image",
+										"value": {
+											"src": {
+												"$$type": "image-src",
+												"value": {
+													"id": null,
+													"url": {
+														"$$type": "url",
+														"value": "http://site.test/assets/hero.png"
+													},
+													"alt": {
+														"$$type": "string",
+														"value": "App screenshot"
+													}
+												}
+											},
+											"size": {
+												"$$type": "string",
+												"value": "full"
+											}
+										}
+									}
+								},
+								"css": {
+									"desktop": "object-fit: cover; height: 500px; width: 1000px; max-width: 100%; border-radius: 16px 0px 0px 0px;"
+								},
+								"elements": []
+							}
+						],
+						"isInner": true
+					}
+				],
+				"isInner": false
+			},
+			{
+				"id": "bfd0922",
+				"elType": "e-flexbox",
+				"settings": {
+					"_cssid": {
+						"$$type": "string",
+						"value": "features"
+					},
+					"tag": {
+						"$$type": "string",
+						"value": "section"
+					}
+				},
+				"css": {
+					"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; gap: 0px; padding-top: 80px; padding-right: 0px; padding-bottom: 80px; padding-left: 0px; background-color: rgb(248, 250, 252);"
+				},
+				"elements": [
+					{
+						"id": "e0fd925",
+						"elType": "widget",
+						"widgetType": "e-heading",
+						"settings": {
+							"tag": {
+								"$$type": "string",
+								"value": "h2"
+							},
+							"title": {
+								"$$type": "escaped-html",
+								"value": "Why teams choose Acme"
+							}
+						},
+						"css": {
+							"desktop": "font-family: Inter; font-size: 36px; font-weight: 700; line-height: 24px; text-align: center; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+						},
+						"elements": []
+					},
+					{
+						"id": "1558878",
+						"elType": "e-flexbox",
+						"settings": {},
+						"css": {
+							"desktop": "display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: auto; gap: 32px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 1240px; max-width: 100%; align-self: center;",
+							"tablet": "grid-template-columns: repeat(2, minmax(0, 1fr));",
+							"mobile": "grid-template-columns: repeat(1, minmax(0, 1fr));"
+						},
+						"elements": [
+							{
+								"id": "c48e0ac",
+								"elType": "e-flexbox",
+								"settings": {},
+								"css": {
+									"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; column-gap: 0px; row-gap: 12px; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; background-color: rgb(255, 255, 255); border-width: 1px 1px 1px 1px; border-style: solid; border-color: rgb(226, 232, 240); border-radius: 12px 0px 0px 0px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);"
+								},
+								"elements": [
+									{
+										"id": "13cce3e",
+										"elType": "widget",
+										"widgetType": "e-svg",
+										"settings": {
+											"svg": {
+												"$$type": "icon",
+												"value": {
+													"value": {
+														"$$type": "string",
+														"value": "fas fa-bolt"
+													},
+													"library": {
+														"$$type": "string",
+														"value": "fa-solid"
+													}
+												}
+											}
+										},
+										"css": {
+											"desktop": "width: 24px; height: 24px; color: rgb(124, 58, 237);"
+										},
+										"elements": []
+									},
+									{
+										"id": "315d32b",
+										"elType": "widget",
+										"widgetType": "e-heading",
+										"settings": {
+											"tag": {
+												"$$type": "string",
+												"value": "h3"
+											},
+											"title": {
+												"$$type": "escaped-html",
+												"value": "Feature 0"
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 20px; font-weight: 600; line-height: 28px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									},
+									{
+										"id": "729f364",
+										"elType": "widget",
+										"widgetType": "e-paragraph",
+										"settings": {
+											"paragraph": {
+												"$$type": "escaped-html",
+												"value": "Description of the feature that explains the value."
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(100, 116, 139); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									}
+								],
+								"isInner": true
+							},
+							{
+								"id": "2657254",
+								"elType": "e-flexbox",
+								"settings": {},
+								"css": {
+									"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; column-gap: 0px; row-gap: 12px; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; background-color: rgb(255, 255, 255); border-width: 1px 1px 1px 1px; border-style: solid; border-color: rgb(226, 232, 240); border-radius: 12px 0px 0px 0px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);"
+								},
+								"elements": [
+									{
+										"id": "f460137",
+										"elType": "widget",
+										"widgetType": "e-svg",
+										"settings": {
+											"svg": {
+												"$$type": "icon",
+												"value": {
+													"value": {
+														"$$type": "string",
+														"value": "fas fa-shield-alt"
+													},
+													"library": {
+														"$$type": "string",
+														"value": "fa-solid"
+													}
+												}
+											}
+										},
+										"css": {
+											"desktop": "width: 24px; height: 24px; color: rgb(124, 58, 237);"
+										},
+										"elements": []
+									},
+									{
+										"id": "aaa128c",
+										"elType": "widget",
+										"widgetType": "e-heading",
+										"settings": {
+											"tag": {
+												"$$type": "string",
+												"value": "h3"
+											},
+											"title": {
+												"$$type": "escaped-html",
+												"value": "Feature 1"
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 20px; font-weight: 600; line-height: 28px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									},
+									{
+										"id": "853fcfe",
+										"elType": "widget",
+										"widgetType": "e-paragraph",
+										"settings": {
+											"paragraph": {
+												"$$type": "escaped-html",
+												"value": "Description of the feature that explains the value."
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(100, 116, 139); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									}
+								],
+								"isInner": true
+							},
+							{
+								"id": "8f2d955",
+								"elType": "e-flexbox",
+								"settings": {},
+								"css": {
+									"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; column-gap: 0px; row-gap: 12px; padding-top: 24px; padding-right: 24px; padding-bottom: 24px; padding-left: 24px; background-color: rgb(255, 255, 255); border-width: 1px 1px 1px 1px; border-style: solid; border-color: rgb(226, 232, 240); border-radius: 12px 0px 0px 0px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);"
+								},
+								"elements": [
+									{
+										"id": "e97f715",
+										"elType": "widget",
+										"widgetType": "e-svg",
+										"settings": {
+											"svg": {
+												"$$type": "svg-src",
+												"value": {
+													"id": null,
+													"url": {
+														"$$type": "url",
+														"value": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxMjQsIDU4LCAyMzcpIj48cGF0aCBkPSJNMSIvPjwvc3ZnPg=="
+													}
+												}
+											}
+										},
+										"css": {
+											"desktop": "width: 24px; height: 24px; color: rgb(124, 58, 237);"
+										},
+										"elements": []
+									},
+									{
+										"id": "6406a24",
+										"elType": "widget",
+										"widgetType": "e-heading",
+										"settings": {
+											"tag": {
+												"$$type": "string",
+												"value": "h3"
+											},
+											"title": {
+												"$$type": "escaped-html",
+												"value": "Feature 2"
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 20px; font-weight: 600; line-height: 28px; color: rgb(17, 21, 28); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									},
+									{
+										"id": "c9cf282",
+										"elType": "widget",
+										"widgetType": "e-paragraph",
+										"settings": {
+											"paragraph": {
+												"$$type": "escaped-html",
+												"value": "Description of the feature that explains the value."
+											}
+										},
+										"css": {
+											"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(100, 116, 139); margin-top: 0px; margin-bottom: 0px;"
+										},
+										"elements": []
+									}
+								],
+								"isInner": true
+							}
+						],
+						"isInner": true
+					},
+					{
+						"id": "3ed70e1",
+						"elType": "widget",
+						"widgetType": "icon-list",
+						"settings": {
+							"icon_list": [
+								{
+									"_id": "69aec85",
+									"text": "Unlimited pages",
+									"selected_icon": {
+										"value": "fas fa-check",
+										"library": "fa-solid"
+									}
+								},
+								{
+									"_id": "1f6b8c4",
+									"text": "Local-first",
+									"selected_icon": {
+										"value": "fas fa-check",
+										"library": "fa-solid"
+									}
+								}
+							],
+							"icon_color": "#12B76A",
+							"icon_typography_typography": "custom"
+						},
+						"elements": []
+					},
+					{
+						"id": "b4afa61",
+						"elType": "widget",
+						"widgetType": "e-divider",
+						"settings": {},
+						"css": {},
+						"elements": []
+					},
+					{
+						"id": "fd06489",
+						"elType": "widget",
+						"widgetType": "e-youtube",
+						"settings": {
+							"source": {
+								"$$type": "string",
+								"value": "https://www.youtube.com/watch?v=abcdefghijk"
+							}
+						},
+						"css": {},
+						"elements": []
+					},
+					{
+						"id": "aa1717f",
+						"elType": "widget",
+						"widgetType": "html",
+						"settings": {
+							"html": "<form><input name=\"email\"></form>",
+							"_title": "HTML (kept) — Forms need Pro to map natively"
+						},
+						"elements": []
+					}
+				],
+				"isInner": false
+			},
+			{
+				"id": "526cf94",
+				"elType": "e-flexbox",
+				"settings": {
+					"tag": {
+						"$$type": "string",
+						"value": "footer"
+					}
+				},
+				"css": {
+					"desktop": "display: flex; flex-direction: column; flex-wrap: nowrap; gap: 0px; padding-top: 32px; padding-right: 0px; padding-bottom: 32px; padding-left: 0px; background-color: rgb(17, 21, 28);"
+				},
+				"elements": [
+					{
+						"id": "9b83750",
+						"elType": "widget",
+						"widgetType": "e-paragraph",
+						"settings": {
+							"paragraph": {
+								"$$type": "escaped-html",
+								"value": "© 2026 Acme Inc."
+							}
+						},
+						"css": {
+							"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(169, 176, 188); margin-top: 0px; margin-bottom: 0px;"
+						},
+						"elements": []
+					},
+					{
+						"id": "2b7e8a4",
+						"elType": "widget",
+						"widgetType": "e-paragraph",
+						"settings": {
+							"paragraph": {
+								"$$type": "escaped-html",
+								"value": "All rights reserved"
+							}
+						},
+						"css": {
+							"desktop": "font-family: Inter; font-size: 16px; font-weight: 400; line-height: 24px; color: rgb(169, 176, 188); margin-top: 0px; margin-bottom: 0px;"
+						},
+						"elements": []
+					}
+				],
+				"isInner": false
+			}
+		],
+		"residual": []
+	},
+	"tokens": {
+		"colors": [
+			{
+				"id": "text",
+				"title": "Text",
+				"hex": "#64748B",
+				"system": true,
+				"usage": 153
+			},
+			{
+				"id": "primary",
+				"title": "Primary",
+				"hex": "#7C3AED",
+				"system": true,
+				"usage": 8000
+			},
+			{
+				"id": "a2k243e",
+				"title": "Surface",
+				"hex": "#FFFFFF",
+				"system": false,
+				"usage": 19183
+			},
+			{
+				"id": "a2k4763",
+				"title": "Dark surface",
+				"hex": "#11151C",
+				"system": false,
+				"usage": 699
+			},
+			{
+				"id": "a2kd180",
+				"title": "Surface 2",
+				"hex": "#E2E8F0",
+				"system": false,
+				"usage": 80
+			},
+			{
+				"id": "a2k0869",
+				"title": "Muted text",
+				"hex": "#A9B0BC",
+				"system": false,
+				"usage": 35
+			},
+			{
+				"id": "a2k83b1",
+				"title": "Muted text 2",
+				"hex": "#EDE9FE",
+				"system": false,
+				"usage": 26
+			}
+		],
+		"fonts": [
+			{
+				"id": "primary",
+				"title": "Primary",
+				"family": "Inter",
+				"weight": "600",
+				"system": true
+			},
+			{
+				"id": "text",
+				"title": "Text",
+				"family": "Inter",
+				"weight": "400",
+				"system": true,
+				"size": 16,
+				"lineHeight": 1.5
+			},
+			{
+				"id": "accent",
+				"title": "Accent",
+				"family": "Inter",
+				"weight": "400",
+				"system": true
+			},
+			{
+				"id": "a2k903b",
+				"title": "H1",
+				"family": "Inter",
+				"weight": "800",
+				"system": false,
+				"size": 56,
+				"lineHeight": 1.14,
+				"letterSpacing": -1.2,
+				"sizeMobile": 36,
+				"lineHeightMobile": 1.11
+			},
+			{
+				"id": "a2k8f3b",
+				"title": "H2",
+				"family": "Inter",
+				"weight": "700",
+				"system": false,
+				"size": 36,
+				"lineHeight": 0.67
+			},
+			{
+				"id": "a2k8e3b",
+				"title": "H3",
+				"family": "Inter",
+				"weight": "600",
+				"system": false,
+				"size": 20,
+				"lineHeight": 1.4
+			}
+		],
+		"source": "clustered"
+	},
+	"sections": [
+		{
+			"id": "0dbdfcc",
+			"label": "Header",
+			"semantic": "header",
+			"rect": {
+				"x": 0,
+				"y": 0,
+				"w": 1440,
+				"h": 72
+			},
+			"score": {
+				"score": 100,
+				"structure": 1,
+				"styles": 1,
+				"fallbackRatio": 0
+			},
+			"summary": "",
+			"widgets": {
+				"e-paragraph": 3,
+				"e-button": 1
+			},
+			"patterns": [],
+			"warnings": [],
+			"mode": "native",
+			"proHints": []
+		},
+		{
+			"id": "327cdea",
+			"label": "Hero",
+			"semantic": "hero",
+			"rect": {
+				"x": 0,
+				"y": 72,
+				"w": 1440,
+				"h": 1092
+			},
+			"score": {
+				"score": 100,
+				"structure": 1,
+				"styles": 1,
+				"fallbackRatio": 0
+			},
+			"summary": "button",
+			"widgets": {
+				"e-paragraph": 2,
+				"e-heading": 1,
+				"button": 1,
+				"e-button": 1,
+				"e-image": 1
+			},
+			"patterns": [],
+			"warnings": [],
+			"mode": "native",
+			"proHints": []
+		},
+		{
+			"id": "55109c2",
+			"label": "Features grid",
+			"semantic": "features",
+			"rect": {
+				"x": 0,
+				"y": 1164,
+				"w": 1440,
+				"h": 900
+			},
+			"score": {
+				"score": 96,
+				"structure": 0.93,
+				"styles": 1,
+				"fallbackRatio": 0.07
+			},
+			"summary": "icon list, HTML block",
+			"widgets": {
+				"e-heading": 4,
+				"e-svg": 3,
+				"e-paragraph": 3,
+				"icon-list": 1,
+				"e-divider": 1,
+				"e-youtube": 1,
+				"html": 1
+			},
+			"patterns": [
+				"repeat"
+			],
+			"warnings": [
+				"Kept as HTML — Forms need Pro to map natively."
+			],
+			"mode": "native",
+			"proHints": []
+		},
+		{
+			"id": "e81ceda",
+			"label": "Footer",
+			"semantic": "footer",
+			"rect": {
+				"x": 0,
+				"y": 2064,
+				"w": 1440,
+				"h": 100
+			},
+			"score": {
+				"score": 100,
+				"structure": 1,
+				"styles": 1,
+				"fallbackRatio": 0
+			},
+			"summary": "",
+			"widgets": {
+				"e-paragraph": 2
+			},
+			"patterns": [],
+			"warnings": [],
+			"mode": "native",
+			"proHints": []
+		}
+	],
+	"overall": 98
+}

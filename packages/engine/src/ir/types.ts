@@ -87,10 +87,27 @@ export type NodeContent = {
 	/** Icon list metrics: icon size and icon-to-text gap (px). */
 	iconSize?: number;
 	iconGap?: number;
+	/** Residual rules for classes used inside `html`. */
+	inlineRules?: ResidualRule[];
 	videoType?: 'youtube' | 'vimeo' | 'hosted';
 };
 
 export type Fallback = { reason: string; html: string; css: string };
+
+/**
+ * Residual CSS (PRD G6): declarations no Elementor control can express.
+ * Structured, never raw CSS — the server validates each declaration and
+ * scopes the rule to the document (`.elementor-{post-id} .{className}{target}`).
+ */
+export type ResidualRule = {
+	className: string;
+	/** Descendant selector appended after the class, from a fixed allowlist. */
+	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' img';
+	breakpoint: 'desktop' | 'tablet' | 'mobile';
+	decls: Record< string, string >;
+	/** Section label, for the report and the CSS comment. */
+	label?: string;
+};
 
 export type IRNode = {
 	id: string;
@@ -107,6 +124,8 @@ export type IRNode = {
 	content?: NodeContent;
 	/** Position/size of the node at desktop width, for scoring and the compare overlay. */
 	rect?: Rect;
+	/** ::before / ::after content, which native widgets can't express (reported, and kept in residual CSS). */
+	pseudo?: { before?: string; after?: string };
 	/** Measured size at the smaller breakpoints (sizes driven by aspect-ratio, vw, etc.). */
 	rects?: { tablet?: Rect; mobile?: Rect };
 	tokens?: { color?: string; font?: string };
@@ -133,6 +152,8 @@ export type CapturedNode = {
 	/** For inline-content leaves: text content and sanitized inner HTML. */
 	text?: string;
 	html?: string;
+	/** Rules for classes used inside `html` (gradient text spans). */
+	inlineRules?: ResidualRule[];
 	/** Frozen, self-contained HTML (inlined styles) for fallback use. */
 	frozen?: string;
 	svg?: string;

@@ -3,8 +3,8 @@
   "core": null,
   "phpVersion": "8.2",
   "plugins": [
-    "./plugin/ai2kit",
-    "./.deps/elementor"
+    "./.deps/elementor",
+    "./plugin/ai2kit"
   ],
   "themes": [
     "./.deps/hello-elementor"
@@ -16,6 +16,7 @@
   },
   "mappings": {
     "wp-content/ai2kit-tools": "./tests/tools",
-    "wp-content/ai2kit-fixtures": "./tests/fixtures"
+    "wp-content/ai2kit-fixtures": "./tests/fixtures",
+    "wp-content/plugins/ai2kit-release": "./dist/ai2kit"
   }
 }

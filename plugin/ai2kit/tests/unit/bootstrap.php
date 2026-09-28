@@ -12,3 +12,12 @@ if ( ! function_exists( '__' ) ) {
 		return $text;
 	}
 }
+
+if ( ! function_exists( 'absint' ) ) {
+	function absint( $n ) { // phpcs:ignore
+		return abs( (int) $n );
+	}
+}
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}

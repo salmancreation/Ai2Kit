@@ -6,6 +6,7 @@
 		"page_settings": {
 			"template": "elementor_canvas"
 		},
+		"format": "v3",
 		"content": [
 			{
 				"id": "81ba715",
@@ -1081,7 +1082,8 @@
 				],
 				"isInner": false
 			}
-		]
+		],
+		"residual": []
 	},
 	"tokens": {
 		"colors": [
@@ -1230,9 +1232,9 @@
 				"h": 1092
 			},
 			"score": {
-				"score": 98,
+				"score": 99,
 				"structure": 1,
-				"styles": 0.95,
+				"styles": 0.97,
 				"fallbackRatio": 0
 			},
 			"summary": "2 texts, 2 buttons, heading, image",
@@ -1258,7 +1260,7 @@
 				"h": 900
 			},
 			"score": {
-				"score": 95,
+				"score": 94,
 				"structure": 0.93,
 				"styles": 0.99,
 				"fallbackRatio": 0.07

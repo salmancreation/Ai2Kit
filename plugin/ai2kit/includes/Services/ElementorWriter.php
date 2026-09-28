@@ -20,12 +20,12 @@ final class ElementorWriter {
 	/**
 	 * Create a draft page or a library template.
 	 *
-	 * @param string $title    Title.
-	 * @param array  $elements Validated elements.
-	 * @param array  $settings Page settings.
-	 * @param string $output   page | template.
-	 * @param string $job      Job UUID.
-	 * @return array|WP_Error { id, type, title, editUrl, viewUrl }
+	 * @param string                           $title    Title.
+	 * @param array<int, array<string, mixed>> $elements Validated elements.
+	 * @param array<string, mixed>             $settings Page settings.
+	 * @param string                           $output   page | template.
+	 * @param string                           $job      Job UUID.
+	 * @return array<string, mixed>|WP_Error { id, type, title, editUrl, viewUrl }
 	 */
 	public function create( $title, array $elements, array $settings, $output, $job ) {
 		$documents = \Elementor\Plugin::$instance->documents;
@@ -43,7 +43,7 @@ final class ElementorWriter {
 				'_ai2kit_job' => $job,
 			)
 		);
-		if ( is_wp_error( $document ) || ! $document ) {
+		if ( ! $document instanceof \Elementor\Core\Base\Document ) {
 			return new WP_Error( 'ai2kit_create_failed', __( 'Elementor couldn\'t create the page.', 'ai2kit' ), array( 'status' => 500 ) );
 		}
 

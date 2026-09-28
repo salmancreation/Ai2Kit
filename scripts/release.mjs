@@ -4,7 +4,7 @@
  * dist/ai2kit-<version>.zip. Dev-only files (tests, vendor, configs) are excluded.
  */
 import { execSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const root = resolve( import.meta.dirname, '..' );
@@ -31,8 +31,10 @@ if ( ! process.argv.includes( '--skip-tests' ) ) {
 run( 'corepack pnpm@9.15.9 --filter @ai2kit/admin-ui build' );
 
 const stage = join( root, 'dist/ai2kit' );
-rmSync( join( root, 'dist' ), { recursive: true, force: true } );
+// Empty the stage in place (keeps Docker bind mounts of dist/ai2kit valid for Plugin Check).
 mkdirSync( stage, { recursive: true } );
+for ( const entry of readdirSync( stage ) ) rmSync( join( stage, entry ), { recursive: true, force: true } );
+rmSync( join( root, `dist/ai2kit-${ version }.zip` ), { force: true } );
 for ( const entry of [ 'ai2kit.php', 'uninstall.php', 'readme.txt', 'includes', 'build', 'languages' ] ) {
 	const from = join( plugin, entry );
 	if ( existsSync( from ) ) cpSync( from, join( stage, entry ), { recursive: true } );

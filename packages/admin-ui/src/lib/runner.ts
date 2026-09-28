@@ -35,6 +35,7 @@ export type RunHooks = {
 	onStage: ( id: StageId, status: StageState[ 'status' ], detail?: string ) => void;
 	onLog: ( line: string ) => void;
 	signal: AbortSignal;
+	format: 'v3' | 'v4';
 };
 
 export class CancelledError extends Error {
@@ -69,7 +70,7 @@ function loadFrame( iframe: HTMLIFrameElement, url: string, signal: AbortSignal 
 }
 
 export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string, seed: string, hooks: RunHooks ): Promise< RunOutput > {
-	const { onStage, onLog, signal } = hooks;
+	const { onStage, onLog, signal, format } = hooks;
 	const check = (): void => {
 		if ( signal.aborted ) throw new CancelledError();
 	};
@@ -106,6 +107,8 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 		onLog( `Capturing ${ bp } (${ DEFAULT_VIEWPORT[ bp ] }px)` );
 	} );
 	onStage( 'capture', 'done' );
+	// Exposed for the e2e harness, which saves real captures as engine test fixtures.
+	( window as Window & { __ai2kitLastCapture?: unknown } ).__ai2kitLastCapture = capture;
 	check();
 
 	/* 3. Sections (+ recognition) */
@@ -130,10 +133,10 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 		const el = doc.querySelector( `[${ KEY_ATTR }="${ CSS.escape( key ) }"]` );
 		if ( el ) frozen[ key ] = freezeElement( el, win, diffs );
 	}
-	const first = emit( analysis, { frozen } );
+	const first = emit( analysis, { frozen, format } );
 	const modes = suggestedModes( first );
-	const result = emit( analysis, { frozen, modes } );
-	onLog( `Built ${ result.document.content.length } containers · overall ${ result.overall }%` );
+	const result = emit( analysis, { frozen, modes, format } );
+	onLog( `Built ${ result.document.content.length } sections as ${ format === 'v4' ? 'atomic (v4) elements' : 'containers + widgets (v3)' } · overall ${ result.overall }%` );
 	onStage( 'build', 'done' );
 
 	return { analysis, result, frozen, modes, timedOut: stable.timedOut };

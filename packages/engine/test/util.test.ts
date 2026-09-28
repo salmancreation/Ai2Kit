@@ -1,6 +1,6 @@
 import { createIdGenerator } from '../src/util/ids';
 import { parseColor, toHex, deltaE, hslTripletToHex, isTransparent, chroma } from '../src/util/color';
-import { px, parseBox, parseShadow, parseLinearGradient, firstFamily } from '../src/util/units';
+import { px, parseBox, parseShadow, parseLinearGradient, firstFamily, normalizeGradient, decomposeMatrix } from '../src/util/units';
 
 describe( 'createIdGenerator', () => {
 	it( 'produces 7-char lowercase hex ids', () => {
@@ -99,5 +99,26 @@ describe( 'units', () => {
 	it( 'extracts the first font family', () => {
 		expect( firstFamily( '"Inter", ui-sans-serif, system-ui' ) ).toBe( 'Inter' );
 		expect( firstFamily( 'ui-sans-serif, system-ui' ) ).toBeNull();
+	} );
+} );
+
+describe( 'converter-friendly CSS', () => {
+	it( 'normalizes gradients to angle + explicit stops', () => {
+		expect( normalizeGradient( 'linear-gradient(to right bottom, rgb(253, 230, 138), rgb(255, 237, 213), rgb(245, 245, 244))' ) ).toBe(
+			'linear-gradient(135deg, rgb(253, 230, 138) 0%, rgb(255, 237, 213) 50%, rgb(245, 245, 244) 100%)'
+		);
+		expect( normalizeGradient( 'linear-gradient(rgb(0, 0, 0), rgb(255, 255, 255))' ) ).toBe( 'linear-gradient(180deg, rgb(0, 0, 0) 0%, rgb(255, 255, 255) 100%)' );
+		expect( normalizeGradient( 'linear-gradient(90deg, red 10%, blue 90%)' ) ).toBe( 'linear-gradient(90deg, red 10%, blue 90%)' );
+		expect( normalizeGradient( 'radial-gradient(red, blue)' ) ).toBe( 'radial-gradient(red, blue)' );
+		expect( normalizeGradient( 'linear-gradient(90deg, red 10px, blue)' ) ).toBe( 'linear-gradient(90deg, red 10px, blue)' );
+	} );
+
+	it( 'decomposes 2D matrices into translate/rotate/scale', () => {
+		expect( decomposeMatrix( 'matrix(0.999848, 0.0174524, -0.0174524, 0.999848, 0, 0)' ) ).toBe( 'rotate(1deg)' );
+		expect( decomposeMatrix( 'matrix(1, 0, 0, 1, 0, -8)' ) ).toBe( 'translate(0px, -8px)' );
+		expect( decomposeMatrix( 'matrix(1.05, 0, 0, 1.05, 0, 0)' ) ).toBe( 'scale(1.05, 1.05)' );
+		expect( decomposeMatrix( 'matrix(1, 0, 0, 1, 0, 0)' ) ).toBe( 'none' );
+		expect( decomposeMatrix( 'matrix(1, 0, 0.5, 1, 0, 0)' ) ).toBe( 'matrix(1, 0, 0.5, 1, 0, 0)' ); // skew stays
+		expect( decomposeMatrix( 'rotate(3deg)' ) ).toBe( 'rotate(3deg)' );
 	} );
 } );

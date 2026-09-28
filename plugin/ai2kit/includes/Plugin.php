@@ -10,6 +10,7 @@ namespace ModinaTheme\Ai2Kit;
 use ModinaTheme\Ai2Kit\Admin\Menu;
 use ModinaTheme\Ai2Kit\Rest\Routes;
 use ModinaTheme\Ai2Kit\Services\Cleanup;
+use ModinaTheme\Ai2Kit\Services\ResidualCss;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -40,11 +41,12 @@ final class Plugin {
 
 	/**
 	 * Register hooks.
+	 *
+	 * @return void
 	 */
 	private function boot() {
 		Installer::maybe_upgrade();
 
-		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action(
 			'rest_api_init',
 			static function () {
@@ -52,6 +54,7 @@ final class Plugin {
 			}
 		);
 		add_action( Cleanup::HOOK, array( Cleanup::class, 'run' ) );
+		add_action( 'elementor/frontend/before_get_builder_content', array( ResidualCss::class, 'enqueue' ) );
 
 		if ( is_admin() ) {
 			( new Menu() )->register();
@@ -68,12 +71,6 @@ final class Plugin {
 		);
 	}
 
-	/**
-	 * Load translations.
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain( 'ai2kit', false, dirname( plugin_basename( AI2KIT_FILE ) ) . '/languages' );
-	}
 
 	/**
 	 * Whether Elementor is loaded.

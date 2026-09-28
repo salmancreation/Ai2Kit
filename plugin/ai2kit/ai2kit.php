@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Ai2Kit
+ * Plugin Name:       Ai2Kit – AI Website to Elementor Converter
  * Plugin URI:        https://ai2kit.com
  * Description:       Convert AI-built sites (Lovable, Bolt, v0, Gemini, HTML templates) into editable Elementor pages — locally, inside wp-admin.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  elementor
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'AI2KIT_VERSION', '0.1.0' );
+define( 'AI2KIT_VERSION', '0.2.0' );
 define( 'AI2KIT_FILE', __FILE__ );
 define( 'AI2KIT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AI2KIT_URL', plugin_dir_url( __FILE__ ) );
@@ -46,4 +46,9 @@ spl_autoload_register(
 register_activation_hook( __FILE__, array( 'ModinaTheme\\Ai2Kit\\Installer', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'ModinaTheme\\Ai2Kit\\Installer', 'deactivate' ) );
 
-add_action( 'plugins_loaded', array( 'ModinaTheme\\Ai2Kit\\Plugin', 'instance' ) );
+add_action(
+	'plugins_loaded',
+	static function () {
+		ModinaTheme\Ai2Kit\Plugin::instance();
+	}
+);

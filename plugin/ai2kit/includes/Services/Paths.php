@@ -63,6 +63,7 @@ final class Paths {
 	 *
 	 * @param string $uuid Job UUID.
 	 * @throws \InvalidArgumentException When the UUID is malformed.
+	 * @return void
 	 */
 	public static function assert_uuid( $uuid ) {
 		if ( ! is_string( $uuid ) || ! preg_match( self::UUID_RE, $uuid ) ) {

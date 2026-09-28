@@ -18,17 +18,17 @@ final class Rollback {
 	/**
 	 * Which created items were edited since import (DESIGN.md §6.3).
 	 *
-	 * @param array $job Job row.
-	 * @return array{ edited: bool, items: array }
+	 * @param array<string, mixed> $job Job row.
+	 * @return array{ edited: bool, items: array<int, array<string, mixed>> }
 	 */
 	public static function check( array $job ) {
 		$items  = array();
 		$edited = false;
 		foreach ( (array) ( $job['result']['created'] ?? array() ) as $c ) {
-			$id     = (int) ( $c['id'] ?? 0 );
-			$exists = $id && get_post( $id ) && 'trash' !== get_post_status( $id );
-			$is_mod = $exists && get_post_meta( $id, '_ai2kit_imported_hash', true ) !== ElementorWriter::content_hash( $id );
-			$edited = $edited || $is_mod;
+			$id      = (int) ( $c['id'] ?? 0 );
+			$exists  = $id && get_post( $id ) && 'trash' !== get_post_status( $id );
+			$is_mod  = $exists && get_post_meta( $id, '_ai2kit_imported_hash', true ) !== ElementorWriter::content_hash( $id );
+			$edited  = $edited || $is_mod;
 			$items[] = array(
 				'id'     => $id,
 				'title'  => $exists ? get_the_title( $id ) : ( $c['title'] ?? '' ),
@@ -45,8 +45,8 @@ final class Rollback {
 	/**
 	 * Undo.
 	 *
-	 * @param array $job Job row.
-	 * @return array
+	 * @param array<string, mixed> $job Job row.
+	 * @return array<string, mixed>
 	 */
 	public static function run( array $job ) {
 		$trashed = 0;
@@ -71,9 +71,9 @@ final class Rollback {
 		}
 		JobStore::update( $job['uuid'], array( 'status' => 'undone' ) );
 		return array(
-			'trashed'     => $trashed,
+			'trashed'      => $trashed,
 			'mediaDeleted' => $deleted,
-			'kitRestored' => $kit_restored,
+			'kitRestored'  => $kit_restored,
 		);
 	}
 

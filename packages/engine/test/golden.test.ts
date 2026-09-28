@@ -13,6 +13,7 @@ const OUT = resolve( __dirname, '../../../tests/fixtures/elementor/generated' );
 
 const cases: Record< string, () => ReturnType< typeof convert > > = {
 	landing: () => convert( capture( landing() ), 'golden-landing' ),
+	'landing-v4': () => convert( capture( landing() ), 'golden-landing', { format: 'v4' } ),
 };
 
 describe( 'golden conversions', () => {

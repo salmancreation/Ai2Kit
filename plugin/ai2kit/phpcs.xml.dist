@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset name="Ai2Kit">
+	<description>WordPress Coding Standards for Ai2Kit (PRD §11).</description>
+	<file>.</file>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
+	<exclude-pattern>/tests/*</exclude-pattern>
+	<arg name="extensions" value="php"/>
+	<arg value="sp"/>
+	<arg name="colors"/>
+
+	<config name="testVersion" value="7.4-"/>
+	<config name="minimum_wp_version" value="6.5"/>
+
+	<rule ref="WordPress"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array"><element value="ai2kit"/></property>
+		</properties>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="ai2kit"/>
+				<element value="ModinaTheme\Ai2Kit"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- PRD §9.2: PSR-4 autoloading (includes/Services/ZipIngest.php), not class-*.php. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+	</rule>
+</ruleset>

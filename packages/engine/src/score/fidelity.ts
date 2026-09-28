@@ -6,7 +6,7 @@ export function scoreSection( stats: NodeStats ): SectionScore {
 	const structure = stats.leaves ? stats.nativeLeaves / stats.leaves : 1;
 	const styles = stats.relevant ? stats.mapped / stats.relevant : 1;
 	const fallbackRatio = stats.leaves ? stats.fallbacks / stats.leaves : 0;
-	const score = Math.round( 100 * ( 0.45 * structure + 0.4 * styles + 0.15 * ( 1 - fallbackRatio ) ) );
+	const score = Math.round( 100 * ( 0.45 * structure + 0.4 * styles + 0.15 * ( 1 - fallbackRatio ) ) - Math.min( 30, stats.penalty ) );
 	const r = ( n: number ): number => Math.round( n * 100 ) / 100;
 	return { score: Math.max( 0, Math.min( 100, score ) ), structure: r( structure ), styles: r( styles ), fallbackRatio: r( fallbackRatio ) };
 }

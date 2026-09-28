@@ -161,12 +161,13 @@ export function classifySection( n: IRNode, index: number, total: number, prev?:
 	if ( tag === 'footer' || ( index === total - 1 && /©|&copy;|copyright|all rights reserved/.test( text ) ) ) return 'footer';
 
 	const kw = ( re: RegExp ): boolean => re.test( idc ) || re.test( ( firstHeading( n ) ?? '' ).toLowerCase() );
-	if ( kw( /pricing|plans?\b/ ) || ( /\/\s?(mo|month|year|yr)\b/.test( text ) && /[$€£]\s?\d/.test( text ) ) ) return 'pricing';
+	// The first h1 section after the header is the hero, whatever its words.
+	if ( hasH1 && ( prev === undefined || prev === 'header' || prev === 'nav' ) ) return 'hero';
+	if ( kw( /pricing|\bplans\b|choose (a|your) plan/ ) || ( /\/\s?(mo|month|year|yr)\b/.test( text ) && /[$€£]\s?\d/.test( text ) ) ) return 'pricing';
 	if ( kw( /faq|frequently asked|questions/ ) || hasPattern( n, 'accordion' ) ) return 'faq';
 	if ( kw( /testimonial|reviews?|what (our )?(customers|clients|people) say|loved by/ ) ) return 'testimonials';
 	if ( kw( /\b(our|the) team\b|meet the|our people|^team$/ ) ) return 'team';
 	if ( kw( /blog|articles|latest (news|posts)/ ) ) return 'blog';
-	if ( hasH1 && ( prev === undefined || prev === 'header' || prev === 'nav' ) ) return 'hero';
 	if ( kw( /gallery|portfolio|our work/ ) || images >= 6 ) return 'gallery';
 	if ( kw( /logos|trusted by|partners|clients/ ) || ( images >= 4 && headings <= 1 && h < 260 ) ) return 'logos';
 	if ( ( text.match( /\b\d+(\.\d+)?\s?(k|m|%|\+|x)(?=\s|$)/g ) ?? [] ).length >= 3 && h < 500 ) return 'stats';

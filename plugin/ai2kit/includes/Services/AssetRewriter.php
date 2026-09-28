@@ -61,6 +61,7 @@ final class AssetRewriter {
 	 * Rewrite all text assets under the build root.
 	 *
 	 * @param string[] $files Paths relative to the build root.
+	 * @return void
 	 */
 	public function rewrite_all( array $files ) {
 		foreach ( $files as $rel ) {
@@ -123,7 +124,7 @@ final class AssetRewriter {
 			},
 			$html
 		);
-		$html = preg_replace_callback(
+		$html     = preg_replace_callback(
 			'/(\ssrcset\s*=\s*)(["\'])([^"\']*)\2/i',
 			function ( $m ) use ( $base_dir ) {
 				$parts = array_map(
@@ -186,7 +187,7 @@ final class AssetRewriter {
 	 * @return string
 	 */
 	public function rewrite_js( $js ) {
-		$js = (string) preg_replace_callback(
+		$js   = (string) preg_replace_callback(
 			'/(["\'`])(\/[A-Za-z0-9_\-.~@%\/]+\.[A-Za-z0-9]{2,5})\1/',
 			function ( $m ) {
 				$url = $this->resolve_root( $m[2] );

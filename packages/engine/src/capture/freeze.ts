@@ -11,6 +11,32 @@ function esc( s: string ): string {
 	return s.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' ).replace( /"/g, '&quot;' );
 }
 
+import type { ResidualRule } from '../ir/types';
+
+/** The gradient of a gradient-text element (background clipped to text), or null. */
+export function gradientText( e: Element, win: Window ): string | null {
+	const cs = win.getComputedStyle( e );
+	const clip = cs.getPropertyValue( 'background-clip' ) || cs.getPropertyValue( '-webkit-background-clip' );
+	const img = cs.getPropertyValue( 'background-image' );
+	return clip === 'text' && /gradient\(/.test( img ) ? img : null;
+}
+
+export function gradientDecls( gradient: string ): Record< string, string > {
+	return {
+		'background-image': gradient,
+		'-webkit-background-clip': 'text',
+		'background-clip': 'text',
+		color: 'transparent',
+		'-webkit-text-fill-color': 'transparent',
+	};
+}
+
+function hash( s: string ): string {
+	let h = 0x811c9dc5;
+	for ( let i = 0; i < s.length; i++ ) h = Math.imul( h ^ s.charCodeAt( i ), 0x01000193 );
+	return ( h >>> 0 ).toString( 36 ).slice( 0, 6 );
+}
+
 /** Typography that inline elements may override relative to their parent. */
 const INLINE_STYLE_PROPS = [ 'color', 'font-size', 'font-weight', 'font-style', 'letter-spacing', 'text-transform', 'background-color', 'text-decoration-line' ];
 
@@ -39,7 +65,7 @@ function inlineStyleDiff( e: Element, win: Window, tag: string ): string {
  * With a window, inline elements keep typography that differs from their
  * parent (e.g. a smaller, grey "/ mo" after a price) as a style attribute.
  */
-export function sanitizeInline( el: Element, win?: Window ): string {
+export function sanitizeInline( el: Element, win?: Window, rules?: ResidualRule[] ): string {
 	const out: string[] = [];
 	const visit = ( n: Node ): void => {
 		if ( n.nodeType === 3 ) {
@@ -54,7 +80,24 @@ export function sanitizeInline( el: Element, win?: Window ): string {
 			out.push( '<br>' );
 			return;
 		}
-		const style = win ? inlineStyleDiff( e, win, tag ) : '';
+		let style = win ? inlineStyleDiff( e, win, tag ) : '';
+		// Gradient text (bg-clip-text + transparent color): a class with a residual rule,
+		// since inline styles can't carry background-clip through wp_kses.
+		let cls = '';
+		if ( win && rules ) {
+			const g = gradientText( e, win );
+			if ( g ) {
+				cls = `a2k-gt-${ hash( g ) }`;
+				if ( ! rules.some( ( r ) => r.className === cls ) ) rules.push( { className: cls, breakpoint: 'desktop', decls: gradientDecls( g ) } );
+				style = style.split( ';' ).filter( ( d ) => d && ! /^(color|background-color):/.test( d ) ).join( ';' );
+			}
+		}
+		if ( cls ) {
+			out.push( `<span class="${ cls }"${ style ? ` style="${ esc( style ) }"` : '' }>` );
+			e.childNodes.forEach( visit );
+			out.push( '</span>' );
+			return;
+		}
 		if ( ! INLINE_ALLOWED.has( tag ) || tag === 'span' ) {
 			if ( style ) {
 				out.push( `<span style="${ esc( style ) }">` );

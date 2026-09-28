@@ -11,7 +11,7 @@ const widgets = ( els: V3Element[], type: string ) => all( els ).filter( ( e ) =
 
 describe( 'emit-v3 on a landing page', () => {
 	const result = convert( capture( landing() ), 'job-1' );
-	const els = result.document.content;
+	const els = result.document.content as V3Element[];
 
 	it( 'produces only settings that exist in the Elementor 4.3 control registry', () => {
 		expect( validateAgainstRegistry( els ) ).toEqual( [] );
@@ -134,7 +134,7 @@ describe( 'review choices', () => {
 		const hero = analysis.sections[ 1 ]!;
 		expect( analysis.freezeKeys ).toContain( hero.key );
 		const out = emit( analysis, { modes: { [ hero.id ]: 'html' }, frozen: { [ hero.key! ]: '<section>frozen</section>' } } );
-		const heroEl = out.document.content[ 1 ]!;
+		const heroEl = out.document.content[ 1 ] as V3Element;
 		expect( heroEl.elements[ 0 ]!.widgetType ).toBe( 'html' );
 		expect( heroEl.elements[ 0 ]!.settings.html ).toBe( '<section>frozen</section>' );
 		expect( out.sections[ 1 ]!.mode ).toBe( 'html' );
@@ -145,7 +145,33 @@ describe( 'review choices', () => {
 
 	it( 'rewrites asset URLs to imported media', () => {
 		const out = convert( capture( landing() ), 'job-4', { assets: { 'http://site.test/assets/hero.png': { url: 'http://wp.test/wp-content/uploads/hero.png', id: 42 } } } );
-		const img = widgets( out.document.content, 'image' )[ 0 ]!.settings.image;
+		const img = widgets( out.document.content as V3Element[], 'image' )[ 0 ]!.settings.image;
 		expect( img ).toMatchObject( { url: 'http://wp.test/wp-content/uploads/hero.png', id: 42, alt: 'App screenshot' } );
+	} );
+} );
+
+describe( 'v4 text fallback', () => {
+	it( 'keeps styled inline text in classic widgets (atomic text drops attributes)', async () => {
+		const { needsClassicText } = await import( '../src/emit/v4' );
+		expect( needsClassicText( '$19<span style="font-size:16px"> / mo</span>' ) ).toBe( true );
+		expect( needsClassicText( 'for <span class="a2k-gt-abc">slow</span>' ) ).toBe( true );
+		expect( needsClassicText( 'Build <strong>faster</strong> with <a href="x">AI</a>' ) ).toBe( false );
+	} );
+} );
+
+describe( 'v4 fonts', () => {
+	it( 'states web fonts by name and moves system stacks to residual CSS on the style class', async () => {
+		const { cn, text, capture } = await import( './helpers' );
+		const { convert } = await import( '../src/pipeline' );
+		const page = cn( 'body', {}, [ cn( 'section', { 'padding-top': '8px' }, [
+			text( 'h2', 'Web font', { 'font-family': '"DM Sans", sans-serif' } ),
+			text( 'p', 'System font', { 'font-family': 'ui-sans-serif, system-ui, sans-serif' } ),
+		], { rect: { x: 0, y: 0, w: 1440, h: 200 } } ) ], { rect: { x: 0, y: 0, w: 1440, h: 200 } } );
+		const doc = convert( capture( page ), 'fonts', { format: 'v4' } ).document;
+		const json = JSON.stringify( doc.content );
+		expect( json ).toContain( 'font-family: DM Sans;' );
+		expect( json ).not.toContain( 'system-ui' );
+		const p = ( doc.content[ 0 ]!.elements as Array< { id: string; widgetType?: string } > ).find( ( e ) => e.widgetType === 'e-paragraph' )!;
+		expect( doc.residual ).toContainEqual( expect.objectContaining( { className: `e-${ p.id }-a2k`, decls: { 'font-family': 'ui-sans-serif, system-ui, sans-serif' } } ) );
 	} );
 } );

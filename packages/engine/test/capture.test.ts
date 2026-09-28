@@ -128,6 +128,8 @@ describe( 'applyBreakpoint', () => {
 		expect( root.children[ 1 ]!.styles.tablet ).toEqual( { display: 'none' } );
 		expect( a.rects?.tablet ).toEqual( { x: 0, y: 0, w: 100, h: 20 } );
 
+		// Font stacks resolve the same way at every breakpoint: no spurious font-family diff.
+		expect( a.styles.tablet?.[ 'font-family' ] ).toBeUndefined();
 		// Same values again on mobile are inherited from tablet, so no mobile diff.
 		applyBreakpoint( root, 'mobile', captureStyles( env() ) );
 		expect( a.styles.mobile ).toBeUndefined();

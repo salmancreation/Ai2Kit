@@ -28,6 +28,8 @@ final class Menu {
 
 	/**
 	 * Register hooks.
+	 *
+	 * @return void
 	 */
 	public function register() {
 		add_action( 'admin_menu', array( $this, 'add_menus' ) );
@@ -47,6 +49,8 @@ final class Menu {
 
 	/**
 	 * Add the top-level menu and submenus.
+	 *
+	 * @return void
 	 */
 	public function add_menus() {
 		$cap  = 'manage_options';
@@ -79,6 +83,8 @@ final class Menu {
 
 	/**
 	 * Mount point. The React app renders everything inside .ai2kit-app.
+	 *
+	 * @return void
 	 */
 	public function render() {
 		$built = file_exists( AI2KIT_DIR . 'build/index.js' );
@@ -96,6 +102,7 @@ final class Menu {
 	 * Enqueue the app only on Ai2Kit screens.
 	 *
 	 * @param string $hook Current admin page hook.
+	 * @return void
 	 */
 	public function enqueue( $hook ) {
 		if ( ! in_array( $hook, $this->hooks, true ) ) {
@@ -125,6 +132,7 @@ final class Menu {
 				'active'  => Plugin::elementor_ready(),
 				'version' => $elementor_version,
 				'pro'     => defined( 'ELEMENTOR_PRO_VERSION' ),
+				'atomic'  => Plugin::elementor_ready() && \ModinaTheme\Ai2Kit\Services\AtomicWriter::available(),
 			),
 			'maxUploadMb'   => (int) floor( min( wp_max_upload_size(), Settings::max_upload_bytes() ) / MB_IN_BYTES ),
 			'canRunScripts' => current_user_can( 'unfiltered_html' ),
@@ -140,8 +148,8 @@ final class Menu {
 	/**
 	 * "Convert" link on the Plugins screen.
 	 *
-	 * @param array $links Links.
-	 * @return array
+	 * @param array<string, mixed> $links Links.
+	 * @return array<string, mixed>
 	 */
 	public function action_links( $links ) {
 		array_unshift( $links, '<a href="' . esc_url( admin_url( 'admin.php?page=' . self::SLUG ) ) . '">' . esc_html__( 'Convert', 'ai2kit' ) . '</a>' );

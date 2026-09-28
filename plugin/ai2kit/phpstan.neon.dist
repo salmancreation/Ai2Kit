@@ -1,0 +1,16 @@
+# PHPStan level 6 (PRD §11). WordPress stubs come from szepeviktor/phpstan-wordpress;
+# Elementor classes are resolved from the local copy fetched by scripts/fetch-deps.sh.
+parameters:
+	level: 6
+	phpVersion: 70400
+	paths:
+		- ai2kit.php
+		- uninstall.php
+		- includes
+	scanDirectories:
+		- ../../.deps/elementor/core
+		- ../../.deps/elementor/includes
+		- ../../.deps/elementor/modules
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php
+	treatPhpDocTypesAsCertain: false

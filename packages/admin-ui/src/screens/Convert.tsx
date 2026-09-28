@@ -53,6 +53,9 @@ export function Convert() {
 	const [ source, setSource ] = useState< SourceInfo | null >( null );
 
 	const [ output, setOutput ] = useState< 'page' | 'template' >( cfg.settings.output );
+	const [ format, setFormat ] = useState< 'auto' | 'v3' | 'v4' >( cfg.settings.format );
+	// PRD §8.3: Auto → v4 when the Atomic editor is on, else v3.
+	const resolvedFormat: 'v3' | 'v4' = format === 'auto' ? ( cfg.elementor.atomic ? 'v4' : 'v3' ) : format === 'v4' && ! cfg.elementor.atomic ? 'v3' : format;
 	const [ title, setTitle ] = useState( '' );
 
 	const [ stages, setStages ] = useState< StageState[] >( freshStages );
@@ -136,6 +139,7 @@ export function Convert() {
 		try {
 			const out = await runConversion( frameRef.current, job.entryUrl, job.uuid, {
 				signal: controller.signal,
+				format: resolvedFormat,
 				onLog: ( line ) => setLog( ( l ) => [ ...l, `[${ new Date().toLocaleTimeString() }] ${ line }` ] ),
 				onStage: ( id, status, detail ) => {
 					if ( status === 'active' && ! started[ id ] ) started[ id ] = performance.now();
@@ -153,7 +157,7 @@ export function Convert() {
 			setStages( ( list ) => list.map( ( st ) => ( st.status === 'active' ? { ...st, status: 'error' } : st ) ) );
 			setRunError( e instanceof Error ? e.message : String( e ) );
 		}
-	}, [ job ] );
+	}, [ job, resolvedFormat ] );
 
 	useEffect( () => {
 		if ( step === 'convert' ) startRun();
@@ -165,7 +169,7 @@ export function Convert() {
 	};
 
 	/* Review: optimistic re-emit on every toggle / rename. */
-	const reemit = ( analysis: Analysis, modes: Record< string, 'native' | 'html' >, frozen: Record< string, string > ): ConversionResult => emit( analysis, { frozen, modes, title } );
+	const reemit = ( analysis: Analysis, modes: Record< string, 'native' | 'html' >, frozen: Record< string, string > ): ConversionResult => emit( analysis, { frozen, modes, title, format: resolvedFormat } );
 
 	const setMode = ( id: string, m: 'native' | 'html' ): void => {
 		if ( ! conv ) return;
@@ -200,6 +204,7 @@ export function Convert() {
 				score: result.overall,
 				sourceType: source?.type ?? '',
 				keepForCompare: true,
+				format: resolvedFormat,
 				report: result.sections.map( ( x ) => ( { label: x.label, mode: x.mode, score: x.score.score } ) ),
 			} );
 			setImported( res );
@@ -348,10 +353,23 @@ export function Convert() {
 									] }
 								/>
 								<Field label={ __( 'Title', 'ai2kit' ) }>{ ( id ) => <input id={ id } className={ inputClass } value={ title } onChange={ ( e ) => setTitle( e.target.value ) } /> }</Field>
-								<Field label={ __( 'Elementor format', 'ai2kit' ) } help={ __( 'Auto uses classic widgets, which work with and without the Atomic (v4) editor.', 'ai2kit' ) }>
+								<Field
+									label={ __( 'Elementor format', 'ai2kit' ) }
+									help={
+										resolvedFormat === 'v4'
+											? __( 'Atomic elements (v4) with classes and responsive styles. Widgets without an atomic version stay classic.', 'ai2kit' )
+											: __( 'Containers and classic widgets (v3). They also work alongside the Atomic editor.', 'ai2kit' )
+									}
+								>
 									{ ( id ) => (
-										<select id={ id } className={ inputClass } value="auto" disabled>
-											<option value="auto">{ __( 'Auto (v4)', 'ai2kit' ) }</option>
+										<select id={ id } className={ inputClass } value={ format } onChange={ ( e ) => setFormat( e.target.value as 'auto' | 'v3' | 'v4' ) }>
+											<option value="auto">
+												{ cfg.elementor.atomic ? __( 'Auto (v4)', 'ai2kit' ) : __( 'Auto (v3)', 'ai2kit' ) }
+											</option>
+											<option value="v4" disabled={ ! cfg.elementor.atomic }>
+												{ __( 'Atomic elements (v4)', 'ai2kit' ) }
+											</option>
+											<option value="v3">{ __( 'Classic widgets (v3)', 'ai2kit' ) }</option>
 										</select>
 									) }
 								</Field>

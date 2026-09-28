@@ -10,6 +10,8 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /**
  * Remove Ai2Kit data for the current site.
+ *
+ * @return void
  */
 function ai2kit_uninstall_site() {
 	global $wpdb;
@@ -18,8 +20,7 @@ function ai2kit_uninstall_site() {
 	delete_option( 'ai2kit_db_version' );
 	wp_clear_scheduled_hook( 'ai2kit_cleanup_jobs' );
 
-	$table = $wpdb->prefix . 'ai2kit_jobs';
-	$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'ai2kit_jobs' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 
 	$uploads = wp_upload_dir( null, false );
 	$root    = trailingslashit( $uploads['basedir'] ) . 'ai2kit';

@@ -23,6 +23,8 @@ final class Installer {
 
 	/**
 	 * Activation hook.
+	 *
+	 * @return void
 	 */
 	public static function activate() {
 		self::create_table();
@@ -34,6 +36,8 @@ final class Installer {
 
 	/**
 	 * Deactivation hook.
+	 *
+	 * @return void
 	 */
 	public static function deactivate() {
 		wp_clear_scheduled_hook( Cleanup::HOOK );
@@ -41,6 +45,8 @@ final class Installer {
 
 	/**
 	 * Create/upgrade the schema when the stored version is stale (covers multisite and updates).
+	 *
+	 * @return void
 	 */
 	public static function maybe_upgrade() {
 		if ( get_option( self::DB_VERSION_OPTION ) !== self::DB_VERSION ) {
@@ -50,6 +56,8 @@ final class Installer {
 
 	/**
 	 * Jobs table (PRD FR-28).
+	 *
+	 * @return void
 	 */
 	public static function create_table() {
 		global $wpdb;

@@ -5,7 +5,7 @@
  * against the control registry exported from a real Elementor install
  * (tests/fixtures/elementor/controls-v3.json).
  */
-import type { IRNode, NodeStyles, StyleMap } from '../ir/types';
+import type { IRNode, NodeStyles, ResidualRule, StyleMap } from '../ir/types';
 import type { TokenIndex } from '../tokens/tokens';
 import { isTransparent, normalizeColor } from '../util/color';
 import { firstFamily, parseBox, parseLinearGradient, parseShadow, px, round } from '../util/units';
@@ -32,6 +32,10 @@ export type NodeStats = {
 	fallbacks: number;
 	widgets: Record< string, number >;
 	warnings: string[];
+	/** Relevant source properties the emitter could not express, with counts. */
+	unmapped: Record< string, number >;
+	/** Visible losses the structure can't show (substituted icons, lost pseudo content…), in score points. */
+	penalty: number;
 };
 
 export type EmitContext = {
@@ -44,6 +48,10 @@ export type EmitContext = {
 	/** Resolved asset URLs (after the PHP media import), by original URL. */
 	assets?: Record< string, { url: string; id?: number } >;
 	stats?: NodeStats;
+	/** Residual CSS rules collected while emitting (PRD G6). */
+	residual?: ResidualRule[];
+	/** Label of the section being emitted, for residual rule comments. */
+	section?: string;
 };
 
 /* ------------------------------------------------------------------ */
@@ -51,18 +59,43 @@ export type EmitContext = {
 /* ------------------------------------------------------------------ */
 
 const RELEVANT = [
+	'transform', 'filter', 'backdrop-filter',
 	'color', 'background-color', 'background-image', 'font-size', 'font-weight', 'font-family', 'line-height', 'letter-spacing',
 	'text-transform', 'text-align', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'margin-top', 'margin-bottom',
 	'border-top-width', 'border-top-left-radius', 'box-shadow', 'row-gap', 'column-gap', 'flex-direction', 'justify-content',
 	'align-items', 'grid-template-columns', 'min-height', 'max-width', 'object-fit', 'opacity', 'font-style',
 ];
 
-function track( ctx: EmitContext, s: StyleMap, consumed: Set< string > ): void {
+const TEXT_ONLY = new Set( [ 'color', 'font-size', 'font-weight', 'font-family', 'line-height', 'letter-spacing', 'text-transform', 'text-align', 'font-style' ] );
+const LAYOUT_ONLY = new Set( [ 'flex-direction', 'justify-content', 'align-items', 'row-gap', 'column-gap', 'grid-template-columns' ] );
+
+/**
+ * Whether a captured property actually affects this node's rendering.
+ * Computed styles report inherited typography on containers and flex
+ * defaults on non-flex elements; counting those would understate fidelity.
+ */
+const TEXT_KINDS = new Set( [ 'heading', 'text', 'button', 'list' ] );
+
+export function isRelevant( prop: string, s: StyleMap, kind: string ): boolean {
+	const isContainer = kind === 'container';
+	if ( TEXT_ONLY.has( prop ) && ! TEXT_KINDS.has( kind ) ) return false;
+	if ( LAYOUT_ONLY.has( prop ) ) {
+		const d = s.display ?? 'block';
+		const layout = d.includes( 'flex' ) || d.includes( 'grid' );
+		if ( ! layout || ! isContainer ) return false;
+		if ( prop === 'grid-template-columns' && ! d.includes( 'grid' ) ) return false;
+		if ( prop === 'flex-direction' && d.includes( 'grid' ) ) return false;
+	}
+	return true;
+}
+
+function track( ctx: EmitContext, s: StyleMap, consumed: Set< string >, kind: string ): void {
 	if ( ! ctx.stats ) return;
 	for ( const p of RELEVANT ) {
-		if ( s[ p ] === undefined ) continue;
+		if ( s[ p ] === undefined || ! isRelevant( p, s, kind ) ) continue;
 		ctx.stats.relevant++;
 		if ( consumed.has( p ) ) ctx.stats.mapped++;
+		else ctx.stats.unmapped[ p ] = ( ctx.stats.unmapped[ p ] ?? 0 ) + 1;
 	}
 }
 
@@ -233,6 +266,63 @@ function backgroundSettings( out: Settings, prefix: string, s: StyleMap, ctx: Em
 }
 
 /* ------------------------------------------------------------------ */
+/* Residual CSS (PRD G6)                                               */
+/* ------------------------------------------------------------------ */
+
+const RESIDUAL_PROPS = [ 'transform', 'filter', 'backdrop-filter', 'mix-blend-mode' ];
+const RESIDUAL_DEFAULT: Record< string, string > = { transform: 'none', filter: 'none', 'backdrop-filter': 'none', 'mix-blend-mode': 'normal', 'font-family': 'inherit' };
+
+function residualDecls( st: StyleMap, kind = '' ): Record< string, string > {
+	const out: Record< string, string > = {};
+	// A system-font stack has no Elementor font control (it takes single family names);
+	// without it the kit's default font would apply.
+	if ( TEXT_KINDS.has( kind ) && st[ 'font-family' ] && ! firstFamily( st[ 'font-family' ] ) ) out[ 'font-family' ] = st[ 'font-family' ];
+	for ( const p of RESIDUAL_PROPS ) {
+		const v = st[ p ];
+		if ( v && v !== RESIDUAL_DEFAULT[ p ] ) out[ p ] = v;
+	}
+	if ( out[ 'backdrop-filter' ] ) out[ '-webkit-backdrop-filter' ] = out[ 'backdrop-filter' ]!;
+	const clip = st[ 'background-clip' ] ?? st[ '-webkit-background-clip' ];
+	if ( clip === 'text' && /gradient\(/.test( st[ 'background-image' ] ?? '' ) ) {
+		Object.assign( out, { 'background-image': st[ 'background-image' ]!, '-webkit-background-clip': 'text', 'background-clip': 'text', color: 'transparent', '-webkit-text-fill-color': 'transparent' } );
+	}
+	return out;
+}
+
+/**
+ * Collect residual declarations for a node (per breakpoint, diffs only) and
+ * tag it with a class. Returns the class name, or undefined when nothing
+ * needed residual CSS.
+ */
+function residual( node: IRNode, ctx: EmitContext, consumed: Set< string >, target: ResidualRule[ 'target' ] = '' ): string | undefined {
+	for ( const r of node.content?.inlineRules ?? [] ) {
+		if ( ! ctx.residual?.some( ( x ) => x.className === r.className ) ) ctx.residual?.push( { ...r, label: ctx.section } );
+	}
+	if ( node.fallback ) return undefined;
+	const className = `a2k-r-${ node.id }`;
+	const d = residualDecls( effective( node.styles, 'desktop' ), node.kind );
+	const t = node.styles.tablet ? residualDecls( effective( node.styles, 'tablet' ), node.kind ) : d;
+	const m = node.styles.mobile ? residualDecls( effective( node.styles, 'mobile' ), node.kind ) : t;
+	const diff = ( a: Record< string, string >, b: Record< string, string > ): Record< string, string > => {
+		const o: Record< string, string > = {};
+		for ( const k of new Set( [ ...Object.keys( a ), ...Object.keys( b ) ] ) ) if ( a[ k ] !== b[ k ] ) o[ k ] = a[ k ] ?? RESIDUAL_DEFAULT[ k ] ?? 'initial';
+		return o;
+	};
+	const rules: ResidualRule[] = [];
+	if ( Object.keys( d ).length ) rules.push( { className, target, breakpoint: 'desktop', decls: d, label: ctx.section } );
+	const td = diff( t, d );
+	if ( Object.keys( td ).length ) rules.push( { className, target, breakpoint: 'tablet', decls: td, label: ctx.section } );
+	const md = diff( m, t );
+	if ( Object.keys( md ).length ) rules.push( { className, target, breakpoint: 'mobile', decls: md, label: ctx.section } );
+	if ( ! rules.length ) return undefined;
+	ctx.residual?.push( ...rules );
+	[ 'transform', 'filter', 'backdrop-filter' ].forEach( ( p ) => consumed.add( p ) );
+	if ( d.color === 'transparent' ) consumed.add( 'color' );
+	ctx.stats?.warnings.push( 'Some styles no Elementor control covers were kept as scoped CSS.' );
+	return className;
+}
+
+/* ------------------------------------------------------------------ */
 /* Containers                                                          */
 /* ------------------------------------------------------------------ */
 
@@ -363,7 +453,9 @@ function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, 
 
 	positionSettings( out, node, parent, consumed );
 	responsiveHide( out, node.styles );
-	track( ctx, s, consumed );
+	const rc = residual( node, ctx, consumed );
+	if ( rc ) out.css_classes = rc;
+	track( ctx, s, consumed, 'container' );
 	return out;
 }
 
@@ -593,7 +685,11 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 		}
 		case 'icon': {
 			const icon = iconValue( node.content?.iconName );
-			if ( icon ) out.selected_icon = icon;
+			if ( icon ) {
+				out.selected_icon = icon;
+				// A Font Awesome equivalent is editable but not pixel-identical.
+				if ( ctx.stats ) ctx.stats.penalty += 0.5;
+			}
 			else if ( node.content?.svg ) out.selected_icon = { value: { url: svgDataUri( node.content.svg ), id: '' }, library: 'svg' };
 			else return null;
 			if ( ! icon ) ctx.stats?.warnings.push( 'Custom icon uploaded as SVG.' );
@@ -668,7 +764,11 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			return htmlWidget( html, 'Unrecognized block', ctx );
 		}
 	}
-	track( ctx, s, consumed );
+	if ( el ) {
+		const rc = residual( node, ctx, consumed, node.kind === 'heading' ? ' .elementor-heading-title' : node.kind === 'button' ? ' .elementor-button' : '' );
+		if ( rc ) el.settings._css_classes = rc;
+	}
+	track( ctx, s, consumed, node.kind );
 	return el;
 }
 
@@ -678,6 +778,10 @@ function svgColor( svg: string | undefined ): string | undefined {
 }
 
 export function emitNode( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V3Element | null {
+	if ( node.pseudo && ctx.stats && ! node.fallback ) {
+		ctx.stats.penalty += 1;
+		ctx.stats.unmapped[ '::before/::after' ] = ( ctx.stats.unmapped[ '::before/::after' ] ?? 0 ) + 1;
+	}
 	if ( node.kind !== 'container' ) return emitLeaf( node, ctx, parent );
 	if ( node.fallback ) return emitLeaf( node, ctx, parent );
 	const settings = containerSettings( node, ctx, isSection, parent );
@@ -688,13 +792,13 @@ export function emitNode( node: IRNode, ctx: EmitContext, parent?: IRNode, isSec
 }
 
 export function emptyStats(): NodeStats {
-	return { relevant: 0, mapped: 0, leaves: 0, nativeLeaves: 0, fallbacks: 0, widgets: {}, warnings: [] };
+	return { relevant: 0, mapped: 0, leaves: 0, nativeLeaves: 0, fallbacks: 0, widgets: {}, warnings: [], unmapped: {}, penalty: 0 };
 }
 
 /** Emit one section, honoring its Native/HTML mode. */
 export function emitSection( section: IRNode, ctx: EmitContext ): { element: V3Element | null; stats: NodeStats } {
 	const stats = emptyStats();
-	const local: EmitContext = { ...ctx, stats };
+	const local: EmitContext = { ...ctx, stats, section: section.label };
 	if ( ctx.modes?.[ section.id ] === 'html' && section.key && ctx.frozen?.[ section.key ] ) {
 		const wrap: V3Element = {
 			id: ctx.nextId(),

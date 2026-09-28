@@ -143,6 +143,27 @@ final class ImportTest extends TestCase {
 		$this->assertSame( 409, $again->get_status() );
 	}
 
+	public function test_residual_css_is_stored_scoped_and_printed_with_the_document() {
+		$golden                         = $this->golden( 'landing' );
+		$golden['document']['residual'] = array(
+			array( 'className' => 'a2k-r-test123', 'target' => ' .elementor-heading-title', 'breakpoint' => 'desktop', 'decls' => array( 'background-image' => 'linear-gradient(90deg, #7c3aed, #2563eb)', '-webkit-background-clip' => 'text', 'color' => 'transparent' ), 'label' => 'Hero' ),
+			array( 'className' => 'a2k-r-evil', 'breakpoint' => 'desktop', 'decls' => array( 'color' => 'red}</style><script>alert(1)</script>' ) ),
+		);
+		$job = $this->html_job();
+		$res = $this->rest( 'POST', '/jobs/' . $job['uuid'] . '/import', array( 'document' => $golden['document'] ) );
+		$this->assertSame( 200, $res->get_status(), wp_json_encode( $res->get_data() ) );
+		$id  = $res->get_data()['created'][0]['id'];
+		$css = get_post_meta( $id, '_ai2kit_residual_css', true );
+		$this->assertStringContainsString( ".elementor-{$id} .a2k-r-test123 .elementor-heading-title{", $css );
+		$this->assertStringNotContainsString( 'script', $css );
+		$this->assertSame( 1, $res->get_data()['residual'] );
+
+		// Rendering the document enqueues its CSS file, which attaches the residual CSS.
+		\Elementor\Plugin::$instance->frontend->get_builder_content( $id, true );
+		$this->assertTrue( wp_style_is( 'ai2kit-residual-' . $id, 'enqueued' ) );
+		$this->assertStringContainsString( 'a2k-r-test123', implode( '', (array) wp_styles()->get_data( 'ai2kit-residual-' . $id, 'after' ) ) );
+	}
+
 	public function test_media_is_deduplicated_by_hash() {
 		list( , $a ) = $this->import_golden();
 		list( , $b ) = $this->import_golden();

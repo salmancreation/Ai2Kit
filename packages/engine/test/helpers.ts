@@ -1,6 +1,8 @@
 import type { CapturedNode, Capture, StyleMap } from '../src/ir/types';
 import type { V3Element } from '../src/emit/v3';
+import type { V4Element } from '../src/emit/v4';
 import registry from '../../../tests/fixtures/elementor/controls-v3.json';
+import atomic from '../../../tests/fixtures/elementor/atomic-schema.json';
 
 let n = 0;
 export function resetKeys(): void {
@@ -41,13 +43,69 @@ const DEVICES = [ '_tablet', '_mobile' ];
  * every key must exist (or be a responsive variant of one that does), every
  * select/choose value must be a registered option, IDs must be unique 7-hex.
  */
-export function validateAgainstRegistry( elements: V3Element[] ): string[] {
+type PropType = { kind?: string; key?: string; prop_types?: Record< string, PropType >; shape?: Record< string, PropType >; settings?: { enum?: string[] } | unknown[]; item_prop_type?: PropType };
+type AtomicSchema = { elements: Record< string, { elType: string; props: Record< string, PropType > } > };
+const atomicSchema = atomic as unknown as AtomicSchema;
+
+/** Check a typed prop value `{ $$type, value }` against an exported prop type. */
+function checkTyped( value: unknown, type: PropType, path: string, errors: string[] ): void {
+	if ( value === null ) return;
+	const v = value as { $$type?: string; value?: unknown };
+	if ( typeof v !== 'object' || typeof v.$$type !== 'string' ) {
+		errors.push( `${ path }: not a typed prop` );
+		return;
+	}
+	const members = type.kind === 'union' ? type.prop_types ?? {} : { [ type.key ?? '' ]: type };
+	const member = members[ v.$$type ];
+	if ( ! member ) {
+		errors.push( `${ path }: $$type "${ v.$$type }" not in [${ Object.keys( members ).join( ', ' ) }]` );
+		return;
+	}
+	const en = ( member.settings as { enum?: string[] } | undefined )?.enum;
+	if ( en && ! en.includes( v.value as string ) ) errors.push( `${ path }: "${ String( v.value ) }" not in enum [${ en.join( ', ' ) }]` );
+	if ( member.kind === 'object' && member.shape && v.value && typeof v.value === 'object' ) {
+		for ( const [ k, child ] of Object.entries( v.value as Record< string, unknown > ) ) {
+			const ct = member.shape[ k ];
+			if ( ! ct ) errors.push( `${ path }.${ k }: not in shape [${ Object.keys( member.shape ).join( ', ' ) }]` );
+			else checkTyped( child, ct, `${ path }.${ k }`, errors );
+		}
+	}
+}
+
+/**
+ * Validate an emitted element tree — v3 against the control registry, atomic
+ * (v4) elements against the exported atomic schema; mixed trees supported.
+ */
+export function validateAgainstRegistry( elements: Array< V3Element | V4Element > ): string[] {
 	const errors: string[] = [];
 	const ids = new Set< string >();
-	const visit = ( el: V3Element, path: string ): void => {
-		if ( ! /^[0-9a-f]{7}$/.test( el.id ) ) errors.push( `${ path }: bad id ${ el.id }` );
-		if ( ids.has( el.id ) ) errors.push( `${ path }: duplicate id ${ el.id }` );
-		ids.add( el.id );
+	const visitAtomic = ( el: V4Element, path: string ): void => {
+		const name = el.elType === 'widget' ? el.widgetType ?? '' : el.elType;
+		const schema = atomicSchema.elements[ name ];
+		if ( ! schema ) {
+			errors.push( `${ path }: unknown atomic element ${ name }` );
+			return;
+		}
+		for ( const [ key, value ] of Object.entries( el.settings ) ) {
+			const pt = schema.props[ key ];
+			if ( ! pt ) errors.push( `${ path }: unknown atomic prop "${ key }" on ${ name }` );
+			else checkTyped( value, pt, `${ path }.${ key }`, errors );
+		}
+		for ( const [ bp, css ] of Object.entries( el.css ?? {} ) ) {
+			if ( ! [ 'desktop', 'tablet', 'mobile' ].includes( bp ) || typeof css !== 'string' || /[{}<>]/.test( css ) ) errors.push( `${ path }: bad css block ${ bp }` );
+		}
+	};
+	const visit = ( node: V3Element | V4Element, path: string ): void => {
+		if ( ! /^[0-9a-f]{7}$/.test( node.id ) ) errors.push( `${ path }: bad id ${ node.id }` );
+		if ( ids.has( node.id ) ) errors.push( `${ path }: duplicate id ${ node.id }` );
+		ids.add( node.id );
+		const isAtomic = node.elType.startsWith( 'e-' ) || ( node.widgetType ?? '' ).startsWith( 'e-' );
+		if ( isAtomic ) {
+			visitAtomic( node as V4Element, path );
+			node.elements.forEach( ( c, i ) => visit( c, `${ path }/${ c.widgetType ?? c.elType }[${ i }]` ) );
+			return;
+		}
+		const el = node as V3Element;
 		const controls = el.elType === 'container' ? reg.elements.container : reg.widgets[ el.widgetType ?? '' ];
 		if ( ! controls ) {
 			errors.push( `${ path }: unknown element ${ el.elType }/${ el.widgetType }` );

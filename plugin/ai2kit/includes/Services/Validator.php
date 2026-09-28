@@ -21,6 +21,7 @@ defined( 'ABSPATH' ) || exit;
 final class Validator {
 
 	const WIDGETS      = array( 'heading', 'text-editor', 'image', 'button', 'icon', 'icon-list', 'video', 'divider', 'spacer', 'html' );
+	const ATOMIC       = array( 'e-flexbox', 'e-div-block', 'e-grid', 'e-heading', 'e-paragraph', 'e-button', 'e-image', 'e-svg', 'e-divider', 'e-youtube' );
 	const MAX_DEPTH    = 30;
 	const MAX_ELEMENTS = 10000;
 	const KEY_RE       = '/^[A-Za-z_][A-Za-z0-9_\-]{0,80}$/';
@@ -44,7 +45,7 @@ final class Validator {
 	 * Validate and sanitize a document.
 	 *
 	 * @param mixed $doc Decoded JSON.
-	 * @return array|WP_Error { title, content, page_settings }
+	 * @return array<string, mixed>|WP_Error { title, content, page_settings }
 	 */
 	public function document( $doc ) {
 		if ( ! is_array( $doc ) || ! isset( $doc['content'] ) || ! is_array( $doc['content'] ) || ! $doc['content'] ) {
@@ -69,9 +70,9 @@ final class Validator {
 	/**
 	 * Validate an element list.
 	 *
-	 * @param array $elements Elements.
-	 * @param int   $depth    Nesting depth.
-	 * @return array|WP_Error
+	 * @param array<int, array<string, mixed>> $elements Elements.
+	 * @param int                              $depth    Nesting depth.
+	 * @return array<int, array<string, mixed>>|WP_Error
 	 */
 	private function elements( array $elements, $depth ) {
 		if ( $depth > self::MAX_DEPTH ) {
@@ -86,8 +87,37 @@ final class Validator {
 				return new WP_Error( 'ai2kit_invalid_element', __( 'The converted page contains an invalid element.', 'ai2kit' ), array( 'status' => 400 ) );
 			}
 			$type = $el['elType'] ?? '';
-			if ( 'container' === $type ) {
+			if ( AtomicWriter::is_atomic( $el ) ) {
+				// Atomic settings are parsed later by Elementor's own Props_Parser (AtomicWriter).
+				$name = 'widget' === $type ? (string) ( $el['widgetType'] ?? '' ) : (string) $type;
+				if ( ! in_array( $name, self::ATOMIC, true ) ) {
+					return new WP_Error(
+						'ai2kit_invalid_element',
+						/* translators: %s: element type. */
+						sprintf( __( 'The converted page contains an unsupported element (%s).', 'ai2kit' ), sanitize_text_field( $name ) ),
+						array( 'status' => 400 )
+					);
+				}
 				$clean = array(
+					'id'       => $this->id( $el['id'] ?? '' ),
+					'elType'   => 'widget' === $type ? 'widget' : $name,
+					'isInner'  => ! empty( $el['isInner'] ),
+					'settings' => is_array( $el['settings'] ?? null ) ? $el['settings'] : array(),
+					'css'      => $this->css( $el['css'] ?? array() ),
+				);
+				if ( 'widget' === $type ) {
+					$clean['widgetType'] = $name;
+				}
+				$children = $this->elements( (array) ( $el['elements'] ?? array() ), $depth + 1 );
+				if ( is_wp_error( $children ) ) {
+					return $children;
+				}
+				$clean['elements'] = $children;
+				$out[]             = $clean;
+				continue;
+			}
+			if ( 'container' === $type ) {
+				$clean    = array(
 					'id'       => $this->id( $el['id'] ?? '' ),
 					'elType'   => 'container',
 					'isInner'  => ! empty( $el['isInner'] ),
@@ -120,6 +150,25 @@ final class Validator {
 	}
 
 	/**
+	 * CSS blocks per breakpoint: declarations only (no rules, at-rules or markup).
+	 *
+	 * @param mixed $css Map of breakpoint => declarations.
+	 * @return array<string, string>
+	 */
+	private function css( $css ) {
+		$out = array();
+		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $bp ) {
+			if ( isset( $css[ $bp ] ) && is_string( $css[ $bp ] ) && strlen( $css[ $bp ] ) < 8000 ) {
+				$clean = preg_replace( '/[{}<>@\\\\]|\/\*|expression\s*\(|javascript:/i', '', $css[ $bp ] );
+				if ( '' !== trim( (string) $clean ) ) {
+					$out[ $bp ] = (string) $clean;
+				}
+			}
+		}
+		return $out;
+	}
+
+	/**
 	 * Keep valid unique 7-hex IDs; replace anything else.
 	 *
 	 * @param mixed $id Proposed ID.
@@ -137,9 +186,9 @@ final class Validator {
 	/**
 	 * Sanitize a settings map for an element type.
 	 *
-	 * @param array  $settings Settings.
-	 * @param string $type     container | widget type.
-	 * @return array
+	 * @param array<string, mixed> $settings Settings.
+	 * @param string               $type     container | widget type.
+	 * @return array<string, mixed>
 	 */
 	private function settings( array $settings, $type ) {
 		$out = array();
@@ -160,7 +209,7 @@ final class Validator {
 	 * Global references: globals/colors?id=x or globals/typography?id=x only.
 	 *
 	 * @param mixed $value Map.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function globals( $value ) {
 		$out = array();
@@ -191,7 +240,7 @@ final class Validator {
 		if ( is_array( $value ) ) {
 			$out = array();
 			foreach ( $value as $k => $v ) {
-				if ( is_int( $k ) || ( is_string( $k ) && preg_match( self::KEY_RE, $k ) ) ) {
+				if ( is_int( $k ) || preg_match( self::KEY_RE, $k ) ) {
 					$out[ $k ] = $this->value( $v, is_int( $k ) ? $key : $k, $type, $depth + 1 );
 				}
 			}

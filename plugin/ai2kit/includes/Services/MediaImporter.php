@@ -48,7 +48,7 @@ final class MediaImporter {
 	/**
 	 * Resolved URL → [ url, id ] cache.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $cache = array();
 
@@ -89,8 +89,8 @@ final class MediaImporter {
 	/**
 	 * Walk elements; import every media value ({url, id}) and rewrite it.
 	 *
-	 * @param array $elements Elements.
-	 * @return array
+	 * @param array<int, array<string, mixed>> $elements Elements.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function process( array $elements ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -116,6 +116,22 @@ final class MediaImporter {
 		if ( ! is_array( $value ) ) {
 			return $value;
 		}
+		// Atomic (v4) media: a typed image-src or svg-src whose url is itself a typed url value.
+		if ( isset( $value['$$type'] ) && in_array( $value['$$type'], array( 'image-src', 'svg-src' ), true ) && is_array( $value['value'] ?? null ) ) {
+			$url = $value['value']['url']['value'] ?? '';
+			if ( is_string( $url ) && '' !== $url ) {
+				$alt      = isset( $value['value']['alt']['value'] ) ? (string) $value['value']['alt']['value'] : '';
+				$resolved = $this->resolve( $url, $alt );
+				if ( $resolved ) {
+					$value['value']['id']  = array(
+						'$$type' => 'image-attachment-id',
+						'value'  => $resolved['id'],
+					);
+					$value['value']['url'] = null;
+				}
+			}
+			return $value;
+		}
 		if ( array_key_exists( 'url', $value ) && array_key_exists( 'id', $value ) && is_string( $value['url'] ) && '' !== $value['url'] ) {
 			$resolved = $this->resolve( $value['url'], isset( $value['alt'] ) ? (string) $value['alt'] : '' );
 			if ( $resolved ) {
@@ -135,7 +151,7 @@ final class MediaImporter {
 	 *
 	 * @param string $url URL or data URI.
 	 * @param string $alt Alt text.
-	 * @return array|null { url, id }
+	 * @return array<string, mixed>|null { url, id }
 	 */
 	public function resolve( $url, $alt = '' ) {
 		if ( isset( $this->cache[ $url ] ) ) {
@@ -170,7 +186,7 @@ final class MediaImporter {
 	 *
 	 * @param string $url Job URL.
 	 * @param string $alt Alt text.
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	private function import_local( $url, $alt ) {
 		$rel  = rawurldecode( (string) wp_parse_url( substr( $url, strlen( $this->job_url ) ), PHP_URL_PATH ) );
@@ -192,7 +208,7 @@ final class MediaImporter {
 	 *
 	 * @param string $url Remote URL.
 	 * @param string $alt Alt text.
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	private function import_remote( $url, $alt ) {
 		$tmp = download_url( $url, 20 );
@@ -245,7 +261,7 @@ final class MediaImporter {
 	 * @param string $name   File name.
 	 * @param string $source Original URL.
 	 * @param string $alt    Alt text.
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	private function import_bytes( $bytes, $name, $source, $alt ) {
 		$ext = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );

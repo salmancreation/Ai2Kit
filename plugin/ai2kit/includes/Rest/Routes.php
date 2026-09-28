@@ -30,6 +30,8 @@ final class Routes {
 
 	/**
 	 * Register routes.
+	 *
+	 * @return void
 	 */
 	public function register() {
 		$admin = array( $this, 'can_manage' );
@@ -168,7 +170,14 @@ final class Routes {
 				return new WP_Error( 'ai2kit_no_input', __( 'Choose a file or paste some HTML to convert.', 'ai2kit' ), array( 'status' => 400 ) );
 			}
 		} catch ( IngestException $e ) {
-			return new WP_Error( $e->slug, $e->getMessage(), array( 'status' => $e->status, 'hint' => $e->hint ) );
+			return new WP_Error(
+				$e->slug,
+				$e->getMessage(),
+				array(
+					'status' => $e->status,
+					'hint'   => $e->hint,
+				)
+			);
 		}
 		return new WP_REST_Response( $job, 201 );
 	}

@@ -23,7 +23,7 @@ interface Window {
 		nonce: string;
 		adminUrl: string;
 		version: string;
-		elementor: { active: boolean; version: string | null; pro: boolean };
+		elementor: { active: boolean; version: string | null; pro: boolean; atomic: boolean };
 		maxUploadMb: number;
 		canRunScripts: boolean;
 		settings: Ai2kitSettings;

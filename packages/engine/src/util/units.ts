@@ -134,3 +134,57 @@ export function firstFamily( stack: string | undefined ): string | null {
 	}
 	return null;
 }
+
+const KEYWORD_ANGLES: Record< string, number > = { ...DIRECTION_ANGLES };
+
+/**
+ * Normalize a computed linear-gradient to `Ndeg, color P%, …` with explicit
+ * stops — the form Elementor's CSS → atomic converter understands. Direction
+ * keywords become angles; missing stop positions are spread evenly.
+ * Returns the input unchanged when it isn't a plain linear gradient.
+ */
+export function normalizeGradient( v: string ): string {
+	const m = v.trim().match( /^linear-gradient\((.*)\)$/ );
+	if ( ! m ) return v;
+	const parts = splitTopLevel( m[ 1 ]!, ',' ).map( ( p ) => p.trim() );
+	let angle = 180;
+	const head = parts[ 0 ] ?? '';
+	if ( /deg$/.test( head ) ) {
+		angle = parseFloat( head );
+		parts.shift();
+	} else if ( KEYWORD_ANGLES[ head ] !== undefined ) {
+		angle = KEYWORD_ANGLES[ head ]!;
+		parts.shift();
+	}
+	if ( parts.length < 2 ) return v;
+	const stops = parts.map( ( p, i ) => {
+		const pm = p.match( /^(.*?)\s+(-?[\d.]+)%$/ );
+		if ( pm ) return `${ pm[ 1 ]!.trim() } ${ round( parseFloat( pm[ 2 ]! ) ) }%`;
+		if ( /\s-?[\d.]+(px|em|rem)$/.test( p ) ) return null; // Length stops can't be expressed as offsets.
+		return `${ p } ${ round( ( i / ( parts.length - 1 ) ) * 100 ) }%`;
+	} );
+	if ( stops.some( ( s ) => s === null ) ) return v;
+	return `linear-gradient(${ round( angle ) }deg, ${ stops.join( ', ' ) })`;
+}
+
+/**
+ * Decompose a computed `matrix(a, b, c, d, e, f)` into translate/rotate/scale
+ * functions (what Elementor's converter understands). Returns the input when
+ * the matrix has skew or isn't a 2D matrix.
+ */
+export function decomposeMatrix( v: string ): string {
+	const m = v.trim().match( /^matrix\(([^)]+)\)$/ );
+	if ( ! m ) return v;
+	const n = m[ 1 ]!.split( ',' ).map( ( x ) => parseFloat( x ) );
+	if ( n.length !== 6 || n.some( ( x ) => Number.isNaN( x ) ) ) return v;
+	const [ a, b, c, d, e, f ] = n as [ number, number, number, number, number, number ];
+	if ( Math.abs( a * c + b * d ) > 1e-4 ) return v; // Skew.
+	const sx = Math.sqrt( a * a + b * b );
+	const sy = ( a * d - b * c ) / ( sx || 1 );
+	const rot = ( Math.atan2( b, a ) * 180 ) / Math.PI;
+	const fns: string[] = [];
+	if ( Math.abs( e ) > 0.01 || Math.abs( f ) > 0.01 ) fns.push( `translate(${ round( e ) }px, ${ round( f ) }px)` );
+	if ( Math.abs( rot ) > 0.01 ) fns.push( `rotate(${ round( rot ) }deg)` );
+	if ( Math.abs( sx - 1 ) > 0.001 || Math.abs( sy - 1 ) > 0.001 ) fns.push( `scale(${ round( sx ) }, ${ round( sy ) })` );
+	return fns.length ? fns.join( ' ' ) : 'none';
+}

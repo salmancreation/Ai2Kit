@@ -20,9 +20,9 @@ final class Importer {
 	/**
 	 * Run an import.
 	 *
-	 * @param array $job    Job row.
-	 * @param array $params Request body: document, tokens, output, kitMode, applyTokens, score, report.
-	 * @return array|WP_Error
+	 * @param array<string, mixed> $job    Job row.
+	 * @param array<string, mixed> $params Request body: document, tokens, output, kitMode, applyTokens, score, report.
+	 * @return array<string, mixed>|WP_Error
 	 */
 	public function run( array $job, array $params ) {
 		if ( ! Plugin::elementor_ready() ) {
@@ -50,6 +50,20 @@ final class Importer {
 		$media    = new MediaImporter( $job['uuid'], (bool) $settings['importRemote'] );
 		$elements = $media->process( $doc['content'] );
 
+		// v4: Elementor converts the CSS and parses settings and styles (AtomicWriter).
+		$atomic_residual = array();
+		if ( 'v4' === ( $params['document']['format'] ?? 'v3' ) ) {
+			if ( ! AtomicWriter::available() ) {
+				foreach ( $media->created as $id ) {
+					wp_delete_attachment( $id, true );
+				}
+				return new WP_Error( 'ai2kit_no_atomic', __( 'Elementor v4 output needs Elementor 4 with the Atomic editor turned on. Choose classic widgets (v3) instead.', 'ai2kit' ), array( 'status' => 409 ) );
+			}
+			$atomic          = new AtomicWriter();
+			$elements        = $atomic->build( $elements );
+			$atomic_residual = $atomic->residual;
+		}
+
 		// Tokens → kit, with backup.
 		$kit = array(
 			'map'    => array(),
@@ -73,6 +87,12 @@ final class Importer {
 			return $created;
 		}
 
+		$residual       = ResidualCss::build( array_merge( (array) ( $params['document']['residual'] ?? array() ), $atomic_residual ), $created['id'] );
+		$residual_rules = substr_count( $residual, '{' ) - substr_count( $residual, '@media' );
+		if ( '' !== $residual ) {
+			update_post_meta( $created['id'], ResidualCss::META, $residual );
+		}
+
 		$fallbacks = $this->count_fallbacks( $elements );
 		$checks    = array();
 		if ( $fallbacks ) {
@@ -86,6 +106,13 @@ final class Importer {
 			$checks[] = array(
 				'type' => 'form',
 				'text' => __( 'A form was kept as HTML. Connect it to an email address or a form plugin before going live.', 'ai2kit' ),
+			);
+		}
+		if ( $residual_rules > 0 ) {
+			$checks[] = array(
+				'type' => 'residual',
+				/* translators: %d: number of CSS rules. */
+				'text' => sprintf( _n( '%d style no Elementor control covers (like gradient text) was kept as CSS scoped to this page.', '%d styles no Elementor control covers (like gradient text or rotation) were kept as CSS scoped to this page.', $residual_rules, 'ai2kit' ), $residual_rules ),
 			);
 		}
 		if ( $media->failed ) {
@@ -103,6 +130,7 @@ final class Importer {
 				'reused'  => $media->reused,
 				'failed'  => array_slice( $media->failed, 0, 50 ),
 			),
+			'residual' => $residual_rules,
 			'kit'      => array(
 				'colors' => $kit['colors'],
 				'fonts'  => $kit['fonts'],
@@ -135,7 +163,7 @@ final class Importer {
 	/**
 	 * Count HTML fallback widgets.
 	 *
-	 * @param array $elements Elements.
+	 * @param array<int, array<string, mixed>> $elements Elements.
 	 * @return int
 	 */
 	private function count_fallbacks( array $elements ) {
@@ -152,7 +180,7 @@ final class Importer {
 	/**
 	 * Whether any HTML fallback contains a form.
 	 *
-	 * @param array $elements Elements.
+	 * @param array<int, array<string, mixed>> $elements Elements.
 	 * @return bool
 	 */
 	private function has_form( array $elements ) {
@@ -171,7 +199,7 @@ final class Importer {
 	 * Keep a compact, sanitized per-section report for History.
 	 *
 	 * @param mixed $report Sections from the engine.
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function report( $report ) {
 		$out = array();

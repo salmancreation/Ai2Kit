@@ -57,6 +57,20 @@ export function Settings( { onTheme }: { onTheme: ( t: Ai2kitSettings[ 'theme' ]
 								</select>
 							) }
 						</Field>
+						<Field
+							label={ __( 'Elementor format', 'ai2kit' ) }
+							help={ __( 'Auto uses Atomic elements (v4) when the Atomic editor is on, otherwise classic widgets (v3).', 'ai2kit' ) }
+						>
+							{ ( id ) => (
+								<select id={ id } className={ inputClass } value={ v.format } onChange={ ( e ) => set( 'format', e.target.value as Ai2kitSettings[ 'format' ] ) }>
+									<option value="auto">{ __( 'Auto', 'ai2kit' ) }</option>
+									<option value="v4" disabled={ ! window.ai2kitConfig.elementor.atomic }>
+										{ __( 'Atomic elements (v4)', 'ai2kit' ) }
+									</option>
+									<option value="v3">{ __( 'Classic widgets (v3)', 'ai2kit' ) }</option>
+								</select>
+							) }
+						</Field>
 						<Field label={ __( 'Global Colors & Fonts', 'ai2kit' ) } help={ __( 'Replace changes the four system globals for the whole site. A backup is always kept.', 'ai2kit' ) }>
 							{ ( id ) => (
 								<select id={ id } className={ inputClass } value={ v.kitMode } onChange={ ( e ) => set( 'kitMode', e.target.value as Ai2kitSettings[ 'kitMode' ] ) }>

@@ -52,24 +52,24 @@ final class KitWriter {
 	/**
 	 * Raw stored kit settings.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function raw_settings() {
 		$kit = self::kit();
 		if ( ! $kit ) {
 			return array();
 		}
-		$meta = get_post_meta( $kit->get_id(), '_elementor_page_settings', true );
+		$meta = get_post_meta( (int) $kit->get_id(), '_elementor_page_settings', true );
 		return is_array( $meta ) ? $meta : array();
 	}
 
 	/**
 	 * Apply tokens.
 	 *
-	 * @param array  $tokens { colors: [], fonts: [] } from the engine.
-	 * @param string $mode   merge | replace.
-	 * @param string $job    Job UUID (namespaces custom ids).
-	 * @return array{ map: array<string,string>, backup: array, colors: int, fonts: int }
+	 * @param array<string, mixed> $tokens { colors: [], fonts: [] } from the engine.
+	 * @param string               $mode   merge | replace.
+	 * @param string               $job    Job UUID (namespaces custom ids).
+	 * @return array{ map: array<string,string>, backup: array<string,mixed>|null, colors: int, fonts: int }
 	 */
 	public function apply( array $tokens, $mode, $job ) {
 		$kit    = self::kit();
@@ -110,11 +110,18 @@ final class KitWriter {
 					continue;
 				}
 				// Custom (or system in merge mode): stable per-job id so re-imports don't collide.
-				$new_id = $is_system ? 'a2k' . substr( md5( $job . $group . $item['_id'] ), 0, 6 ) : $item['_id'];
+				$new_id                             = $is_system ? 'a2k' . substr( md5( $job . $group . $item['_id'] ), 0, 6 ) : $item['_id'];
 				$map[ $group . ':' . $item['_id'] ] = $new_id;
-				$item['_id'] = $new_id;
-				$custom      = array_values( array_filter( $custom, static function ( $c ) use ( $new_id ) { return ( $c['_id'] ?? '' ) !== $new_id; } ) );
-				$custom[]    = $item;
+				$item['_id']                        = $new_id;
+				$custom                             = array_values(
+					array_filter(
+						$custom,
+						static function ( $c ) use ( $new_id ) {
+							return ( $c['_id'] ?? '' ) !== $new_id;
+						}
+					)
+				);
+				$custom[]                           = $item;
 			}
 			$settings[ 'system_' . $group ] = $system;
 			$settings[ 'custom_' . $group ] = $custom;
@@ -133,7 +140,8 @@ final class KitWriter {
 	/**
 	 * Restore a backup (undo).
 	 *
-	 * @param array $backup Raw settings.
+	 * @param array<string, mixed> $backup Raw settings.
+	 * @return void
 	 */
 	public static function restore( array $backup ) {
 		$kit = self::kit();
@@ -143,9 +151,9 @@ final class KitWriter {
 		// Write the exact previous meta: saving through the document would add
 		// Elementor's defaults, so undo wouldn't be a true restore.
 		if ( $backup ) {
-			update_post_meta( $kit->get_id(), '_elementor_page_settings', $backup );
+			update_post_meta( (int) $kit->get_id(), '_elementor_page_settings', $backup );
 		} else {
-			delete_post_meta( $kit->get_id(), '_elementor_page_settings' );
+			delete_post_meta( (int) $kit->get_id(), '_elementor_page_settings' );
 		}
 		\Elementor\Plugin::$instance->files_manager->clear_cache();
 	}
@@ -154,7 +162,7 @@ final class KitWriter {
 	 * Elementor's default system items, when the kit has never been saved.
 	 *
 	 * @param string $group colors | typography.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function default_system( $group ) {
 		$kit = self::kit();
@@ -164,8 +172,8 @@ final class KitWriter {
 	/**
 	 * Engine color tokens → kit items.
 	 *
-	 * @param array $colors Tokens.
-	 * @return array
+	 * @param array<string, mixed> $colors Tokens.
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function clean_colors( array $colors ) {
 		$out = array();
@@ -187,8 +195,8 @@ final class KitWriter {
 	/**
 	 * Engine font tokens → kit typography items.
 	 *
-	 * @param array $fonts Tokens.
-	 * @return array
+	 * @param array<string, mixed> $fonts Tokens.
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function clean_fonts( array $fonts ) {
 		$out    = array();
@@ -222,7 +230,11 @@ final class KitWriter {
 			if ( ! empty( $f['sizeMobile'] ) ) {
 				$item['typography_font_size_mobile'] = $slider( $f['sizeMobile'], 'px' );
 			}
-			foreach ( array( 'lineHeight' => '', 'lineHeightTablet' => '_tablet', 'lineHeightMobile' => '_mobile' ) as $key => $suffix ) {
+			foreach ( array(
+				'lineHeight'       => '',
+				'lineHeightTablet' => '_tablet',
+				'lineHeightMobile' => '_mobile',
+			) as $key => $suffix ) {
 				if ( ! empty( $f[ $key ] ) ) {
 					$item[ 'typography_line_height' . $suffix ] = $slider( $f[ $key ], 'em' );
 				}
@@ -241,9 +253,9 @@ final class KitWriter {
 	/**
 	 * Rewrite global references in elements after merge-mode id changes.
 	 *
-	 * @param array $elements Elements.
-	 * @param array $map      "colors:primary" => "a2kxxxxxx".
-	 * @return array
+	 * @param array<int, array<string, mixed>> $elements Elements.
+	 * @param array<string, mixed>             $map      "colors:primary" => "a2kxxxxxx".
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function remap( array $elements, array $map ) {
 		if ( ! $map ) {

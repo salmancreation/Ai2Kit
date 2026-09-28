@@ -174,7 +174,9 @@ function walk( el: Element, ctx: WalkCtx ): CapturedNode | null {
 	const inlineLeaf = isInlineContent( el, win ) || ( ( tag === 'a' || tag === 'button' ) && ! el.querySelector( 'div,p,h1,h2,h3,h4,h5,h6,img,ul,ol,section,article' ) );
 	if ( inlineLeaf ) {
 		node.text = ( el.textContent ?? '' ).replace( /\s+/g, ' ' ).trim();
-		node.html = sanitizeInline( el, win );
+		const rules: CapturedNode[ 'inlineRules' ] = [];
+		node.html = sanitizeInline( el, win, rules );
+		if ( rules.length ) node.inlineRules = rules;
 		const svg = el.querySelector( 'svg' );
 		if ( svg ) {
 			node.svg = serializeSvg( svg, win );
@@ -292,8 +294,17 @@ export function captureTree( env: CaptureEnv ): CapturedNode {
 export function captureStyles( env: CaptureEnv ): Map< string, { styles: StyleMap; rect: Rect; visible: boolean } > {
 	const measure = env.measure ?? measureRect;
 	const out = new Map< string, { styles: StyleMap; rect: Rect; visible: boolean } >();
+	// Resolve font stacks exactly like the desktop pass, or every breakpoint would
+	// record a spurious font-family change.
+	const stacks = new Map< string, string >();
+	const cache = new Map< string, boolean >();
 	env.doc.querySelectorAll( `[${ KEY_ATTR }]` ).forEach( ( el ) => {
 		const styles = readStyles( el, env.win );
+		const ff = styles[ 'font-family' ];
+		if ( ff ) {
+			if ( ! stacks.has( ff ) ) stacks.set( ff, renderedFontStack( env.doc, ff, cache ) );
+			styles[ 'font-family' ] = stacks.get( ff )!;
+		}
 		const rect = measure( el );
 		out.set( el.getAttribute( KEY_ATTR )!, { styles, rect, visible: isVisible( el, styles, rect ) } );
 	} );

@@ -49,6 +49,7 @@ export type ImportPayload = {
 	score: number;
 	sourceType: string;
 	keepForCompare?: boolean;
+	format: 'v3' | 'v4';
 	report: Array< Pick< SectionReport, 'label' | 'mode' > & { score: number } >;
 };
 

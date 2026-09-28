@@ -12,6 +12,8 @@
 
 namespace ModinaTheme\Ai2Kit\Services;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- IngestException messages become REST JSON errors rendered as text by the admin app; HTML-escaping would show entities.
+
 /**
  * ZipIngest.
  */
@@ -96,7 +98,7 @@ final class ZipIngest {
 		}
 
 		try {
-			$count = $zip->numFiles;
+			$count = $zip->numFiles; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive API.
 			if ( $count > $this->max_files ) {
 				throw new IngestException( 'ai2kit_too_many_files', sprintf( /* translators: 1: number of files in the ZIP, 2: maximum allowed. */ __( 'This ZIP has %1$d files; the limit is %2$d.', 'ai2kit' ), $count, $this->max_files ), __( 'Upload only the built site (the dist folder), not the whole project.', 'ai2kit' ) );
 			}
@@ -191,6 +193,7 @@ final class ZipIngest {
 	 * Create a directory tree.
 	 *
 	 * @param string $dir Directory.
+	 * @return void
 	 */
 	private function mkdir( $dir ) {
 		if ( ! is_dir( $dir ) ) {
@@ -219,9 +222,17 @@ final class ZipIngest {
 			}
 		}
 		$by_depth = static function ( $a, $b ) {
-			return substr_count( $a, '/' ) - substr_count( $b, '/' ) ?: strcmp( $a, $b );
+			$depth = substr_count( $a, '/' ) - substr_count( $b, '/' );
+			return 0 !== $depth ? $depth : strcmp( $a, $b );
 		};
-		$index = array_values( array_filter( $files, static function ( $f ) { return (bool) preg_match( '#(^|/)index\.html?$#i', $f ) && false === strpos( $f, 'node_modules/' ); } ) );
+		$index    = array_values(
+			array_filter(
+				$files,
+				static function ( $f ) {
+					return (bool) preg_match( '#(^|/)index\.html?$#i', $f ) && false === strpos( $f, 'node_modules/' );
+				}
+			)
+		);
 		if ( $index ) {
 			usort( $index, $by_depth );
 			// Prefer a built folder (dist/out/build) at any depth.
@@ -232,7 +243,14 @@ final class ZipIngest {
 			}
 			return $index[0];
 		}
-		$html = array_values( array_filter( $files, static function ( $f ) { return (bool) preg_match( '/\.html?$/i', $f ); } ) );
+		$html = array_values(
+			array_filter(
+				$files,
+				static function ( $f ) {
+					return (bool) preg_match( '/\.html?$/i', $f );
+				}
+			)
+		);
 		if ( $html ) {
 			usort( $html, $by_depth );
 			return $html[0];
@@ -262,3 +280,4 @@ final class ZipIngest {
 		return false;
 	}
 }
+// phpcs:enable

@@ -9,6 +9,8 @@
 
 namespace ModinaTheme\Ai2Kit\Services;
 
+// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- PHP's DOM API (documentElement, childNodes, …).
+
 /**
  * SvgSanitizer.
  */
@@ -17,18 +19,111 @@ final class SvgSanitizer {
 	const MAX_BYTES = 512000;
 
 	const TAGS = array(
-		'svg', 'g', 'path', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'rect', 'defs', 'lineargradient', 'radialgradient',
-		'stop', 'clippath', 'mask', 'pattern', 'symbol', 'use', 'title', 'desc', 'text', 'tspan', 'filter', 'fegaussianblur',
-		'feoffset', 'feblend', 'fecolormatrix', 'femerge', 'femergenode', 'feflood', 'fecomposite',
+		'svg',
+		'g',
+		'path',
+		'circle',
+		'ellipse',
+		'line',
+		'polyline',
+		'polygon',
+		'rect',
+		'defs',
+		'lineargradient',
+		'radialgradient',
+		'stop',
+		'clippath',
+		'mask',
+		'pattern',
+		'symbol',
+		'use',
+		'title',
+		'desc',
+		'text',
+		'tspan',
+		'filter',
+		'fegaussianblur',
+		'feoffset',
+		'feblend',
+		'fecolormatrix',
+		'femerge',
+		'femergenode',
+		'feflood',
+		'fecomposite',
 	);
 
 	const ATTRS = array(
-		'xmlns', 'xmlns:xlink', 'viewbox', 'width', 'height', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points',
-		'fill', 'fill-opacity', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit',
-		'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity', 'opacity', 'transform', 'id', 'class', 'offset', 'stop-color', 'stop-opacity',
-		'gradientunits', 'gradienttransform', 'clip-path', 'mask', 'preserveaspectratio', 'href', 'xlink:href', 'font-size', 'font-family',
-		'font-weight', 'text-anchor', 'dominant-baseline', 'stddeviation', 'dx', 'dy', 'in', 'in2', 'result', 'mode', 'values', 'type',
-		'flood-color', 'flood-opacity', 'operator', 'k1', 'k2', 'k3', 'k4', 'patternunits', 'filterunits', 'color', 'version', 'role', 'aria-hidden',
+		'xmlns',
+		'xmlns:xlink',
+		'viewbox',
+		'width',
+		'height',
+		'x',
+		'y',
+		'x1',
+		'x2',
+		'y1',
+		'y2',
+		'cx',
+		'cy',
+		'r',
+		'rx',
+		'ry',
+		'd',
+		'points',
+		'fill',
+		'fill-opacity',
+		'fill-rule',
+		'clip-rule',
+		'stroke',
+		'stroke-width',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'stroke-dasharray',
+		'stroke-dashoffset',
+		'stroke-opacity',
+		'opacity',
+		'transform',
+		'id',
+		'class',
+		'offset',
+		'stop-color',
+		'stop-opacity',
+		'gradientunits',
+		'gradienttransform',
+		'clip-path',
+		'mask',
+		'preserveaspectratio',
+		'href',
+		'xlink:href',
+		'font-size',
+		'font-family',
+		'font-weight',
+		'text-anchor',
+		'dominant-baseline',
+		'stddeviation',
+		'dx',
+		'dy',
+		'in',
+		'in2',
+		'result',
+		'mode',
+		'values',
+		'type',
+		'flood-color',
+		'flood-opacity',
+		'operator',
+		'k1',
+		'k2',
+		'k3',
+		'k4',
+		'patternunits',
+		'filterunits',
+		'color',
+		'version',
+		'role',
+		'aria-hidden',
 	);
 
 	/**
@@ -64,6 +159,7 @@ final class SvgSanitizer {
 	 * Recursively remove disallowed nodes and attributes.
 	 *
 	 * @param \DOMElement $el Element.
+	 * @return void
 	 */
 	private static function clean( \DOMElement $el ) {
 		// Iterate over a static copy: removing while iterating a live list skips nodes.
@@ -92,3 +188,4 @@ final class SvgSanitizer {
 		}
 	}
 }
+// phpcs:enable

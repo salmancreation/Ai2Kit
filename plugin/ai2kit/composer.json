@@ -7,7 +7,12 @@
     "php": ">=7.4"
   },
   "require-dev": {
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^9.6",
+    "szepeviktor/phpstan-wordpress": "^2.0",
+    "wp-coding-standards/wpcs": "^3.1",
     "yoast/phpunit-polyfills": "^2.0"
   },
   "autoload-dev": {
@@ -17,12 +22,19 @@
   },
   "scripts": {
     "test": "phpunit",
-    "test:integration": "phpunit -c phpunit-integration.xml.dist"
+    "test:integration": "phpunit -c phpunit-integration.xml.dist",
+    "lint": "phpcs",
+    "lint:fix": "phpcbf",
+    "stan": "phpstan analyse --memory-limit=2G"
   },
   "config": {
     "sort-packages": true,
     "platform": {
       "php": "7.4.33"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true
     }
   }
 }

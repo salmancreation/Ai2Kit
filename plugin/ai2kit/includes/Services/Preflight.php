@@ -34,7 +34,7 @@ final class Preflight {
 	/**
 	 * Run all checks.
 	 *
-	 * @return array{ ready: bool, checks: array }
+	 * @return array{ ready: bool, checks: array<int, array<string, mixed>> }
 	 */
 	public static function run() {
 		$checks = array();
