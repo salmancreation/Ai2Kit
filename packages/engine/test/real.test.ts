@@ -73,3 +73,19 @@ it( 'v4 never resets a desktop-only computed height at smaller breakpoints', () 
 	const doc = convert( load( 'lovable-spa-dist' ), 'x', { format: 'v4' } ).document;
 	expect( JSON.stringify( doc.content ) ).not.toMatch( /min-height: initial/ );
 } );
+
+it( 'maps all three native <details> FAQ styles to native Accordions', () => {
+	const result = convert( load( 'faq-details' ), 'x' );
+	const accs: Array< { settings: Record< string, unknown >; elements: unknown[] } > = [];
+	const walk = ( e: { widgetType?: string; elements: unknown[] } ): void => {
+		if ( e.widgetType === 'nested-accordion' ) accs.push( e as never );
+		( e.elements as Array< typeof e > ).forEach( walk );
+	};
+	( result.document.content as Array< { widgetType?: string; elements: unknown[] } > ).forEach( walk );
+	expect( accs ).toHaveLength( 3 );
+	expect( accs.map( ( a ) => a.settings.max_items_expended ) ).toEqual( [ 'multiple', 'multiple', 'one' ] );
+	expect( accs.map( ( a ) => ( a.settings.accordion_item_title_icon as { library: string } ).library ) ).toEqual( [ 'fa-solid', 'svg', 'fa-solid' ] );
+	const json = JSON.stringify( result.document.content );
+	for ( const a of [ 'tracking on every order', 'Bank transfer for <strong>annual plans</strong>', 'takes effect immediately' ] ) expect( json ).toContain( a );
+	expect( json ).not.toContain( '"widgetType":"html"' );
+} );

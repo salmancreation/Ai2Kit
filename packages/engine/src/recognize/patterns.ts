@@ -16,9 +16,10 @@ function descendants( n: CapturedNode, pred: ( n: CapturedNode ) => boolean, out
 }
 
 const isTrigger = ( n: CapturedNode ): boolean =>
-	n.attrs[ 'aria-expanded' ] !== undefined &&
+	n.tag === 'summary' ||
+	( n.attrs[ 'aria-expanded' ] !== undefined &&
 	( n.tag === 'button' || n.attrs.role === 'button' ) &&
-	( n.attrs[ 'data-radix-collection-item' ] !== undefined || n.attrs[ 'data-state' ] !== undefined || n.attrs[ 'aria-controls' ] !== undefined );
+	( n.attrs[ 'data-radix-collection-item' ] !== undefined || n.attrs[ 'data-state' ] !== undefined || n.attrs[ 'aria-controls' ] !== undefined ) );
 
 /** One accordion item: title, trigger/item styles, chevron and the captured panel. */
 function accordionItem( item: CapturedNode, trigger: CapturedNode ): AccordionItem {
@@ -30,13 +31,23 @@ function accordionItem( item: CapturedNode, trigger: CapturedNode ): AccordionIt
 	};
 	const iconName = lucideName( trigger.attrs[ 'data-a2k-icon' ] ?? svg?.attrs.class );
 	if ( iconName ) out.iconName = iconName;
+	if ( trigger.attrs[ 'data-a2k-icon-pos' ] === 'before' ) out.iconStart = true;
+	else if ( svg ) {
+		// A trigger captured as a container (<summary> with text + svg): order of its children.
+		const holds = ( k: CapturedNode ): boolean => k === svg || descendants( k, ( d ) => d === svg ).length > 0;
+		const si = trigger.children.findIndex( holds );
+		const ti = trigger.children.findIndex( ( k ) => ! holds( k ) && !! textOf( k ) );
+		if ( si >= 0 && ti >= 0 && si < ti ) out.iconStart = true;
+	}
 	if ( trigger.svg ?? svg?.svg ) out.svg = trigger.svg ?? svg?.svg;
 	const size = svg?.rect.w || parseFloat( trigger.attrs[ 'data-a2k-icon-size' ] ?? '' );
 	if ( size ) out.iconSize = size;
 	// Space a closed item has beyond its trigger and borders (e.g. a margin on the Radix <h3> header).
 	const s = item.styles.desktop;
 	const borders = ( parseFloat( s[ 'border-top-width' ] ?? '0' ) || 0 ) + ( parseFloat( s[ 'border-bottom-width' ] ?? '0' ) || 0 );
-	const extra = Math.round( item.rect.h - trigger.rect.h - borders );
+	// The item's own padding is mapped separately (added to the title padding): not part of `extra`.
+	const pads = ( parseFloat( s[ 'padding-top' ] ?? '0' ) || 0 ) + ( parseFloat( s[ 'padding-bottom' ] ?? '0' ) || 0 );
+	const extra = Math.round( item.rect.h - trigger.rect.h - borders - pads );
 	if ( item !== trigger && ! trigger.panel?.open && extra > 0 && extra <= 48 ) out.extraBottom = extra;
 	if ( trigger.panel ) out.panel = trigger.panel;
 	return out;

@@ -64,6 +64,8 @@ export type AccordionItem = {
 	svg?: string;
 	/** Rendered icon size (px). */
 	iconSize?: number;
+	/** The icon sits before the title text. */
+	iconStart?: boolean;
 	/** Height a closed item has below its trigger, inside its border (px). */
 	extraBottom?: number;
 	panel?: PanelCapture;
@@ -190,6 +192,10 @@ export type PanelCapture = {
 	multiple?: boolean;
 	/** Rotation (deg) of the trigger's icon while open (shadcn turns the chevron 180°). */
 	iconRotate?: number;
+	/** A native <summary> showing the browser's disclosure triangle (▸ / ▾). */
+	marker?: boolean;
+	/** A ::before/::after character icon, closed and open ("+" → "−"). */
+	glyph?: { closed: string; open: string; position: 'start' | 'end'; size?: number };
 };
 
 export type CapturedNode = {

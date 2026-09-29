@@ -150,3 +150,43 @@ describe( 'collapsed panel capture helpers', () => {
 		expect( buttons.every( ( b ) => b.getAttribute( 'aria-expanded' ) === 'false' ) ).toBe( true );
 	} );
 } );
+
+describe( 'native <details> accordions', () => {
+	it( 'opens each <details>, reads the answer (not the summary) and restores it', async () => {
+		const { captureCollapsed } = await import( '../src/capture/collapsed' );
+		document.body.innerHTML =
+			'<div><details><summary data-a2k-key="s1">Q1</summary><p>Answer <strong>one</strong></p></details>' +
+			'<details open><summary data-a2k-key="s2">Q2</summary><div class="a"><p>Answer two</p><ul><li>x</li></ul></div></details></div>';
+		const { panels } = await captureCollapsed( document, window, 'data-a2k-key', () => ( {} ) );
+		expect( panels.get( 's1' )?.html ).toBe( '<p>Answer <strong>one</strong></p>' );
+		expect( panels.get( 's1' )?.text ).toBe( 'Answer one' );
+		expect( panels.get( 's2' )?.html ).toBe( '<p>Answer two</p><ul><li>x</li></ul>' );
+		expect( panels.get( 's2' )?.open ).toBe( true );
+		const details = Array.from( document.querySelectorAll( 'details' ) );
+		expect( details.map( ( d ) => d.open ) ).toEqual( [ false, true ] );
+	} );
+
+	it( 'maps a "+"/"−" ::after glyph and the browser marker to Font Awesome icons', async () => {
+		const { convert } = await import( '../src/pipeline' );
+		for ( const [ panelExtra, normal, active, pos ] of [
+			[ { glyph: { closed: '+', open: '−', position: 'end', size: 20 } }, 'fas fa-plus', 'fas fa-minus', 'end' ],
+			[ { marker: true }, 'fas fa-caret-right', 'fas fa-caret-down', 'start' ],
+		] as const ) {
+			resetKeys();
+			const items = [ 'A?', 'B?' ].map( ( q ) => {
+				const summary = text( 'summary', q, { 'font-size': '16px' }, { rect: { x: 0, y: 0, w: 700, h: 24 } } );
+				summary.panel = { html: `<p>${ q } yes</p>`, text: `${ q } yes`, styles: {}, textStyles: {}, open: false, multiple: true, ...panelExtra };
+				return cn( 'details', { 'padding-top': '8px', 'padding-bottom': '8px' }, [ summary ], { rect: { x: 0, y: 0, w: 700, h: 40 } } );
+			} );
+			const els = convert( capture( cn( 'body', {}, [ cn( 'section', {}, [ cn( 'div', {}, items, { rect: { x: 0, y: 0, w: 700, h: 80 } } ) ] ) ] ) ), 'details' ).document.content as V3Element[];
+			const acc = all( els ).find( ( e ) => e.widgetType === 'nested-accordion' ) as V3Element;
+			expect( validateAgainstRegistry( els ) ).toEqual( [] );
+			expect( ( acc.settings.accordion_item_title_icon as { value: string } ).value ).toBe( normal );
+			expect( ( acc.settings.accordion_item_title_icon_active as { value: string } ).value ).toBe( active );
+			expect( acc.settings.accordion_item_title_icon_position ).toBe( pos );
+			expect( acc.settings.max_items_expended ).toBe( 'multiple' );
+			// The <details> padding lands on the title, once.
+			expect( acc.settings.accordion_padding ).toMatchObject( { top: '8', bottom: '8' } );
+		}
+	} );
+} );

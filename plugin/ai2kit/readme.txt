@@ -81,7 +81,7 @@ Administrators. Sites that run JavaScript can only be converted by users allowed
 == Changelog ==
 
 = 0.3.0 =
-* New: accordions and FAQs (Radix/shadcn and similar) become Elementor's native Accordion. Collapsed answers are opened and captured during conversion.
+* New: accordions and FAQs — Radix/shadcn and similar, and native <details>/<summary> — become Elementor's native Accordion. Collapsed answers are opened and captured during conversion; one-at-a-time vs. several-open behavior, card styling, the source's chevron SVG, "+"/"−" and ▸ markers are kept.
 * New: hover effects — colors, backgrounds, borders, shadows, lift/scale and transition duration — map to Elementor's hover controls (v3) and the hover style state (v4).
 * Improved: icons are the source's own SVG (identical), not a Font Awesome look-alike. Icons colored by CSS classes or inline styles, sprite icons (<use>), gradients and icons without a viewBox all import correctly. If an SVG can't be imported, the closest Font Awesome icon is used and the import report says so.
 * Fixed: button icons keep their size; icon list spacing matches the source; grids that stay multi-column on phones no longer collapse to one column; text with a "normal" line height no longer gets the theme's taller line height.

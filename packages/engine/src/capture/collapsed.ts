@@ -12,13 +12,22 @@ import { sanitizeInline } from './freeze';
 
 type ReadStyles = ( el: Element, win: Window ) => StyleMap;
 
-const TRIGGER = 'button[aria-expanded], [role="button"][aria-expanded]';
+const TRIGGER = 'button[aria-expanded], [role="button"][aria-expanded], details > summary';
+
+/** A native <details> summary (the browser's own accordion). */
+const isSummary = ( el: Element ): boolean => el.tagName.toLowerCase() === 'summary' && el.parentElement?.tagName.toLowerCase() === 'details';
 
 /** Triggers that open an in-page panel (not menus, dialogs or popovers). */
 function isPanelTrigger( el: Element ): boolean {
 	if ( el.hasAttribute( 'aria-haspopup' ) ) return false;
 	if ( el.closest( 'nav, header, [role="menu"], [role="menubar"], [role="dialog"]' ) ) return false;
+	if ( isSummary( el ) ) return true;
 	return el.hasAttribute( 'aria-controls' ) || el.hasAttribute( 'data-state' ) || el.hasAttribute( 'data-radix-collection-item' );
+}
+
+/** A <details> element's content: everything but its <summary>. */
+function detailsContent( summary: Element ): Element[] {
+	return Array.from( summary.parentElement!.children ).filter( ( c ) => c !== summary && c.tagName.toLowerCase() !== 'summary' );
 }
 
 /** Group triggers by the nearest ancestor holding ≥2 of them (the accordion root). */
@@ -41,6 +50,11 @@ export function groupTriggers( triggers: Element[] ): Element[][] {
 
 /** The panel a trigger controls: its aria-controls target, else the item's region. */
 function panelOf( trigger: Element, doc: Document ): Element | null {
+	if ( isSummary( trigger ) ) {
+		// One content element (the usual <div class="answer">) is the panel; otherwise the whole <details>.
+		const content = detailsContent( trigger );
+		return content.length === 1 ? content[ 0 ]! : trigger.parentElement;
+	}
 	const id = trigger.getAttribute( 'aria-controls' );
 	const byId = id ? doc.getElementById( id ) : null;
 	if ( byId ) return byId;
@@ -55,7 +69,13 @@ const BLOCK = new Set( [ 'p', 'div', 'ul', 'ol', 'blockquote', 'h3', 'h4', 'h5',
 export function panelHtml( panel: Element, win: Window ): string {
 	const blocks = Array.from( panel.children ).filter( ( c ) => BLOCK.has( c.tagName.toLowerCase() ) );
 	if ( ! blocks.length ) {
-		const inner = sanitizeInline( panel, win );
+		// A <details> with inline answer text: everything but the summary.
+		let src = panel;
+		if ( panel.tagName.toLowerCase() === 'details' ) {
+			src = panel.cloneNode( true ) as Element;
+			Array.from( src.children ).filter( ( c ) => c.tagName.toLowerCase() === 'summary' ).forEach( ( s ) => s.remove() );
+		}
+		const inner = sanitizeInline( src, panel === src ? win : undefined );
 		return inner ? `<p>${ inner }</p>` : '';
 	}
 	const out: string[] = [];
@@ -85,7 +105,28 @@ export function rotationOf( transform: string | undefined, rotate?: string ): nu
 	return deg === 360 ? 0 : deg;
 }
 
-const expanded = ( t: Element ): boolean => t.getAttribute( 'aria-expanded' ) === 'true';
+const expanded = ( t: Element ): boolean => ( isSummary( t ) ? ( t.parentElement as HTMLDetailsElement ).open : t.getAttribute( 'aria-expanded' ) === 'true' );
+
+/** The summary shows the browser's disclosure triangle (not hidden with list-style:none). */
+function hasMarker( summary: Element, win: Window ): boolean {
+	const cs = win.getComputedStyle( summary );
+	return cs.display === 'list-item' && cs.listStyleType !== 'none';
+}
+
+/** A one-character icon drawn by the trigger's ::before/::after ("+" that becomes "−"). */
+export function pseudoGlyph( el: Element, win: Window ): { char: string; position: 'start' | 'end'; size?: number } | undefined {
+	for ( const [ which, position ] of [ [ '::after', 'end' ], [ '::before', 'start' ] ] as const ) {
+		try {
+			const cs = win.getComputedStyle( el, which );
+			const m = /^["'](.{1,2})["']$/u.exec( cs.content ?? '' );
+			const size = parseFloat( cs.fontSize );
+			if ( m && m[ 1 ]!.trim() ) return { char: m[ 1 ]!.trim(), position, ...( size > 0 ? { size } : {} ) };
+		} catch {
+			/* not supported */
+		}
+	}
+	return undefined;
+}
 
 /** Wait until `done()` holds (frameworks render clicks asynchronously), up to `ms`. */
 async function until( win: Window, done: () => boolean, ms = 400 ): Promise< boolean > {
@@ -100,7 +141,10 @@ async function until( win: Window, done: () => boolean, ms = 400 ): Promise< boo
 /** Click a trigger and wait for its state to flip. */
 async function toggle( win: Window, t: Element ): Promise< void > {
 	const was = expanded( t );
-	( t as HTMLElement ).click();
+	// <details>: set `open` directly (a page may intercept summary clicks). Exclusive groups
+	// (<details name="faq">) still close the others, so "multiple" is observed correctly.
+	if ( isSummary( t ) ) ( t.parentElement as HTMLDetailsElement ).open = ! was;
+	else ( t as HTMLElement ).click();
 	await until( win, () => expanded( t ) !== was );
 }
 
@@ -122,7 +166,9 @@ export async function captureCollapsed(
 		const initial = group.map( expanded );
 		try {
 			for ( const t of group ) {
+				const closedGlyph = ! expanded( t ) ? pseudoGlyph( t, win ) : undefined;
 				if ( ! expanded( t ) ) await toggle( win, t );
+				const openGlyph = pseudoGlyph( t, win );
 				await until( win, () => ( panelOf( t, doc )?.textContent ?? '' ).trim().length > 0 );
 				const panel = panelOf( t, doc );
 				if ( ! panel ) continue;
@@ -131,13 +177,16 @@ export async function captureCollapsed(
 				const iconEl = t.querySelector( 'svg' );
 				const iconCs = iconEl ? win.getComputedStyle( iconEl ) : null;
 				const iconOpen = iconCs ? rotationOf( iconCs.transform, iconCs.getPropertyValue( 'rotate' ) ) : 0;
+				const summaryText = isSummary( t ) && panel === t.parentElement ? ( t.textContent ?? '' ) : '';
 				panels.set( t.getAttribute( keyAttr )!, {
 					html: panelHtml( panel, win ),
-					text: ( panel.textContent ?? '' ).replace( /\s+/g, ' ' ).trim(),
+					text: ( panel.textContent ?? '' ).replace( summaryText, '' ).replace( /\s+/g, ' ' ).trim(),
 					styles: readStyles( panel, win ),
 					textStyles: readStyles( textEl, win ),
 					open: initial[ group.indexOf( t ) ]!,
 					...( iconOpen ? { iconRotate: iconOpen } : {} ),
+					...( isSummary( t ) && hasMarker( t, win ) ? { marker: true } : {} ),
+					...( closedGlyph && openGlyph && closedGlyph.position === openGlyph.position ? { glyph: { closed: closedGlyph.char, open: openGlyph.char, position: closedGlyph.position, ...( closedGlyph.size ? { size: closedGlyph.size } : {} ) } } : {} ),
 				} );
 			}
 			// Opened one after another without closing: all still open means "multiple".

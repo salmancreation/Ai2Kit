@@ -8,7 +8,8 @@
  * tests/fixtures/elementor/controls-v3.json (`nested-accordion`).
  */
 import type { AccordionItem, AccordionMeta, IRNode, StyleMap } from '../ir/types';
-import { parseBox, px } from '../util/units';
+import { parseBox, px, round } from '../util/units';
+import { isTransparent } from '../util/color';
 import { dims, slider, type Settings } from './settings';
 import { borderSettings, boxSetting, colorSetting, commonWidget, iconSetting, iconValue, typography, widget, type EmitContext, type IconSetting, type V3Element } from './v3';
 
@@ -24,6 +25,24 @@ export function rotateSvg( svg: string, deg: number ): string {
 	return svg.replace( /(<svg\b[^>]*>)([\s\S]*)(<\/svg>\s*)$/, `$1<g transform="rotate(${ deg } ${ cx } ${ cy })">$2</g>$3` );
 }
 
+/** One-character pseudo icons ("+", "−", "▾") → Font Awesome (bundled with Elementor Free). */
+const GLYPH_FA: Record< string, string > = {
+	'+': 'fas fa-plus', '＋': 'fas fa-plus',
+	'−': 'fas fa-minus', '-': 'fas fa-minus', '–': 'fas fa-minus', '—': 'fas fa-minus',
+	'×': 'fas fa-times', '✕': 'fas fa-times', x: 'fas fa-times',
+	'▾': 'fas fa-caret-down', '▼': 'fas fa-caret-down', '⌄': 'fas fa-chevron-down', 'v': 'fas fa-chevron-down', '∨': 'fas fa-chevron-down',
+	'▴': 'fas fa-caret-up', '▲': 'fas fa-caret-up', '⌃': 'fas fa-chevron-up', '^': 'fas fa-chevron-up', '∧': 'fas fa-chevron-up',
+	'▸': 'fas fa-caret-right', '▶': 'fas fa-caret-right', '›': 'fas fa-chevron-right', '>': 'fas fa-chevron-right',
+};
+const fa = ( value: string ): IconSetting => ( { value, library: 'fa-solid' } );
+
+/** Where the icon sits: the source's (a marker or ::before is at the start). */
+export function iconAtStart( item: AccordionItem ): boolean {
+	if ( item.svg ) return !! item.iconStart;
+	if ( item.panel?.glyph ) return item.panel.glyph.position === 'start';
+	return !! item.panel?.marker;
+}
+
 /**
  * Closed and open icons: the source's own SVG (open = the same SVG with the
  * rotation the source applies when open), or Font Awesome when no SVG exists.
@@ -36,6 +55,10 @@ function icons( item: AccordionItem ): { normal: IconSetting; active: IconSettin
 			active: iconSetting( undefined, rot ? rotateSvg( item.svg, rot ) : item.svg )!,
 		};
 	}
+	// A "+"/"−" drawn by ::after, or the browser's ▸/▾ disclosure marker (<details>).
+	const g = item.panel?.glyph;
+	if ( g && GLYPH_FA[ g.closed ] ) return { normal: fa( GLYPH_FA[ g.closed ]! ), active: fa( GLYPH_FA[ g.open ] ?? GLYPH_FA[ g.closed ]! ) };
+	if ( item.panel?.marker ) return { normal: fa( 'fas fa-caret-right' ), active: fa( 'fas fa-caret-down' ) };
 	const normal = iconValue( item.iconName );
 	if ( ! normal ) return null;
 	return { normal, active: iconValue( ACTIVE_ICON[ item.iconName ?? '' ] ?? item.iconName ) ?? normal };
@@ -75,8 +98,13 @@ export function emitAccordion( node: IRNode, meta: AccordionMeta, ctx: EmitConte
 	if ( ic ) {
 		out.accordion_item_title_icon = ic.normal;
 		out.accordion_item_title_icon_active = ic.active;
-		out.accordion_item_title_icon_position = 'end';
-		if ( first.iconSize ) out.icon_size = slider( first.iconSize );
+		out.accordion_item_title_icon_position = iconAtStart( first ) ? 'start' : 'end';
+		const fs = px( trig[ 'font-size' ] ) ?? 16;
+		// No SVG to measure. A text "+" is ~0.7 of its font size wide (Font Awesome's fills its box);
+		// the ▸ marker matches a caret at the title's size.
+		const glyph = first.panel?.glyph;
+		const size = first.iconSize ?? ( first.svg ? undefined : glyph ? round( ( glyph.size ?? fs ) * 0.7 ) : fs );
+		if ( size ) out.icon_size = slider( size );
 	} else {
 		out.accordion_item_title_icon = { value: '', library: '' };
 	}
@@ -93,8 +121,15 @@ export function emitAccordion( node: IRNode, meta: AccordionMeta, ctx: EmitConte
 	const hover = first.trigger.hover?.color ?? trig.color;
 	colorSetting( out, 'hover_title_color', hover, ctx );
 	colorSetting( out, 'hover_icon_color', hover, ctx );
+	// Title padding = the trigger's, plus the item's own padding around it (<details style="padding">).
 	const pad = parseBox( trig, 'padding' ) ?? ZERO;
-	out.accordion_padding = dims( { ...pad, bottom: pad.bottom + ( first.extraBottom ?? 0 ) } );
+	const itemPad = parseBox( first.item.desktop, 'padding' ) ?? ZERO;
+	out.accordion_padding = dims( {
+		top: pad.top + itemPad.top,
+		right: pad.right + itemPad.right,
+		bottom: pad.bottom + itemPad.bottom + ( first.extraBottom ?? 0 ),
+		left: pad.left + itemPad.left,
+	} );
 
 	// Borders: the source draws them on the item (title + answer); Elementor on the title and the answer box.
 	const itemBorder = border( first.item.desktop ) ?? border( trig );
@@ -110,15 +145,43 @@ export function emitAccordion( node: IRNode, meta: AccordionMeta, ctx: EmitConte
 			out.content_border_width = dims( { ...ZERO, bottom: itemBorder.box.bottom } );
 			colorSetting( out, 'content_border_color', itemBorder.color, ctx );
 		} else {
-			out.content_border_border = 'none';
+			// A card (border all round): closed = the whole card; open = the title keeps top and
+			// sides, the answer box continues the sides and closes the bottom.
+			out.accordion_border_active_border = itemBorder.style;
+			out.accordion_border_active_width = dims( { ...itemBorder.box, bottom: 0 } );
+			colorSetting( out, 'accordion_border_active_color', itemBorder.color, ctx );
+			out.content_border_border = itemBorder.style;
+			out.content_border_width = dims( { ...itemBorder.box, top: 0 } );
+			colorSetting( out, 'content_border_color', itemBorder.color, ctx );
 		}
 	} else {
 		out.accordion_border_normal_border = 'none';
 		out.accordion_border_active_border = 'none';
 		out.content_border_border = 'none';
 	}
-	const gap = px( first.item.desktop[ 'margin-bottom' ] ) ?? 0;
+	// Space between items: their margin, or the list's flex/grid gap (separate cards).
+	const rs = node.styles.desktop;
+	const listGap = ( rs.display ?? '' ).includes( 'flex' ) || ( rs.display ?? '' ).includes( 'grid' ) ? px( rs[ 'row-gap' ] ) ?? 0 : 0;
+	const gap = ( px( first.item.desktop[ 'margin-bottom' ] ) ?? 0 ) + listGap;
 	if ( gap ) out.accordion_item_title_space_between = slider( gap );
+
+	// Card corners: the title rounds all corners; the open answer rounds the bottom ones.
+	const r = [ 'top-left', 'top-right', 'bottom-right', 'bottom-left' ].map( ( c ) => Math.min( 999, px( first.item.desktop[ `border-${ c }-radius` ] ) ?? 0 ) );
+	if ( r.some( Boolean ) ) {
+		out.accordion_border_radius = dims( { top: r[ 0 ]!, right: r[ 1 ]!, bottom: r[ 2 ]!, left: r[ 3 ]! } );
+		out.content_border_radius = dims( { top: 0, right: 0, bottom: r[ 2 ]!, left: r[ 3 ]! } );
+	}
+
+	// Item background (a tinted card): behind the title in every state, and behind the answer.
+	const bg = first.item.desktop[ 'background-color' ];
+	if ( bg && ! isTransparent( bg ) ) {
+		for ( const state of [ 'normal', 'hover', 'active' ] as const ) {
+			out[ `accordion_background_${ state }_background` ] = 'classic';
+			colorSetting( out, `accordion_background_${ state }_color`, bg, ctx );
+		}
+		out.content_background_background = 'classic';
+		colorSetting( out, 'content_background_color', bg, ctx );
+	}
 
 	// The accordion's own box (a top rule above the first item, a card around it).
 	commonWidget( out, node, ctx, parent, consumed, { boxStyles: true } );

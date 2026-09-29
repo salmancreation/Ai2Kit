@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwind FAQ — native details accordions</title>
+<style>
+	body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; color: #0f172a; background: #fff; line-height: 1.5; }
+	.wrap { max-width: 760px; margin: 0 auto; padding: 64px 24px; }
+	h2 { font-size: 30px; margin: 0 0 24px; }
+	section + section { margin-top: 56px; }
+
+	/* 1. Plain <details>: the browser's own ▸ marker. */
+	.plain details { padding: 8px 0; }
+	.plain summary { font-weight: 600; cursor: pointer; }
+	.plain details p { margin: 8px 0 0; color: #475569; }
+
+	/* 2. Tailwind-style cards: marker hidden, chevron svg that turns when open. */
+	.cards { display: flex; flex-direction: column; gap: 12px; }
+	.cards details { border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
+	.cards summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-weight: 600; font-size: 17px; cursor: pointer; }
+	.cards summary::-webkit-details-marker { display: none; }
+	.cards summary svg { width: 20px; height: 20px; color: #6366f1; transition: transform .2s; }
+	.cards details[open] summary svg { transform: rotate(180deg); }
+	.cards .answer { padding: 0 20px 18px; color: #475569; }
+	.cards .answer p { margin: 0 0 8px; }
+	.cards .answer ul { margin: 0; padding-left: 20px; }
+
+	/* 3. Exclusive group with a "+" that becomes "−" (summary::after). */
+	.plus details { border-bottom: 1px solid #e2e8f0; }
+	.plus summary { list-style: none; display: flex; justify-content: space-between; padding: 18px 0; font-size: 16px; font-weight: 600; cursor: pointer; }
+	.plus summary::-webkit-details-marker { display: none; }
+	.plus summary::after { content: "+"; font-size: 20px; line-height: 1; color: #0f172a; }
+	.plus details[open] summary::after { content: "−"; }
+	.plus details p { margin: 0 0 18px; color: #475569; }
+</style>
+</head>
+<body>
+<div class="wrap">
+	<section class="plain">
+		<h2>Shipping</h2>
+		<div class="plain-list">
+			<details><summary>Do you ship internationally?</summary><p>Yes — to 40 countries, with tracking on every order.</p></details>
+			<details><summary>How long does delivery take?</summary><p>2–4 business days in the US, 5–10 days abroad.</p></details>
+			<details><summary>Can I change my address?</summary><p>Until the order ships, from your account page.</p></details>
+		</div>
+	</section>
+
+	<section>
+		<h2>Billing</h2>
+		<div class="cards">
+			<details>
+				<summary>Which payment methods do you accept? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+				<div class="answer"><p>All major cards, plus:</p><ul><li>Apple Pay and Google Pay</li><li>Bank transfer for <strong>annual plans</strong></li></ul></div>
+			</details>
+			<details>
+				<summary>Can I get an invoice? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+				<div class="answer"><p>Yes. Every payment emails a PDF invoice, and all invoices are in <a href="#billing">Billing</a>.</p></div>
+			</details>
+			<details>
+				<summary>Do you offer refunds? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+				<div class="answer"><p>Within 30 days, no questions asked.</p></div>
+			</details>
+		</div>
+	</section>
+
+	<section class="plus">
+		<h2>Account</h2>
+		<div class="plus-list">
+			<details name="account"><summary>How do I reset my password?</summary><p>Use “Forgot password” on the sign-in page.</p></details>
+			<details name="account"><summary>Can I have several users?</summary><p>Team plans include up to 10 seats.</p></details>
+			<details name="account"><summary>How do I delete my account?</summary><p>Settings → Account → Delete. It takes effect immediately.</p></details>
+		</div>
+	</section>
+</div>
+</body>
+</html>
