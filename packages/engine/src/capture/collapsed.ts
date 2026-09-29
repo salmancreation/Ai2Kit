@@ -74,6 +74,17 @@ export function panelHtml( panel: Element, win: Window ): string {
 	return out.join( '' );
 }
 
+/** Rotation (deg) from a computed transform matrix and/or the `rotate` property. */
+export function rotationOf( transform: string | undefined, rotate?: string ): number {
+	let deg = 0;
+	const m = ( transform ?? '' ).match( /^matrix\(([^,]+),\s*([^,]+)/ );
+	if ( m ) deg += ( Math.atan2( parseFloat( m[ 2 ]! ), parseFloat( m[ 1 ]! ) ) * 180 ) / Math.PI;
+	const r = ( rotate ?? '' ).match( /^(-?[\d.]+)deg$/ );
+	if ( r ) deg += parseFloat( r[ 1 ]! );
+	deg = Math.round( ( ( deg % 360 ) + 360 ) % 360 );
+	return deg === 360 ? 0 : deg;
+}
+
 const expanded = ( t: Element ): boolean => t.getAttribute( 'aria-expanded' ) === 'true';
 
 /** Wait until `done()` holds (frameworks render clicks asynchronously), up to `ms`. */
@@ -116,12 +127,17 @@ export async function captureCollapsed(
 				const panel = panelOf( t, doc );
 				if ( ! panel ) continue;
 				const textEl = panel.querySelector( 'p, li' ) ?? panel;
+				// shadcn rotates the chevron when open ([data-state=open]>svg{rotate:180deg}).
+				const iconEl = t.querySelector( 'svg' );
+				const iconCs = iconEl ? win.getComputedStyle( iconEl ) : null;
+				const iconOpen = iconCs ? rotationOf( iconCs.transform, iconCs.getPropertyValue( 'rotate' ) ) : 0;
 				panels.set( t.getAttribute( keyAttr )!, {
 					html: panelHtml( panel, win ),
 					text: ( panel.textContent ?? '' ).replace( /\s+/g, ' ' ).trim(),
 					styles: readStyles( panel, win ),
 					textStyles: readStyles( textEl, win ),
 					open: initial[ group.indexOf( t ) ]!,
+					...( iconOpen ? { iconRotate: iconOpen } : {} ),
 				} );
 			}
 			// Opened one after another without closing: all still open means "multiple".

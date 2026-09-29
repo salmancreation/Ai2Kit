@@ -122,6 +122,8 @@ Today there are three ways to get there, and all of them are bad:
   - **Built** SPA ZIP (Vite `dist/`, Next static `out/`) with a single route
 - Iframe render and capture at 3 breakpoints
 - Conversion to Elementor v3 containers and core free widgets, **and/or** v4 atomic elements (auto-detected, user can switch)
+- Hover states (colors, background, border, shadow, lift/scale, transition duration) → widget hover controls / v4 hover style state (FR-22)
+- Accordions / FAQ → Elementor's native (nested) Accordion, with collapsed answers opened and captured during conversion (decided 2026-09-29: moved from Pro to Free)
 - Global colors and fonts extraction into the Elementor Kit
 - Images imported to the Media Library (deduped by hash)
 - Output: a saved Elementor template, **or** a new draft page
@@ -136,7 +138,7 @@ Today there are three ways to get there, and all of them are bad:
   - Header/footer detection → Theme Builder templates with conditions (if Elementor Pro), else Ai2Kit's own header/footer renderer
   - WordPress menus from nav links
   - Front page and blog page settings
-- **Interactive mapping:** tabs, accordion, carousel/slider, counters, testimonials, pricing toggles, dialogs/popups (Popup via Elementor Pro, else a Ai2Kit modal widget)
+- **Interactive mapping:** tabs, carousel/slider, counters, testimonials, pricing toggles, dialogs/popups (Popup via Elementor Pro, else a Ai2Kit modal widget)
 - **Forms:** Elementor Form (Pro) or Ai2Kit Form widget with email + spam protection; optional Fluent Forms / CF7 mapping
 - **Dynamic content:** repeated patterns → CPT + fields + Loop Grid (Pro) / Ai2Kit Loop widget, and demo posts
 - **Animations:** Framer Motion / CSS entrance effects → Elementor Motion Effects / v4 Interactions

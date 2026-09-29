@@ -1,6 +1,6 @@
 import { convert, analyze, emit, suggestedModes } from '../src/pipeline';
 import type { V3Element } from '../src/emit/v3';
-import { capture, validateAgainstRegistry } from './helpers';
+import { capture, cn, resetKeys, text, validateAgainstRegistry } from './helpers';
 import { gridColumns } from '../src/emit/v3';
 import { landing } from './fixtures/landing';
 
@@ -48,7 +48,8 @@ describe( 'emit-v3 on a landing page', () => {
 		const btns = widgets( els, 'button' );
 		const start = btns.find( ( b ) => b.settings.text === 'Get started' )!.settings;
 		expect( start.link ).toEqual( { url: 'http://site.test/start', is_external: '', nofollow: '', custom_attributes: '' } );
-		expect( start.selected_icon ).toEqual( { value: 'fas fa-arrow-right', library: 'fa-solid' } );
+		// The source's own SVG, not a Font Awesome look-alike.
+		expect( start.selected_icon ).toMatchObject( { library: 'svg', value: { url: expect.stringMatching( /^data:image\/svg\+xml;base64,/ ) } } );
 		expect( start.icon_align ).toBe( 'row-reverse' );
 		expect( start.border_radius ).toMatchObject( { top: '8', left: '8', isLinked: true } );
 		expect( start.text_padding ).toMatchObject( { top: '12', right: '24' } );
@@ -70,9 +71,9 @@ describe( 'emit-v3 on a landing page', () => {
 		expect( all( els ).filter( ( e ) => e.elType === 'container' && e.settings.container_type !== 'grid' ).every( ( e ) => 'flex_gap' in e.settings ) ).toBe( true );
 	} );
 
-	it( 'maps icons (Lucide → Font Awesome) and uploads unmapped ones as SVG', () => {
+	it( 'uses the source\'s own SVG for every icon (identical, not a Font Awesome look-alike)', () => {
 		const icons = widgets( els, 'icon' );
-		expect( icons.map( ( i ) => ( i.settings.selected_icon as { library: string } ).library ) ).toEqual( [ 'fa-solid', 'fa-solid', 'svg' ] );
+		expect( icons.map( ( i ) => ( i.settings.selected_icon as { library: string } ).library ) ).toEqual( [ 'svg', 'svg', 'svg' ] );
 		expect( ( icons[ 2 ]!.settings.selected_icon as { value: { url: string } } ).value.url ).toMatch( /^data:image\/svg\+xml;base64,/ );
 		expect( icons[ 0 ]!.settings.__globals__ ).toEqual( { primary_color: 'globals/colors?id=primary' } );
 	} );
@@ -173,5 +174,18 @@ describe( 'v4 fonts', () => {
 		expect( json ).not.toContain( 'system-ui' );
 		const p = ( doc.content[ 0 ]!.elements as Array< { id: string; widgetType?: string } > ).find( ( e ) => e.widgetType === 'e-paragraph' )!;
 		expect( doc.residual ).toContainEqual( expect.objectContaining( { className: `e-${ p.id }-a2k`, decls: { 'font-family': 'ui-sans-serif, system-ui, sans-serif' } } ) );
+	} );
+} );
+
+describe( 'grids on mobile', () => {
+	it( 'writes the mobile column count when a grid stays multi-column (Elementor would fall back to 1)', () => {
+		resetKeys();
+		const cells = [ 'A', 'B', 'C', 'D' ].map( ( t ) => text( 'div', t, {}, { rect: { x: 0, y: 0, w: 300, h: 40 } } ) );
+		const grid = cn( 'div', { display: 'grid', 'grid-template-columns': '300px 300px', 'row-gap': '16px', 'column-gap': '16px' }, cells, { rect: { x: 0, y: 0, w: 616, h: 96 }, mobile: { 'grid-template-columns': '171px 171px' } } );
+		const els = convert( capture( cn( 'body', {}, [ cn( 'section', { 'padding-top': '40px' }, [ grid ] ) ] ) ), 'grid-m' ).document.content as V3Element[];
+		const g = JSON.parse( JSON.stringify( els ) ).flatMap( function flat( e: V3Element ): V3Element[] { return [ e, ...e.elements.flatMap( flat ) ]; } ).find( ( e: V3Element ) => e.settings.container_type === 'grid' ) as V3Element;
+		expect( g.settings.grid_columns_grid ).toEqual( { unit: 'fr', size: 2, sizes: [] } );
+		expect( g.settings.grid_columns_grid_mobile ).toEqual( { unit: 'fr', size: 2, sizes: [] } );
+		expect( validateAgainstRegistry( els ) ).toEqual( [] );
 	} );
 } );

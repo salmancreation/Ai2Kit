@@ -164,6 +164,42 @@ final class ImportTest extends TestCase {
 		$this->assertStringContainsString( 'a2k-r-test123', implode( '', (array) wp_styles()->get_data( 'ai2kit-residual-' . $id, 'after' ) ) );
 	}
 
+	public function test_svg_icons_import_once_render_and_fall_back_when_invalid() {
+		$svg  = 'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" fill="none" stroke="rgb(22, 163, 74)" stroke-width="2"/></svg>' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$bad  = 'data:image/svg+xml;base64,' . base64_encode( '<html>not an svg</html>' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$icon = static function ( $url, $fallback = null ) {
+			$v = array(
+				'value'   => array(
+					'url' => $url,
+					'id'  => '',
+				),
+				'library' => 'svg',
+			);
+			if ( $fallback ) {
+				$v['fallback'] = $fallback;
+			}
+			return $v;
+		};
+		$media = new \ModinaTheme\Ai2Kit\Services\MediaImporter( wp_generate_uuid4(), false );
+		$out   = $media->process(
+			array(
+				array( 'id' => 'a000001', 'elType' => 'widget', 'widgetType' => 'icon', 'settings' => array( 'selected_icon' => $icon( $svg, 'fas fa-check' ) ), 'elements' => array() ),
+				array( 'id' => 'a000002', 'elType' => 'widget', 'widgetType' => 'icon', 'settings' => array( 'selected_icon' => $icon( $svg ) ), 'elements' => array() ),
+				array( 'id' => 'a000003', 'elType' => 'widget', 'widgetType' => 'icon', 'settings' => array( 'selected_icon' => $icon( $bad, 'fas fa-star' ) ), 'elements' => array() ),
+				array( 'id' => 'a000004', 'elType' => 'widget', 'widgetType' => 'icon', 'settings' => array( 'selected_icon' => $icon( $bad ) ), 'elements' => array() ),
+			)
+		);
+		$first = $out[0]['settings']['selected_icon'];
+		$this->assertSame( 'svg', $first['library'] );
+		$this->assertArrayNotHasKey( 'fallback', $first );
+		$this->assertGreaterThan( 0, $first['value']['id'] );
+		$this->assertSame( $first['value']['id'], $out[1]['settings']['selected_icon']['value']['id'], 'The same icon is uploaded once.' );
+		$this->assertStringContainsString( 'stroke="rgb(22, 163, 74)"', \Elementor\Core\Files\File_Types\Svg::get_inline_svg( $first['value']['id'] ) );
+		$this->assertSame( array( 'value' => 'fas fa-star', 'library' => 'fa-solid' ), $out[2]['settings']['selected_icon'] );
+		$this->assertSame( '', $out[3]['settings']['selected_icon']['library'] );
+		$this->assertSame( 2, $media->icon_fallbacks );
+	}
+
 	public function test_media_is_deduplicated_by_hash() {
 		list( , $a ) = $this->import_golden();
 		list( , $b ) = $this->import_golden();

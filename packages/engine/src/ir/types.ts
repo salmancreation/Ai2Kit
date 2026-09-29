@@ -123,7 +123,7 @@ export type Fallback = { reason: string; html: string; css: string };
 export type ResidualRule = {
 	className: string;
 	/** Descendant selector appended after the class, from a fixed allowlist. */
-	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' img';
+	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' .elementor-button-icon svg' | ' img';
 	breakpoint: 'desktop' | 'tablet' | 'mobile';
 	/** Pseudo-state the rule applies in (`:hover`). */
 	state?: 'hover';
@@ -178,6 +178,8 @@ export type PanelCapture = {
 	open: boolean;
 	/** Several items can be open at once (observed while capturing). */
 	multiple?: boolean;
+	/** Rotation (deg) of the trigger's icon while open (shadcn turns the chevron 180°). */
+	iconRotate?: number;
 };
 
 export type CapturedNode = {

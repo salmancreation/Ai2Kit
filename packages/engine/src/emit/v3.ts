@@ -147,6 +147,8 @@ export function typography( out: Settings, prefix: string, node: IRNode, ctx: Em
 		consumed.add( 'font-weight' );
 	}
 	responsive( out, `${ prefix }_line_height`, node.styles, ( st ) => {
+		// `normal` is ~1.2 for web fonts; unset, the theme's 1.5 would apply instead.
+		if ( st[ 'line-height' ] === 'normal' ) return slider( 1.2, 'em' );
 		const lh = px( st[ 'line-height' ] );
 		const fs = px( st[ 'font-size' ] );
 		return lh !== null && fs ? slider( round( lh / fs ), 'em' ) : undefined;
@@ -501,6 +503,12 @@ function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, 
 	if ( L.display === 'grid' ) {
 		out.container_type = 'grid';
 		responsive( out, 'grid_columns_grid', node.styles, ( st ) => gridColumns( st[ 'grid-template-columns' ] ) );
+		// Elementor's grid falls back to 1 column on mobile (its mobile_default), not the tablet value:
+		// a grid that stays multi-column on phones needs the value written.
+		if ( out.grid_columns_grid_mobile === undefined ) {
+			const m = gridColumns( effective( node.styles, 'mobile' )[ 'grid-template-columns' ] );
+			if ( ! ( m.unit === 'fr' && m.size === 1 ) ) out.grid_columns_grid_mobile = m;
+		}
 		// Content-sized rows, like the source's implicit rows (fr rows would force equal heights).
 		out.grid_rows_grid = { unit: 'custom', size: 'auto', sizes: [] };
 		responsive( out, 'grid_gaps', node.styles, ( st ) => gaps( px( st[ 'row-gap' ] ) ?? 0, px( st[ 'column-gap' ] ) ?? 0 ) );
@@ -677,6 +685,24 @@ export function iconValue( name: string | undefined ): { value: string; library:
 	return { value: fa, library: fa.startsWith( 'fab ' ) ? 'fa-brands' : 'fa-solid' };
 }
 
+export type IconSetting = { value: string | { url: string; id: string | number }; library: string; fallback?: string };
+
+/**
+ * An icon setting: the source's own SVG (uploaded to the Media Library on
+ * import, so it is identical to the source), or the Font Awesome equivalent
+ * of a Lucide icon only when no SVG was captured.
+ */
+export function iconSetting( name: string | undefined, svg: string | undefined ): IconSetting | undefined {
+	const fa = iconValue( name );
+	if ( svg ) {
+		// `fallback`: what the server uses if this SVG can't be imported (it is removed on import).
+		const setting: IconSetting = { value: { url: svgDataUri( svg ), id: '' }, library: 'svg' };
+		if ( fa ) setting.fallback = fa.value;
+		return setting;
+	}
+	return fa;
+}
+
 export function svgDataUri( svg: string ): string {
 	const b64 = typeof btoa === 'function' ? btoa( unescape( encodeURIComponent( svg ) ) ) : Buffer.from( svg, 'utf8' ).toString( 'base64' );
 	return `data:image/svg+xml;base64,${ b64 }`;
@@ -738,12 +764,12 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 		case 'button': {
 			out.text = node.content?.text ?? '';
 			out.link = link( node.content?.href || '#', node.content?.target );
-			const icon = iconValue( node.content?.iconName );
+			const icon = iconSetting( node.content?.iconName, node.content?.svg );
 			if ( icon ) {
 				out.selected_icon = icon;
 				// Icon after the label in the source → row-reverse.
 				if ( node.content?.iconPos === 'after' ) out.icon_align = 'row-reverse';
-				out.icon_indent = slider( 8 );
+				out.icon_indent = slider( px( s[ 'column-gap' ] ) ?? 8 );
 			}
 			// A button's horizontal position comes from its parent: text-align, or align-items in a column.
 			const placed = placement( node, parent );
@@ -779,6 +805,14 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			boxSetting( out, 'text_padding', node.styles, 'padding', consumed );
 			commonWidget( out, node, ctx, parent, consumed );
 			hoverSettings( out, node, 'button', ctx );
+			// Elementor draws button icons at 1em of the label; keep the source's icon size.
+			const iconPx = node.content?.iconSize;
+			const labelPx = px( s[ 'font-size' ] );
+			if ( icon && iconPx && labelPx && Math.abs( iconPx - labelPx ) > 0.5 ) {
+				const className = `a2k-r-${ node.id }`;
+				ctx.residual?.push( { className, target: ' .elementor-button-icon svg', breakpoint: 'desktop', decls: { width: `${ round( iconPx ) }px`, height: `${ round( iconPx ) }px` }, label: ctx.section } );
+				out._css_classes = className;
+			}
 			el = widget( 'button', out, ctx );
 			break;
 		}
@@ -814,18 +848,15 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			break;
 		}
 		case 'icon': {
-			const icon = iconValue( node.content?.iconName );
-			if ( icon ) {
-				out.selected_icon = icon;
-				// A Font Awesome equivalent is editable but not pixel-identical.
-				if ( ctx.stats ) ctx.stats.penalty += 0.5;
-			}
-			else if ( node.content?.svg ) out.selected_icon = { value: { url: svgDataUri( node.content.svg ), id: '' }, library: 'svg' };
-			else return null;
-			if ( ! icon ) ctx.stats?.warnings.push( 'Custom icon uploaded as SVG.' );
+			const icon = iconSetting( node.content?.iconName, node.content?.svg );
+			if ( ! icon ) return null;
+			out.selected_icon = icon;
+			// A Font Awesome stand-in (no SVG captured) is editable but not pixel-identical.
+			if ( icon.library !== 'svg' && ctx.stats ) ctx.stats.penalty += 0.5;
 			const color = svgColor( node.content?.svg ) ?? s.color;
 			colorSetting( out, 'primary_color', color, ctx ) && consumed.add( 'color' );
-			if ( node.rect?.w ) out.size = slider( node.rect.w );
+			// Elementor draws icons in a 1em square: size by the larger side so nothing crops.
+			if ( node.rect?.w ) out.size = slider( Math.max( node.rect.w, node.rect.h ) );
 			out.align = innerAlign( node, parent ) ?? 'start';
 			if ( node.content?.href ) out.link = link( node.content.href );
 			commonWidget( out, node, ctx, parent, consumed );
@@ -837,8 +868,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			const items = node.content?.items ?? [];
 			out.icon_list = items.map( ( it ) => {
 				const item: Settings = { _id: ctx.nextId(), text: it.text };
-				const icon = iconValue( it.iconName );
-				item.selected_icon = icon ?? ( it.svg ? { value: { url: svgDataUri( it.svg ), id: '' }, library: 'svg' } : { value: 'fas fa-check', library: 'fa-solid' } );
+				item.selected_icon = iconSetting( it.iconName, it.svg ) ?? { value: 'fas fa-check', library: 'fa-solid' };
 				if ( it.href ) item.link = link( it.href );
 				return item;
 			} );
@@ -855,8 +885,12 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 				const listAlign = j === 'center' ? 'center' : j === 'flex-end' || j === 'end' ? 'end' : innerAlign( node, parent );
 				if ( listAlign ) out.icon_align = listAlign;
 			}
-			if ( node.content?.iconSize ) out.icon_size = slider( node.content.iconSize );
-			if ( node.content?.iconGap ) out.text_indent = slider( node.content.iconGap );
+			const iconSize = node.content?.iconSize;
+			if ( iconSize ) out.icon_size = slider( iconSize );
+			if ( node.content?.iconGap !== undefined ) {
+				// Elementor's icon-to-text distance = text_indent + the icon's 0.25em margin + 5px text padding.
+				out.text_indent = slider( Math.max( 0, round( node.content.iconGap - ( iconSize ?? 14 ) * 0.25 - 5 ) ) );
+			}
 			commonWidget( out, node, ctx, parent, consumed, { sizing: true } );
 			el = widget( 'icon-list', out, ctx );
 			break;

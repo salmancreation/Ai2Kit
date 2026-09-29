@@ -115,6 +115,13 @@ final class Importer {
 				'text' => sprintf( _n( '%d style no Elementor control covers (like gradient text) was kept as CSS scoped to this page.', '%d styles no Elementor control covers (like gradient text or rotation) were kept as CSS scoped to this page.', $residual_rules, 'ai2kit' ), $residual_rules ),
 			);
 		}
+		if ( $media->icon_fallbacks ) {
+			$checks[] = array(
+				'type' => 'icons',
+				/* translators: %d: number of icons. */
+				'text' => sprintf( _n( '%d icon couldn\'t be imported as SVG and uses the closest Font Awesome icon instead.', '%d icons couldn\'t be imported as SVG and use the closest Font Awesome icon instead.', $media->icon_fallbacks, 'ai2kit' ), $media->icon_fallbacks ),
+			);
+		}
 		if ( $media->failed ) {
 			$checks[] = array(
 				'type' => 'media',

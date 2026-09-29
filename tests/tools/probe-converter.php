@@ -9,6 +9,7 @@ use Elementor\Modules\AtomicWidgets\CssConverter\Expander_Registry_Factory;
 use Elementor\Modules\AtomicWidgets\CssConverter\Metrics\Null_Failure_Reporter;
 $c = new Css_Converter( Converter_Registry_Factory::create( null ), new Null_Failure_Reporter(), Expander_Registry_Factory::create( null ), null );
 $tests = array(
+	'line-height: 1.2em',
 	'transition: all 0.2s ease',
 	'transition-duration: 0.15s',
 	'transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s cubic-bezier(0.4, 0, 0.2, 1)',

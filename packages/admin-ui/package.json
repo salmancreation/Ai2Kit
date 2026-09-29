@@ -1,6 +1,6 @@
 {
   "name": "@ai2kit/admin-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Ai2Kit wp-admin app (React via @wordpress/element).",
   "license": "GPL-2.0-or-later",

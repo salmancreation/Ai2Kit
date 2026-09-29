@@ -4,7 +4,7 @@ Tags: elementor, html to elementor, lovable, converter, ai website
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,8 @@ Ai2Kit turns websites built with AI tools into native, editable Elementor pages.
 = What you get =
 
 * Native Elementor containers and widgets: headings, text, buttons, images, icons, icon lists, videos, dividers and spacers.
+* FAQs and accordions become Elementor's native Accordion, with every answer — even the ones hidden until clicked.
+* Hover effects are kept: button and link colors, card shadows and lifts, with their transition speed.
 * Elementor 4 Atomic elements (v4) when the Atomic editor is on — or classic widgets (v3), your choice.
 * Styles no Elementor control covers (gradient text, rotations, blur) are kept as small CSS scoped to the converted page.
 * Responsive values for tablet and mobile, only where they differ.
@@ -43,7 +45,7 @@ Ai2Kit converts presentational pages. App features (logins, dashboards, database
 
 = Ai2Kit Pro =
 
-A separate add-on converts whole sites in one job (multiple routes, header and footer templates, menus), maps tabs, accordions and carousels to native widgets, and more. Everything in the free version stays free.
+A separate add-on converts whole sites in one job (multiple routes, header and footer templates, menus), maps tabs and carousels to native widgets, and more. Everything in the free version stays free.
 
 == Installation ==
 
@@ -77,6 +79,13 @@ Administrators. Sites that run JavaScript can only be converted by users allowed
 6. Done — edit your new page with Elementor.
 
 == Changelog ==
+
+= 0.3.0 =
+* New: accordions and FAQs (Radix/shadcn and similar) become Elementor's native Accordion. Collapsed answers are opened and captured during conversion.
+* New: hover effects — colors, backgrounds, borders, shadows, lift/scale and transition duration — map to Elementor's hover controls (v3) and the hover style state (v4).
+* Improved: icons are the source's own SVG (identical), not a Font Awesome look-alike. Icons colored by CSS classes or inline styles, sprite icons (<use>), gradients and icons without a viewBox all import correctly. If an SVG can't be imported, the closest Font Awesome icon is used and the import report says so.
+* Fixed: button icons keep their size; icon list spacing matches the source; grids that stay multi-column on phones no longer collapse to one column; text with a "normal" line height no longer gets the theme's taller line height.
+* Improved: History shows each score as a ring, and actions have icons.
 
 = 0.2.0 =
 * New: Elementor 4 Atomic (v4) output, built with Elementor's own CSS converter and validators. Mixed with classic widgets where no atomic element exists.

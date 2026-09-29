@@ -208,8 +208,12 @@
 												"custom_attributes": ""
 											},
 											"selected_icon": {
-												"value": "fas fa-arrow-right",
-												"library": "fa-solid"
+												"value": {
+													"url": "data:image/svg+xml;base64,PHN2Zy8+",
+													"id": ""
+												},
+												"library": "svg",
+												"fallback": "fas fa-arrow-right"
 											},
 											"icon_align": "row-reverse",
 											"icon_indent": {
@@ -373,15 +377,12 @@
 										"widgetType": "e-svg",
 										"settings": {
 											"svg": {
-												"$$type": "icon",
+												"$$type": "svg-src",
 												"value": {
-													"value": {
-														"$$type": "string",
-														"value": "fas fa-bolt"
-													},
-													"library": {
-														"$$type": "string",
-														"value": "fa-solid"
+													"id": null,
+													"url": {
+														"$$type": "url",
+														"value": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxMjQsIDU4LCAyMzcpIj48cGF0aCBkPSJNMSIvPjwvc3ZnPg=="
 													}
 												}
 											}
@@ -442,15 +443,12 @@
 										"widgetType": "e-svg",
 										"settings": {
 											"svg": {
-												"$$type": "icon",
+												"$$type": "svg-src",
 												"value": {
-													"value": {
-														"$$type": "string",
-														"value": "fas fa-shield-alt"
-													},
-													"library": {
-														"$$type": "string",
-														"value": "fa-solid"
+													"id": null,
+													"url": {
+														"$$type": "url",
+														"value": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxMjQsIDU4LCAyMzcpIj48cGF0aCBkPSJNMSIvPjwvc3ZnPg=="
 													}
 												}
 											}
@@ -576,16 +574,24 @@
 									"_id": "69aec85",
 									"text": "Unlimited pages",
 									"selected_icon": {
-										"value": "fas fa-check",
-										"library": "fa-solid"
+										"value": {
+											"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxOCwgMTgzLCAxMDYpIi8+",
+											"id": ""
+										},
+										"library": "svg",
+										"fallback": "fas fa-check"
 									}
 								},
 								{
 									"_id": "1f6b8c4",
 									"text": "Local-first",
 									"selected_icon": {
-										"value": "fas fa-check",
-										"library": "fa-solid"
+										"value": {
+											"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxOCwgMTgzLCAxMDYpIi8+",
+											"id": ""
+										},
+										"library": "svg",
+										"fallback": "fas fa-check"
 									}
 								}
 							],

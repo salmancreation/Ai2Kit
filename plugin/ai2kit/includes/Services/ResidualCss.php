@@ -66,7 +66,7 @@ final class ResidualCss {
 		'hover' => ':hover',
 	);
 
-	const TARGETS = array( '', ' .elementor-heading-title', ' .elementor-widget-container', ' .elementor-button', ' img' );
+	const TARGETS = array( '', ' .elementor-heading-title', ' .elementor-widget-container', ' .elementor-button', ' .elementor-button-icon svg', ' img' );
 
 	const MEDIA = array(
 		'desktop' => '',

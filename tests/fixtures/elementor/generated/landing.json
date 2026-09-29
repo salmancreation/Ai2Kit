@@ -391,8 +391,12 @@
 										"custom_attributes": ""
 									},
 									"selected_icon": {
-										"value": "fas fa-arrow-right",
-										"library": "fa-solid"
+										"value": {
+											"url": "data:image/svg+xml;base64,PHN2Zy8+",
+											"id": ""
+										},
+										"library": "svg",
+										"fallback": "fas fa-arrow-right"
 									},
 									"icon_align": "row-reverse",
 									"icon_indent": {
@@ -668,8 +672,12 @@
 										"widgetType": "icon",
 										"settings": {
 											"selected_icon": {
-												"value": "fas fa-bolt",
-												"library": "fa-solid"
+												"value": {
+													"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxMjQsIDU4LCAyMzcpIj48cGF0aCBkPSJNMSIvPjwvc3ZnPg==",
+													"id": ""
+												},
+												"library": "svg",
+												"fallback": "fas fa-bolt"
 											},
 											"__globals__": {
 												"primary_color": "globals/colors?id=primary"
@@ -777,8 +785,12 @@
 										"widgetType": "icon",
 										"settings": {
 											"selected_icon": {
-												"value": "fas fa-shield-alt",
-												"library": "fa-solid"
+												"value": {
+													"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxMjQsIDU4LCAyMzcpIj48cGF0aCBkPSJNMSIvPjwvc3ZnPg==",
+													"id": ""
+												},
+												"library": "svg",
+												"fallback": "fas fa-shield-alt"
 											},
 											"__globals__": {
 												"primary_color": "globals/colors?id=primary"
@@ -952,16 +964,24 @@
 									"_id": "1558878",
 									"text": "Unlimited pages",
 									"selected_icon": {
-										"value": "fas fa-check",
-										"library": "fa-solid"
+										"value": {
+											"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxOCwgMTgzLCAxMDYpIi8+",
+											"id": ""
+										},
+										"library": "svg",
+										"fallback": "fas fa-check"
 									}
 								},
 								{
 									"_id": "69aec85",
 									"text": "Local-first",
 									"selected_icon": {
-										"value": "fas fa-check",
-										"library": "fa-solid"
+										"value": {
+											"url": "data:image/svg+xml;base64,PHN2ZyBzdHJva2U9InJnYigxOCwgMTgzLCAxMDYpIi8+",
+											"id": ""
+										},
+										"library": "svg",
+										"fallback": "fas fa-check"
 									}
 								}
 							],
@@ -1260,7 +1280,7 @@
 				"h": 900
 			},
 			"score": {
-				"score": 94,
+				"score": 95,
 				"structure": 0.93,
 				"styles": 0.99,
 				"fallbackRatio": 0.07
@@ -1279,7 +1299,6 @@
 				"repeat"
 			],
 			"warnings": [
-				"Custom icon uploaded as SVG.",
 				"Kept as HTML — Forms need Pro to map natively."
 			],
 			"mode": "native",

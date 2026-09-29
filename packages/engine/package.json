@@ -1,6 +1,6 @@
 {
   "name": "@ai2kit/engine",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Ai2Kit conversion engine: capture → IR → Elementor JSON. Pure, deterministic, zero runtime deps.",
   "license": "GPL-2.0-or-later",

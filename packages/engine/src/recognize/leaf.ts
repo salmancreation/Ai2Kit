@@ -156,6 +156,8 @@ export function classify( node: CapturedNode ): Classification {
 			if ( iconName ) content.iconName = iconName;
 			if ( node.svg ) content.svg = node.svg;
 			if ( a[ 'data-a2k-icon-pos' ] === 'after' ) content.iconPos = 'after';
+			const iconSize = parseFloat( a[ 'data-a2k-icon-size' ] ?? '' );
+			if ( iconSize > 0 ) content.iconSize = iconSize;
 			return { kind: 'button', content };
 		}
 		const html = href ? `<a href="${ href.replace( /"/g, '&quot;' ) }">${ node.html ?? text }</a>` : node.html ?? text;

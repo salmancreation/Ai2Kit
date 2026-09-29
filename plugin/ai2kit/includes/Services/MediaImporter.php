@@ -74,6 +74,13 @@ final class MediaImporter {
 	public $failed = array();
 
 	/**
+	 * SVG icons that couldn't be imported (replaced by their Font Awesome fallback, or removed).
+	 *
+	 * @var int
+	 */
+	public $icon_fallbacks = 0;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $job    Job UUID.
@@ -131,6 +138,30 @@ final class MediaImporter {
 				}
 			}
 			return $value;
+		}
+		// Uploaded SVG icon ({ value: { url, id }, library: svg, fallback? }). If the SVG can't be
+		// imported, Elementor would render nothing: use the Font Awesome fallback, or drop the icon.
+		if ( 'svg' === ( $value['library'] ?? null ) && is_array( $value['value'] ?? null ) && is_string( $value['value']['url'] ?? null ) ) {
+			$fallback = isset( $value['fallback'] ) && is_string( $value['fallback'] ) && preg_match( '/^fa[bsr] fa-[a-z0-9-]+$/', $value['fallback'] ) ? $value['fallback'] : '';
+			unset( $value['fallback'] );
+			$resolved = '' !== $value['value']['url'] ? $this->resolve( $value['value']['url'] ) : null;
+			if ( $resolved ) {
+				$value['value'] = array(
+					'url' => $resolved['url'],
+					'id'  => $resolved['id'],
+				);
+				return $value;
+			}
+			++$this->icon_fallbacks;
+			return $fallback
+				? array(
+					'value'   => $fallback,
+					'library' => 0 === strpos( $fallback, 'fab ' ) ? 'fa-brands' : 'fa-solid',
+				)
+				: array(
+					'value'   => '',
+					'library' => '',
+				);
 		}
 		if ( array_key_exists( 'url', $value ) && array_key_exists( 'id', $value ) && is_string( $value['url'] ) && '' !== $value['url'] ) {
 			$resolved = $this->resolve( $value['url'], isset( $value['alt'] ) ? (string) $value['alt'] : '' );

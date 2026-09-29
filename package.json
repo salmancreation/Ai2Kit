@@ -1,7 +1,7 @@
 {
   "name": "ai2kit-monorepo",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Ai2Kit \u2014 AI-built site to Elementor converter (monorepo)",
   "license": "GPL-2.0-or-later",
   "packageManager": "pnpm@9.15.9",
@@ -17,8 +17,10 @@
     "release": "node scripts/release.mjs",
     "test:php": "cd plugin/ai2kit && vendor/bin/phpunit",
     "test:php:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/ai2kit vendor/bin/phpunit -c phpunit-integration.xml.dist",
-    "e2e": "for fmt in v3 v4; do for f in static-landing.zip lovable-spa-dist.zip ai-tailwind.html; do node tests/e2e/convert.mjs --file tests/fixtures/source/$f --format $fmt --out tests/e2e/output/$fmt-${f%%.*} --min 90 || exit 1; done; done",
+    "e2e": "for fmt in v3 v4; do for f in static-landing.zip lovable-spa-dist.zip ai-tailwind.html icons.html; do node tests/e2e/convert.mjs --file tests/fixtures/source/$f --format $fmt --out tests/e2e/output/$fmt-${f%%.*} --min 90 || exit 1; done; done",
     "deps": "bash scripts/fetch-deps.sh",
+    "e2e:icons": "node tests/e2e/icons.mjs",
+    "e2e:interactions": "node tests/e2e/interactions.mjs",
     "lint:php": "cd plugin/ai2kit && composer lint && composer stan",
     "plugin-check": "node scripts/release.mjs --skip-tests && wp-env run cli wp plugin check ai2kit-release --slug=ai2kit"
   },

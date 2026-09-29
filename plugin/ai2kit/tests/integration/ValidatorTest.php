@@ -39,6 +39,24 @@ final class ValidatorTest extends TestCase {
 		$this->assertSame( 'Go', $out['content'][1]['settings']['text'] );
 	}
 
+	public function test_nested_accordion_keeps_item_containers_only() {
+		$item    = array(
+			'id'       => 'abcdef5',
+			'elType'   => 'container',
+			'settings' => array(),
+			'elements' => array( $this->widget( 'text-editor', array( 'editor' => '<p>Yes<script>x</script></p>' ), 'abcdef6' ) ),
+		);
+		$acc     = $this->widget( 'nested-accordion', array( 'items' => array( array( '_id' => 'abcdef7', 'item_title' => 'Free? <img src=x onerror=y>' ) ) ) );
+		$acc['elements'] = array( $item, $this->widget( 'html', array( 'html' => '<script>z</script>' ), 'abcdef8' ) );
+		$out     = ( new Validator() )->document( $this->doc( array( $acc ) ) );
+		$el      = $out['content'][0];
+		$this->assertSame( 'nested-accordion', $el['widgetType'] );
+		$this->assertCount( 1, $el['elements'] );
+		$this->assertSame( 'container', $el['elements'][0]['elType'] );
+		$this->assertStringNotContainsString( '<script', $el['elements'][0]['elements'][0]['settings']['editor'] );
+		$this->assertStringNotContainsString( 'onerror', wp_json_encode( $out ) );
+	}
+
 	public function test_html_fallback_keeps_scripts_only_with_unfiltered_html() {
 		$doc = $this->doc( array( $this->widget( 'html', array( 'html' => '<div>x</div><script>track()</script>' ) ) ) );
 		$this->assertStringContainsString( '<script>', ( new Validator() )->document( $doc )['content'][0]['settings']['html'] );

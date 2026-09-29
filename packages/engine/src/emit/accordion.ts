@@ -10,24 +10,35 @@
 import type { AccordionItem, AccordionMeta, IRNode, StyleMap } from '../ir/types';
 import { parseBox, px } from '../util/units';
 import { dims, slider, type Settings } from './settings';
-import { borderSettings, boxSetting, colorSetting, commonWidget, iconValue, svgDataUri, typography, widget, type EmitContext, type V3Element } from './v3';
+import { borderSettings, boxSetting, colorSetting, commonWidget, iconSetting, iconValue, typography, widget, type EmitContext, type IconSetting, type V3Element } from './v3';
 
 /** Chevron-down opens to chevron-up, plus to minus; anything else keeps its icon. */
 const ACTIVE_ICON: Record< string, string > = { 'chevron-down': 'chevron-up', 'chevron-right': 'chevron-down', plus: 'minus', 'arrow-down': 'arrow-up' };
 
-type IconSetting = { value: string | { url: string; id: string }; library: string };
+/** The SVG turned by `deg` about its viewBox center (the open-state icon). */
+export function rotateSvg( svg: string, deg: number ): string {
+	const vb = /viewBox="([-\d.\s,]+)"/.exec( svg )?.[ 1 ]?.split( /[\s,]+/ ).map( Number );
+	if ( ! vb || vb.length !== 4 || vb.some( Number.isNaN ) ) return svg;
+	const cx = vb[ 0 ]! + vb[ 2 ]! / 2;
+	const cy = vb[ 1 ]! + vb[ 3 ]! / 2;
+	return svg.replace( /(<svg\b[^>]*>)([\s\S]*)(<\/svg>\s*)$/, `$1<g transform="rotate(${ deg } ${ cx } ${ cy })">$2</g>$3` );
+}
 
+/**
+ * Closed and open icons: the source's own SVG (open = the same SVG with the
+ * rotation the source applies when open), or Font Awesome when no SVG exists.
+ */
 function icons( item: AccordionItem ): { normal: IconSetting; active: IconSetting } | null {
-	const normal = iconValue( item.iconName );
-	if ( normal ) {
-		const active = iconValue( ACTIVE_ICON[ item.iconName ?? '' ] ?? item.iconName ) ?? normal;
-		return { normal, active };
-	}
 	if ( item.svg ) {
-		const svg: IconSetting = { value: { url: svgDataUri( item.svg ), id: '' }, library: 'svg' };
-		return { normal: svg, active: svg };
+		const rot = item.panel?.iconRotate ?? 0;
+		return {
+			normal: iconSetting( undefined, item.svg )!,
+			active: iconSetting( undefined, rot ? rotateSvg( item.svg, rot ) : item.svg )!,
+		};
 	}
-	return null;
+	const normal = iconValue( item.iconName );
+	if ( ! normal ) return null;
+	return { normal, active: iconValue( ACTIVE_ICON[ item.iconName ?? '' ] ?? item.iconName ) ?? normal };
 }
 
 /** First side with a visible border: style, widths and color. */

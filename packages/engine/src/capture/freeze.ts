@@ -125,27 +125,141 @@ export function sanitizeInline( el: Element, win?: Window, rules?: ResidualRule[
 
 const SVG_ATTR_BLOCK = /^(on.*|style|class|data-a2k-key)$/i;
 
-/** Serialize an SVG with `currentColor` resolved and scripts/handlers removed. */
+const SVG_SHAPES = 'path,circle,ellipse,line,polyline,polygon,rect,text,tspan,use';
+
+/**
+ * Paint properties baked from computed style onto every shape. Source icons
+ * are often colored by CSS (`.pill svg { fill: … }`, Tailwind `fill-*`,
+ * `style=""`), which the class/style stripping below — and the SVG
+ * sanitizer on the server — would otherwise lose.
+ */
+const SVG_PAINT = [ 'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity' ];
+const PAINT_DEFAULT: Record< string, string > = { 'fill-opacity': '1', 'fill-rule': 'nonzero', 'stroke-opacity': '1', 'stroke-linecap': 'butt', 'stroke-linejoin': 'miter', 'stroke-dasharray': 'none', opacity: '1' };
+
+/** Inline `<use href="#id">` references (icon sprites) so the icon is self-contained. */
+function inlineUses( clone: Element, doc: Document ): void {
+	clone.querySelectorAll( 'use' ).forEach( ( use ) => {
+		const ref = use.getAttribute( 'href' ) ?? use.getAttribute( 'xlink:href' ) ?? '';
+		const id = ref.slice( 1 );
+		// Local references (a gradient or shape defined inside this icon) already travel with it.
+		if ( ! ref.startsWith( '#' ) || Array.from( clone.querySelectorAll( '[id]' ) ).some( ( e ) => e.id === id ) ) return;
+		const target = doc.getElementById( id );
+		if ( ! target ) return;
+		const g = doc.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
+		Array.from( target.childNodes ).forEach( ( n ) => g.appendChild( n.cloneNode( true ) ) );
+		for ( const a of [ 'transform', ...SVG_PAINT ] ) {
+			const v = use.getAttribute( a );
+			if ( v ) g.setAttribute( a, v );
+		}
+		// <use x y> offsets the referenced content.
+		const x = parseFloat( use.getAttribute( 'x' ) ?? '0' ) || 0;
+		const y = parseFloat( use.getAttribute( 'y' ) ?? '0' ) || 0;
+		if ( x || y ) g.setAttribute( 'transform', `${ g.getAttribute( 'transform' ) ?? '' } translate(${ x } ${ y })`.trim() );
+		// A <symbol>'s viewBox becomes the icon's, when the icon has none.
+		const vb = target.getAttribute( 'viewBox' );
+		if ( vb && ! clone.getAttribute( 'viewBox' ) ) clone.setAttribute( 'viewBox', vb );
+		use.replaceWith( g );
+	} );
+}
+
+const num = ( v: string ): string => v.replace( /px$/, '' );
+
+/**
+ * Gradients, clip paths and masks referenced as url(#id) but defined outside
+ * this icon (a shared <defs> elsewhere on the page) are copied into it, so the
+ * uploaded icon doesn't lose them.
+ */
+function inlineRefs( clone: Element, doc: Document ): void {
+	const have = new Set( Array.from( clone.querySelectorAll( '[id]' ) ).map( ( e ) => e.id ) );
+	const needed = new Set< string >();
+	for ( const e of [ clone, ...Array.from( clone.querySelectorAll( '*' ) ) ] ) {
+		for ( const a of Array.from( e.attributes ) ) {
+			for ( const m of a.value.matchAll( /url\(#([^)]+)\)/g ) ) if ( ! have.has( m[ 1 ]! ) ) needed.add( m[ 1 ]! );
+		}
+	}
+	if ( ! needed.size ) return;
+	let defs = clone.querySelector( 'defs' );
+	if ( ! defs ) {
+		defs = doc.createElementNS( 'http://www.w3.org/2000/svg', 'defs' );
+		clone.insertBefore( defs, clone.firstChild );
+	}
+	for ( const id of needed ) {
+		const src = doc.getElementById( id );
+		if ( src && src.namespaceURI === 'http://www.w3.org/2000/svg' ) defs.appendChild( src.cloneNode( true ) );
+	}
+}
+
+/**
+ * Serialize an SVG so it renders the same outside the source page: computed
+ * paint baked onto every shape (currentColor and CSS-driven colors resolved),
+ * sprite references inlined, a viewBox guaranteed, and scripts, handlers,
+ * classes and inline styles removed.
+ */
 export function serializeSvg( svg: Element, win: Window ): string {
+	const doc = svg.ownerDocument;
 	const clone = svg.cloneNode( true ) as Element;
 	const color = win.getComputedStyle( svg ).color || '#000';
+
+	// Bake paint from the live element onto its clone (same document order).
+	const src = [ svg, ...Array.from( svg.querySelectorAll( SVG_SHAPES ) ) ];
+	const dst = [ clone, ...Array.from( clone.querySelectorAll( SVG_SHAPES ) ) ];
+	src.forEach( ( s, i ) => {
+		const d = dst[ i ];
+		if ( ! d ) return;
+		const cs = win.getComputedStyle( s );
+		for ( const p of SVG_PAINT ) {
+			let v = cs.getPropertyValue( p ).trim();
+			if ( ! v ) continue;
+			if ( i === 0 && ( p === 'opacity' || v === PAINT_DEFAULT[ p ] ) ) continue;
+			if ( i > 0 && v === PAINT_DEFAULT[ p ] && ! d.hasAttribute( p ) ) continue;
+			if ( p === 'stroke-width' ) v = num( v );
+			// Computed paint servers are absolute (url("https://…/page#grad")): keep them local.
+			const ref = /^url\(\s*["']?[^"')]*#([^"')]+)["']?\s*\)/.exec( v );
+			if ( ref ) v = `url(#${ ref[ 1 ] })`;
+			if ( p === 'stroke-dasharray' && v !== 'none' ) v = v.split( ',' ).map( ( x ) => num( x.trim() ) ).join( ' ' );
+			d.setAttribute( p, v );
+		}
+	} );
+
+	// Outline icons: Elementor paints `fill` on the icon's root, so every shape states its own
+	// fill="none" (also when computed style didn't report an inherited value).
+	if ( ( clone.getAttribute( 'fill' ) ?? '' ).toLowerCase() === 'none' ) {
+		clone.querySelectorAll( SVG_SHAPES ).forEach( ( shape ) => {
+			if ( ! shape.hasAttribute( 'fill' ) ) shape.setAttribute( 'fill', 'none' );
+		} );
+	}
+
+	inlineUses( clone, doc );
+
 	const clean = ( e: Element ): void => {
 		for ( const a of Array.from( e.attributes ) ) {
 			if ( SVG_ATTR_BLOCK.test( a.name ) || /javascript:/i.test( a.value ) ) e.removeAttribute( a.name );
-			else if ( a.value === 'currentColor' ) e.setAttribute( a.name, color );
+			else if ( /currentcolor/i.test( a.value ) ) e.setAttribute( a.name, a.value.replace( /currentcolor/gi, color ) );
+			else if ( /url\(\s*["']?[^"')#]+#/.test( a.value ) ) e.setAttribute( a.name, a.value.replace( /url\(\s*["']?[^"')#]*#([^"')]+)["']?\s*\)/g, 'url(#$1)' ) );
 		}
 		Array.from( e.children ).forEach( ( c ) => {
-			if ( c.tagName.toLowerCase() === 'script' || c.tagName.toLowerCase() === 'foreignobject' ) c.remove();
+			const tag = c.tagName.toLowerCase();
+			if ( tag === 'script' || tag === 'foreignobject' || tag === 'style' ) c.remove();
 			else clean( c );
 		} );
 	};
 	clean( clone );
-	// Outline icons (fill="none" on the root): Elementor paints `fill` on uploaded SVG icons,
-	// so shapes carry their own fill="none" to stay outlines.
-	if ( ( clone.getAttribute( 'fill' ) ?? '' ).toLowerCase() === 'none' ) {
-		clone.querySelectorAll( 'path,circle,ellipse,line,polyline,polygon,rect' ).forEach( ( shape ) => {
-			if ( ! shape.hasAttribute( 'fill' ) ) shape.setAttribute( 'fill', 'none' );
-		} );
+	// References resolved after cleaning (URLs are local by now); copied definitions are cleaned too.
+	inlineRefs( clone, doc );
+	clean( clone );
+
+	// Without a viewBox, a resized icon (Elementor sizes icons to 1em) crops instead of scaling.
+	if ( ! clone.getAttribute( 'viewBox' ) ) {
+		const w = parseFloat( svg.getAttribute( 'width' ) ?? '' );
+		const h = parseFloat( svg.getAttribute( 'height' ) ?? '' );
+		let box: { x: number; y: number; width: number; height: number } | undefined;
+		try {
+			box = ( svg as SVGGraphicsElement ).getBBox?.();
+		} catch {
+			box = undefined; // Not rendered.
+		}
+		if ( w > 0 && h > 0 ) clone.setAttribute( 'viewBox', `0 0 ${ w } ${ h }` );
+		else if ( box && box.width > 0 && box.height > 0 ) clone.setAttribute( 'viewBox', `${ box.x } ${ box.y } ${ box.width } ${ box.height }` );
 	}
 	if ( ! clone.getAttribute( 'xmlns' ) ) clone.setAttribute( 'xmlns', 'http://www.w3.org/2000/svg' );
 	return clone.outerHTML;

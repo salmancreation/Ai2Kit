@@ -3,7 +3,7 @@
  * Plugin Name:       Ai2Kit – AI Website to Elementor Converter
  * Plugin URI:        https://ai2kit.com
  * Description:       Convert AI-built sites (Lovable, Bolt, v0, Gemini, HTML templates) into editable Elementor pages — locally, inside wp-admin.
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Requires Plugins:  elementor
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'AI2KIT_VERSION', '0.2.0' );
+define( 'AI2KIT_VERSION', '0.3.0' );
 define( 'AI2KIT_FILE', __FILE__ );
 define( 'AI2KIT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AI2KIT_URL', plugin_dir_url( __FILE__ ) );

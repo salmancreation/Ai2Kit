@@ -72,8 +72,8 @@ describe( 'accordion → native Nested Accordion (Free)', () => {
 	it( 'overrides Elementor\'s stock look with the source\'s', () => {
 		const s = acc.settings;
 		expect( s.accordion_item_title_position_horizontal ).toBe( 'stretch' );
-		expect( s.accordion_item_title_icon ).toEqual( { value: 'fas fa-chevron-down', library: 'fa-solid' } );
-		expect( s.accordion_item_title_icon_active ).toEqual( { value: 'fas fa-chevron-up', library: 'fa-solid' } );
+		expect( s.accordion_item_title_icon ).toMatchObject( { library: 'svg' } );
+		expect( s.accordion_item_title_icon_active ).toEqual( s.accordion_item_title_icon ); // The source doesn't rotate it.
 		expect( s.accordion_item_title_icon_position ).toBe( 'end' );
 		expect( s.icon_size ).toEqual( { unit: 'px', size: 16, sizes: [] } );
 		expect( s.accordion_padding ).toMatchObject( { top: '18', right: '0', bottom: '18', left: '0' } );

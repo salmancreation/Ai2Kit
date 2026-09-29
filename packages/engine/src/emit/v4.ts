@@ -104,7 +104,8 @@ function typography( d: Decls, st: StyleMap ): void {
 		if ( p === 'text-align' && ( v === 'start' || v === 'left' ) ) continue;
 		if ( p === 'text-transform' && v === 'none' ) continue;
 		if ( p === 'font-style' && v === 'normal' ) continue;
-		d[ p ] = v;
+		// `normal` (~1.2) isn't a value the converter keeps; unset, the theme's 1.5 applies.
+		d[ p ] = p === 'line-height' && v === 'normal' ? '1.2em' : v;
 	}
 	if ( st.color && ! isTransparent( st.color ) ) d.color = st.color;
 	if ( st[ 'text-decoration-line' ] && st[ 'text-decoration-line' ] !== 'none' ) d[ 'text-decoration' ] = st[ 'text-decoration-line' ]!;
@@ -448,7 +449,8 @@ function atomicLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V4Elemen
 			return el( 'e-paragraph' );
 		}
 		case 'button': {
-			if ( c.iconName && faIcon( c.iconName ) ) return null; // v3 Button keeps the icon.
+			// Atomic buttons have no icon: any icon (SVG or Lucide) keeps the v3 Button, which carries it.
+			if ( c.svg || c.iconName ) return null;
 			settings.text = t( 'escaped-html', c.text ?? '' );
 			settings.link = linkProp( c.href || '#', c.target );
 			return el( 'e-button' );
@@ -461,9 +463,10 @@ function atomicLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V4Elemen
 			return el( 'e-image' );
 		}
 		case 'icon': {
-			const fa = faIcon( c.iconName );
-			if ( fa ) settings.svg = t( 'icon', { value: t( 'string', fa.value ), library: t( 'string', fa.library ) } );
-			else if ( c.svg ) settings.svg = t( 'svg-src', { id: null, url: t( 'url', svgDataUri( c.svg ) ) } );
+			// The source's own SVG (identical); Font Awesome only when none was captured.
+			const fa = c.svg ? undefined : faIcon( c.iconName );
+			if ( c.svg ) settings.svg = t( 'svg-src', { id: null, url: t( 'url', svgDataUri( c.svg ) ) } );
+			else if ( fa ) settings.svg = t( 'icon', { value: t( 'string', fa.value ), library: t( 'string', fa.library ) } );
 			else return null;
 			if ( c.href ) settings.link = linkProp( c.href );
 			return el( 'e-svg' );
