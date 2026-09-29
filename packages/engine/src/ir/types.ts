@@ -113,7 +113,10 @@ export type NodeContent = {
 	videoType?: 'youtube' | 'vimeo' | 'hosted';
 };
 
-export type Fallback = { reason: string; html: string; css: string };
+/** A color or gradient painted over the node's background image. */
+export type BgOverlay = { color?: string; gradient?: string; opacity: number };
+
+export type Fallback ={ reason: string; html: string; css: string };
 
 /**
  * Residual CSS (PRD G6): declarations no Elementor control can express.
@@ -149,6 +152,13 @@ export type IRNode = {
 	rect?: Rect;
 	/** ::before / ::after content, which native widgets can't express (reported, and kept in residual CSS). */
 	pseudo?: { before?: string; after?: string };
+	/** ::before / ::after paint layers (from capture), consumed by background lifting. */
+	pseudoLayers?: { before?: StyleMap; after?: StyleMap };
+	/**
+	 * Background overlay lifted from a covering layer (a darkening gradient over
+	 * a hero image) → Elementor's Background Overlay (v3) / a background layer (v4).
+	 */
+	bgOverlay?: BgOverlay;
 	/** Measured size at the smaller breakpoints (sizes driven by aspect-ratio, vw, etc.). */
 	rects?: { tablet?: Rect; mobile?: Rect };
 	tokens?: { color?: string; font?: string };
@@ -201,6 +211,8 @@ export type CapturedNode = {
 	pseudo?: { before?: string; after?: string };
 	/** On accordion triggers: the panel this trigger opens. */
 	panel?: PanelCapture;
+	/** ::before / ::after used as absolutely positioned paint layers (overlays). */
+	pseudoLayers?: { before?: StyleMap; after?: StyleMap };
 	children: CapturedNode[];
 };
 

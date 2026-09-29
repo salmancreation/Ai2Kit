@@ -10,6 +10,9 @@ use Elementor\Modules\AtomicWidgets\CssConverter\Metrics\Null_Failure_Reporter;
 $c = new Css_Converter( Converter_Registry_Factory::create( null ), new Null_Failure_Reporter(), Expander_Registry_Factory::create( null ), null );
 $tests = array(
 	'line-height: 1.2em',
+	'background-image: url("https://example.test/a.jpg"); background-size: cover; background-position: 50% 50%; background-repeat: no-repeat',
+	'background-image: linear-gradient(180deg, rgba(11, 31, 56, 0.35) 0%, rgba(11, 31, 56, 0.92) 100%), url("https://example.test/a.jpg"); background-size: auto, cover; background-position: 0% 0%, 50% 50%; background-repeat: repeat, no-repeat',
+	'background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%), url("https://example.test/a.jpg") center / cover no-repeat, rgb(11, 31, 56)',
 	'transition: all 0.2s ease',
 	'transition-duration: 0.15s',
 	'transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s cubic-bezier(0.4, 0, 0.2, 1)',

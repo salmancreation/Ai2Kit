@@ -23,6 +23,7 @@ export function buildIR( captured: CapturedNode, nextId: () => string ): IRNode 
 	};
 	if ( captured.rects ) node.rects = captured.rects;
 	if ( captured.pseudo ) node.pseudo = captured.pseudo;
+	if ( captured.pseudoLayers ) node.pseudoLayers = captured.pseudoLayers;
 	if ( c.content ) node.content = c.content;
 	if ( captured.inlineRules?.length ) node.content = { ...node.content, inlineRules: captured.inlineRules };
 	if ( c.fallbackReason ) {
@@ -94,6 +95,8 @@ function isPlainWrapper( n: IRNode ): boolean {
 		! SEMANTIC_TAGS.has( n.tag ?? '' ) &&
 		! hasOwnVisual( n.styles.desktop ) &&
 		! n.styles.hover &&
+		! n.pseudoLayers &&
+		! n.bgOverlay &&
 		! n.styles.tablet?.display &&
 		! n.styles.mobile?.display
 	);

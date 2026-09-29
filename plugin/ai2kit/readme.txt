@@ -85,6 +85,8 @@ Administrators. Sites that run JavaScript can only be converted by users allowed
 * New: hover effects — colors, backgrounds, borders, shadows, lift/scale and transition duration — map to Elementor's hover controls (v3) and the hover style state (v4).
 * Improved: icons are the source's own SVG (identical), not a Font Awesome look-alike. Icons colored by CSS classes or inline styles, sprite icons (<use>), gradients and icons without a viewBox all import correctly. If an SVG can't be imported, the closest Font Awesome icon is used and the import report says so.
 * Fixed: button icons keep their size; icon list spacing matches the source; grids that stay multi-column on phones no longer collapse to one column; text with a "normal" line height no longer gets the theme's taller line height.
+* Improved: background layers (an image or <img> covering a section, a darkening ::after or bg-black/50 layer on top) become the section's own Background image and Background Overlay, instead of extra absolutely positioned containers. A section that pins its content to the bottom keeps it there.
+* Fixed: v4 background images are imported into the Media Library (they pointed at the temporary upload folder).
 * Improved: History shows each score as a ring, and actions have icons.
 
 = 0.2.0 =

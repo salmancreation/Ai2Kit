@@ -4,6 +4,7 @@
  */
 import type { Capture, IRNode, PatternType, ResidualRule, SectionReport, TokenTable } from './ir/types';
 import { buildIR, collapseWrappers } from './normalize/build';
+import { liftBackgroundLayers } from './normalize/layers';
 import { boxSection, boxSelf, findSections, labelSections } from './recognize/sections';
 import { detectRepeats } from './recognize/repeat';
 import { extractTokens, tokenIndex } from './tokens/tokens';
@@ -84,7 +85,8 @@ function contains( a: IRNode, b: IRNode ): boolean {
 export function analyze( capture: Capture, seed: string ): Analysis {
 	const nextId = createIdGenerator( `${ seed }:ir` );
 	const built = buildIR( capture.root, nextId );
-	const root = collapseWrappers( built );
+	// Background layers first: a lifted layer can leave a wrapper collapsible.
+	const root = collapseWrappers( liftBackgroundLayers( built ) );
 	const found = findSections( root, capture.meta.viewport.desktop );
 	// Box sections in place so the IR tree and the section list stay the same objects.
 	const sections = found.map( ( s ) => {

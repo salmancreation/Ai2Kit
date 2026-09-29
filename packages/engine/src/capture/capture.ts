@@ -126,6 +126,31 @@ function pseudo( el: Element, win: Window, which: '::before' | '::after' ): stri
 	return undefined;
 }
 
+const LAYER_PROPS = [ 'position', 'top', 'right', 'bottom', 'left', 'width', 'height', 'z-index', 'background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'opacity', 'mix-blend-mode' ];
+
+/**
+ * A pseudo-element used as a paint layer (`content:""; position:absolute;
+ * inset:0; background: …` — the usual darkening overlay on hero images).
+ * Its text content is empty, so `pseudo()` above doesn't report it.
+ */
+export function pseudoLayer( el: Element, win: Window, which: '::before' | '::after' ): StyleMap | undefined {
+	try {
+		const cs = win.getComputedStyle( el, which );
+		if ( ! cs.content || cs.content === 'none' || cs.content === 'normal' ) return undefined;
+		if ( cs.position !== 'absolute' && cs.position !== 'fixed' ) return undefined;
+		const paints = ! /rgba\(0, 0, 0, 0\)|transparent/.test( cs.backgroundColor ) || ( cs.backgroundImage && cs.backgroundImage !== 'none' );
+		if ( ! paints || cs.display === 'none' || cs.visibility === 'hidden' ) return undefined;
+		const out: StyleMap = {};
+		for ( const p of LAYER_PROPS ) {
+			const v = cs.getPropertyValue( p );
+			if ( v ) out[ p ] = v.trim();
+		}
+		return out;
+	} catch {
+		return undefined;
+	}
+}
+
 type WalkCtx = { env: CaptureEnv; next: () => string; measure: ( el: Element ) => Rect };
 
 function walk( el: Element, ctx: WalkCtx ): CapturedNode | null {
@@ -148,6 +173,9 @@ function walk( el: Element, ctx: WalkCtx ): CapturedNode | null {
 	const before = pseudo( el, win, '::before' );
 	const after = pseudo( el, win, '::after' );
 	if ( before || after ) node.pseudo = { ...( before ? { before } : {} ), ...( after ? { after } : {} ) };
+	const layerBefore = pseudoLayer( el, win, '::before' );
+	const layerAfter = pseudoLayer( el, win, '::after' );
+	if ( layerBefore || layerAfter ) node.pseudoLayers = { ...( layerBefore ? { before: layerBefore } : {} ), ...( layerAfter ? { after: layerAfter } : {} ) };
 
 	if ( tag === 'svg' ) {
 		node.svg = serializeSvg( el, win );

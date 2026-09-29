@@ -11,7 +11,7 @@
  * fallbacks, buttons with icons) are emitted as v3 widgets on the same page,
  * which Elementor 4 supports.
  */
-import type { IRNode, StyleMap } from '../ir/types';
+import type { BgOverlay, IRNode, StyleMap } from '../ir/types';
 import { isTransparent } from '../util/color';
 import { decomposeMatrix, firstFamily, normalizeGradient, parseShadow, px, round, transitionSeconds } from '../util/units';
 import { effective } from './settings';
@@ -20,6 +20,7 @@ import { explicitMinHeight, innerBox, isRowParent, parentCenters, placement } fr
 import lucideFa from '../../data/lucide-fa-map.json';
 import { accordionMeta } from '../recognize/patterns';
 import { canEmitAccordion } from './accordion';
+import { withAlpha } from '../normalize/layers';
 
 type Typed = { $$type: string; value: unknown };
 const t = ( $$type: string, value: unknown ): Typed => ( { $$type, value } );
@@ -90,6 +91,34 @@ function surface( d: Decls, st: StyleMap ): void {
 		if ( v && ! [ '1', 'none', 'normal' ].includes( v ) ) d[ p ] = v;
 	}
 	if ( st.overflow === 'hidden' ) d.overflow = 'hidden';
+}
+
+/** Every color in a CSS value with an extra opacity multiplied into its alpha. */
+export function fadeColors( v: string, opacity: number ): string {
+	if ( opacity >= 0.999 ) return v;
+	return v.replace( /rgba?\([^)]*\)|#[0-9a-fA-F]{3,8}\b/g, ( c ) => withAlpha( c, opacity ) );
+}
+
+/**
+ * v4 has no overlay control: the overlay becomes the top layer of the
+ * background shorthand (`gradient, url() pos / size repeat, color`), which
+ * Elementor's converter turns into native background layers.
+ */
+function layerOverlay( d: Decls, overlay: BgOverlay ): void {
+	const img = d[ 'background-image' ];
+	if ( ! img || ! /url\(/.test( img ) ) return;
+	const top = overlay.gradient
+		? fadeColors( normalizeGradient( overlay.gradient ), overlay.opacity )
+		: overlay.color
+		? `linear-gradient(180deg, ${ withAlpha( overlay.color, overlay.opacity ) } 0%, ${ withAlpha( overlay.color, overlay.opacity ) } 100%)`
+		: '';
+	if ( ! top ) return;
+	const pos = d[ 'background-position' ] ?? '50% 50%';
+	const size = d[ 'background-size' ] ?? 'cover';
+	const repeat = d[ 'background-repeat' ] ?? 'no-repeat';
+	const color = d[ 'background-color' ];
+	d.background = `${ top }, ${ img } ${ pos } / ${ size } ${ repeat }${ color ? `, ${ color }` : '' }`;
+	for ( const p of [ 'background-image', 'background-position', 'background-size', 'background-repeat', 'background-color' ] ) delete d[ p ];
 }
 
 function typography( d: Decls, st: StyleMap ): void {
@@ -242,6 +271,7 @@ function declsAt( node: IRNode, parent: IRNode | undefined, bp: 'desktop' | 'tab
 		}
 	}
 	surface( d, st );
+	if ( node.bgOverlay ) layerOverlay( d, node.bgOverlay );
 	if ( node.kind === 'button' ) {
 		// e-button's base style is a blue, padded, rounded button: state the source's values.
 		box( d, st, 'padding', false, true );

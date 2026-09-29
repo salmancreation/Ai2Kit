@@ -2,7 +2,7 @@
  * Page → sections, and heuristic semantic labeling (FR-18). Position,
  * landmarks and keywords only; the optional AI pass (Pro) refines labels.
  */
-import type { IRNode, Semantic } from '../ir/types';
+import type { IRNode, Semantic, StyleMap } from '../ir/types';
 import { hasOwnVisual } from '../normalize/build';
 import { hasVisualBox } from './leaf';
 import { px } from '../util/units';
@@ -59,6 +59,13 @@ export function findSections( root: IRNode, pageW: number ): IRNode[] {
  * wrapper is hoisted, its max-width becomes the boxed width and its padding
  * merges into the section's.
  */
+/** How a flex container places its children vertically: flex-end / center, or undefined (top). */
+export function verticalPlacement( s: StyleMap ): 'flex-end' | 'center' | undefined {
+	if ( ! ( s.display ?? '' ).includes( 'flex' ) ) return undefined;
+	const v = ( s[ 'flex-direction' ] ?? 'row' ).startsWith( 'column' ) ? s[ 'justify-content' ] : s[ 'align-items' ];
+	return v === 'flex-end' || v === 'end' ? 'flex-end' : v === 'center' ? 'center' : undefined;
+}
+
 export function boxSection( section: IRNode, collapse: ( n: IRNode ) => IRNode ): IRNode {
 	let s = section;
 	for ( let guard = 0; guard < 3; guard++ ) {
@@ -83,6 +90,15 @@ export function boxSection( section: IRNode, collapse: ( n: IRNode ) => IRNode )
 			else if ( k !== 'display' ) delete merged[ k ];
 		}
 		if ( d.display === undefined ) merged.display = 'block';
+		// Where the section placed its inner box vertically (hero: align-items:flex-end pins the
+		// content to the bottom of a tall section) becomes the merged column's justify-content.
+		const place = verticalPlacement( s.styles.desktop );
+		const innerIsColumn = ! ( d.display ?? '' ).includes( 'flex' ) || ( d[ 'flex-direction' ] ?? 'row' ).startsWith( 'column' );
+		if ( place && innerIsColumn && ! [ 'flex-end', 'end', 'center' ].includes( d[ 'justify-content' ] ?? '' ) ) {
+			merged.display = 'flex';
+			merged[ 'flex-direction' ] = 'column';
+			merged[ 'justify-content' ] = place;
+		}
 		const styles = { ...s.styles, desktop: merged };
 		for ( const bp of [ 'tablet', 'mobile' ] as const ) {
 			if ( inner.styles[ bp ] ) styles[ bp ] = { ...s.styles[ bp ], ...inner.styles[ bp ] };

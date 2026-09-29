@@ -62,6 +62,8 @@ final class Importer {
 			$atomic          = new AtomicWriter();
 			$elements        = $atomic->build( $elements );
 			$atomic_residual = $atomic->residual;
+			// Background images live in the converted styles: import them too.
+			$elements = $media->process_styles( $elements );
 		}
 
 		// Tokens → kit, with backup.

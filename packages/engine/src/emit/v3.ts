@@ -5,7 +5,7 @@
  * against the control registry exported from a real Elementor install
  * (tests/fixtures/elementor/controls-v3.json).
  */
-import type { IRNode, NodeStyles, ResidualRule, StyleMap } from '../ir/types';
+import type { BgOverlay, IRNode, NodeStyles, ResidualRule, StyleMap } from '../ir/types';
 import type { TokenIndex } from '../tokens/tokens';
 import { isTransparent, normalizeColor } from '../util/color';
 import { firstFamily, matrixParts, parseBox, parseLinearGradient, parseShadow, px, round, transitionSeconds } from '../util/units';
@@ -358,6 +358,46 @@ function asset( ctx: EmitContext, url: string ): { url: string; id: number | str
 	return a ? { url: a.url, id: a.id ?? '' } : { url, id: '' };
 }
 
+/** Computed background-position (`50% 0%`, `center top`) → Elementor's position option. */
+export function bgPosition( v: string | undefined ): string | undefined {
+	if ( ! v ) return undefined;
+	const word = ( t: string | undefined, axis: 'x' | 'y' ): string | undefined => {
+		if ( ! t ) return 'center';
+		if ( t === 'center' || t === '50%' ) return 'center';
+		if ( t === ( axis === 'x' ? 'left' : 'top' ) || t === '0%' || t === '0px' ) return axis === 'x' ? 'left' : 'top';
+		if ( t === ( axis === 'x' ? 'right' : 'bottom' ) || t === '100%' ) return axis === 'x' ? 'right' : 'bottom';
+		return undefined;
+	};
+	const parts = v.split( ',' )[ 0 ]!.trim().split( /\s+/ );
+	// Keywords may come in either order ("top center"); computed values are "X Y".
+	let [ a, b ] = parts;
+	if ( a === 'top' || a === 'bottom' ) [ a, b ] = [ b, a ];
+	const x = word( a, 'x' );
+	const y = word( b, 'y' );
+	if ( ! x || ! y ) return undefined;
+	return `${ y } ${ x }`;
+}
+
+/** Background overlay (lifted from a covering layer) → Elementor's Background Overlay group. */
+export function overlaySettings( out: Settings, overlay: BgOverlay, ctx: EmitContext ): void {
+	const grad = overlay.gradient ? parseLinearGradient( overlay.gradient ) : null;
+	if ( grad ) {
+		out.background_overlay_background = 'gradient';
+		colorSetting( out, 'background_overlay_color', grad.from, ctx );
+		out.background_overlay_color_stop = slider( grad.fromStop, '%' );
+		colorSetting( out, 'background_overlay_color_b', grad.to, ctx );
+		out.background_overlay_color_b_stop = slider( grad.toStop, '%' );
+		out.background_overlay_gradient_angle = slider( grad.angle, 'deg' );
+	} else if ( overlay.color ) {
+		out.background_overlay_background = 'classic';
+		colorSetting( out, 'background_overlay_color', overlay.color, ctx );
+	} else {
+		return;
+	}
+	// Elementor's default overlay opacity is 0.5: always state it.
+	out.background_overlay_opacity = slider( round( overlay.opacity ), 'px' );
+}
+
 export function backgroundSettings( out: Settings, prefix: string, s: StyleMap, ctx: EmitContext, consumed: Set< string > ): void {
 	const img = s[ 'background-image' ];
 	const grad = parseLinearGradient( img );
@@ -378,8 +418,8 @@ export function backgroundSettings( out: Settings, prefix: string, s: StyleMap, 
 		out[ `${ prefix }_image` ] = { ...asset( ctx, url ), size: '' };
 		const size = s[ 'background-size' ];
 		if ( size === 'cover' || size === 'contain' ) out[ `${ prefix }_size` ] = size;
-		const pos = s[ 'background-position' ];
-		if ( pos && /50%\s+50%|center/.test( pos ) ) out[ `${ prefix }_position` ] = 'center center';
+		const pos = bgPosition( s[ 'background-position' ] );
+		if ( pos ) out[ `${ prefix }_position` ] = pos;
 		if ( s[ 'background-repeat' ] === 'no-repeat' ) out[ `${ prefix }_repeat` ] = 'no-repeat';
 		consumed.add( 'background-image' );
 		colorSetting( out, `${ prefix }_color`, s[ 'background-color' ], ctx ) && consumed.add( 'background-color' );
@@ -573,6 +613,7 @@ function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, 
 	}
 
 	backgroundSettings( out, 'background', s, ctx, consumed );
+	if ( node.bgOverlay ) overlaySettings( out, node.bgOverlay, ctx );
 	borderSettings( out, 'border', s, ctx, consumed );
 	shadowSettings( out, 'box_shadow', s, consumed );
 	if ( s.overflow === 'hidden' ) out.overflow = 'hidden';

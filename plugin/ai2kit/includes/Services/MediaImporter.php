@@ -114,6 +114,26 @@ final class MediaImporter {
 	}
 
 	/**
+	 * Import images referenced by atomic (v4) styles — background images exist
+	 * only after Elementor converts the CSS (AtomicWriter), so they are handled
+	 * in a second pass over each element's `styles`.
+	 *
+	 * @param array<int, array<string, mixed>> $elements Elements after AtomicWriter.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function process_styles( array $elements ) {
+		foreach ( $elements as &$el ) {
+			if ( ! empty( $el['styles'] ) && is_array( $el['styles'] ) ) {
+				$el['styles'] = $this->walk( $el['styles'] );
+			}
+			if ( ! empty( $el['elements'] ) ) {
+				$el['elements'] = $this->process_styles( $el['elements'] );
+			}
+		}
+		return $elements;
+	}
+
+	/**
 	 * Recursively rewrite media values.
 	 *
 	 * @param mixed $value Settings value.
