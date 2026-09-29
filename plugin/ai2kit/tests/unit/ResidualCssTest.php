@@ -22,6 +22,14 @@ final class ResidualCssTest extends TestCase {
 		$this->assertStringContainsString( "@media (max-width:767px){\n.elementor-42 .a2k-r-def5678{transform:none !important}\n}", $css );
 	}
 
+	public function test_hover_state_rules() {
+		$css = ResidualCss::build(
+			array( array( 'className' => 'e-abc1234-a2k', 'breakpoint' => 'desktop', 'state' => 'hover', 'decls' => array( 'transition-duration' => '0.2s', 'box-shadow' => '0px 4px 6px 0px rgba(0, 0, 0, 0.1)' ) ) ),
+			7
+		);
+		$this->assertSame( '.elementor-7 .e-abc1234-a2k:hover{transition-duration:0.2s !important;box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1) !important}', $css );
+	}
+
 	/** @dataProvider hostile */
 	public function test_rejects_hostile_input( $rule ) {
 		$this->assertSame( '', ResidualCss::build( array( $rule ), 1 ) );
@@ -37,6 +45,7 @@ final class ResidualCssTest extends TestCase {
 			'import'          => array( $ok + array( 'decls' => array( 'color' => '@import "x"' ) ) ),
 			'comment'         => array( $ok + array( 'decls' => array( 'color' => 'red/*' ) ) ),
 			'unknown prop'    => array( $ok + array( 'decls' => array( 'position' => 'fixed' ) ) ),
+			'bad state'       => array( $ok + array( 'state' => 'hover{}', 'decls' => array( 'color' => 'red' ) ) ),
 			'bad class'       => array( array( 'className' => 'x}body{', 'breakpoint' => 'desktop', 'decls' => array( 'color' => 'red' ) ) ),
 			'bad target'      => array( $ok + array( 'target' => ' *', 'decls' => array( 'color' => 'red' ) ) ),
 			'unbalanced quote' => array( $ok + array( 'decls' => array( 'font-family' => '"Inter, sans-serif' ) ) ),

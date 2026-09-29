@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { api, asApiError, type Job } from '../lib/api';
 import { localDate } from '../lib/format';
 import { PageTitle, Shell } from '../components/Shell';
-import { Badge, Button, Card, EmptyState, ErrorNotice, Modal, ScoreBadge, Skeleton, useToast, type Tone } from '../components/ui';
+import { Badge, Button, Card, EmptyState, ErrorNotice, Modal, ScoreBadge, ScoreRing, Skeleton, useToast, type Tone } from '../components/ui';
 import s from './screens.module.css';
 
 const STATUS: Record< Job[ 'status' ], { tone: Tone; label: () => string } > = {
@@ -103,21 +103,21 @@ export function History() {
 											</a>
 										) ) ?? '—' }
 									</td>
-									<td>{ j.score !== null ? <ScoreBadge score={ j.score } /> : '—' }</td>
+									<td>{ j.score !== null ? <ScoreRing score={ j.score } size={ 44 } compact /> : '—' }</td>
 									<td>
 										<Badge tone={ STATUS[ j.status ].tone }>{ STATUS[ j.status ].label() }</Badge>
 									</td>
 									<td className={ s.actions }>
 										{ j.result && (
-											<Button size="sm" variant="ghost" onClick={ () => setReport( j ) }>
+											<Button size="sm" variant="ghost" icon="eye" onClick={ () => setReport( j ) }>
 												{ __( 'View report', 'ai2kit' ) }
 											</Button>
 										) }
-										<Button size="sm" variant="ghost" href={ convertUrl }>
+										<Button size="sm" variant="ghost" icon="refresh" href={ convertUrl }>
 											{ __( 'Re-run', 'ai2kit' ) }
 										</Button>
 										{ j.status === 'imported' && (
-											<Button size="sm" variant="ghost" onClick={ () => askUndo( j ) }>
+											<Button size="sm" variant="ghost" icon="undo" onClick={ () => askUndo( j ) }>
 												{ __( 'Undo', 'ai2kit' ) }
 											</Button>
 										) }

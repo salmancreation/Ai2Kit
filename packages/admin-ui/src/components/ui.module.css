@@ -13,14 +13,14 @@
 .btn:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 .btn-sm { height: 32px; padding-inline: var(--a2k-space-3); font-size: var(--a2k-text-sm); }
 .btn-lg { height: 48px; padding-inline: var(--a2k-space-6); font-size: var(--a2k-text-lg); }
-.btn-primary { background: var(--a2k-bg-brand); color: var(--a2k-text-on-brand); }
+.btn.btn-primary { background: var(--a2k-bg-brand); color: var(--a2k-text-on-brand); }
 .btn-primary:hover:not(:disabled) { background: var(--a2k-bg-brand-hover); color: var(--a2k-text-on-brand); }
-.btn-secondary { background: var(--a2k-bg-surface); color: var(--a2k-text-primary); border-color: var(--a2k-border-strong); }
+.btn.btn-secondary { background: var(--a2k-bg-surface); color: var(--a2k-text-primary); border-color: var(--a2k-border-strong); }
 .btn-secondary:hover:not(:disabled) { color: var(--a2k-text-primary); }
-.btn-ghost { background: transparent; color: var(--a2k-text-secondary); }
+.btn.btn-ghost { background: transparent; color: var(--a2k-text-secondary); }
 .btn-ghost:hover:not(:disabled) { background: var(--a2k-bg-subtle); color: var(--a2k-text-primary); box-shadow: none; }
-.btn-danger { background: var(--a2k-status-danger-fg); color: var(--a2k-text-inverse); }
-.btn-link { background: none; color: var(--a2k-text-brand); padding-inline: 0; height: auto; font-weight: var(--a2k-weight-medium); }
+.btn.btn-danger { background: var(--a2k-status-danger-fg); color: var(--a2k-text-inverse); }
+.btn.btn-link { background: none; color: var(--a2k-text-brand); padding-inline: 0; height: auto; font-weight: var(--a2k-weight-medium); }
 .btn-link:hover:not(:disabled) { text-decoration: underline; box-shadow: none; transform: none; }
 
 .spinner {
@@ -64,7 +64,9 @@
 .ring-high { stroke: var(--a2k-score-high); }
 .ring-mid { stroke: var(--a2k-score-mid); }
 .ring-low { stroke: var(--a2k-score-low); }
+.ringCompact .ringTrack, .ringCompact .ringValue { stroke-width: 4; }
 .ringLabel { font-weight: var(--a2k-weight-bold); font-size: var(--a2k-text-md); font-variant-numeric: tabular-nums; }
+.ringCompact .ringLabel { font-size: var(--a2k-text-xs); font-weight: var(--a2k-weight-semibold); letter-spacing: -.02em; }
 
 /* Segmented (§5.11) */
 .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--a2k-bg-subtle); border-radius: var(--a2k-radius-md); }

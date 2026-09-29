@@ -54,6 +54,27 @@ export type Pattern = {
 	meta: Record< string, unknown >;
 };
 
+/** Accordion item as recognized (pattern meta), with the panel read at capture. */
+export type AccordionItem = {
+	title: string;
+	/** Trigger (question) and item wrapper styles. */
+	trigger: NodeStyles;
+	item: NodeStyles;
+	iconName?: string;
+	svg?: string;
+	/** Rendered icon size (px). */
+	iconSize?: number;
+	/** Height a closed item has below its trigger, inside its border (px). */
+	extraBottom?: number;
+	panel?: PanelCapture;
+};
+
+export type AccordionMeta = {
+	titles: string[];
+	items: AccordionItem[];
+	multiple: boolean;
+};
+
 export type Layout = {
 	display: 'flex' | 'grid' | 'block';
 	direction?: 'row' | 'column';
@@ -104,6 +125,8 @@ export type ResidualRule = {
 	/** Descendant selector appended after the class, from a fixed allowlist. */
 	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' img';
 	breakpoint: 'desktop' | 'tablet' | 'mobile';
+	/** Pseudo-state the rule applies in (`:hover`). */
+	state?: 'hover';
 	decls: Record< string, string >;
 	/** Section label, for the report and the CSS comment. */
 	label?: string;
@@ -144,6 +167,19 @@ export type IRNode = {
 /* normalize/. Kept separate from the IR so capture stays dumb.        */
 /* ------------------------------------------------------------------ */
 
+/** An accordion panel read by opening its trigger (closed panels aren't in the DOM). */
+export type PanelCapture = {
+	html: string;
+	text: string;
+	/** Computed styles of the panel box, and of its text. */
+	styles: StyleMap;
+	textStyles: StyleMap;
+	/** Open in the source on load. */
+	open: boolean;
+	/** Several items can be open at once (observed while capturing). */
+	multiple?: boolean;
+};
+
 export type CapturedNode = {
 	/** Stable key stamped on the element so breakpoints can be aligned. */
 	key: string;
@@ -161,6 +197,8 @@ export type CapturedNode = {
 	rects?: { tablet?: Rect; mobile?: Rect };
 	styles: NodeStyles;
 	pseudo?: { before?: string; after?: string };
+	/** On accordion triggers: the panel this trigger opens. */
+	panel?: PanelCapture;
 	children: CapturedNode[];
 };
 

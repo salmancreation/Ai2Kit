@@ -20,7 +20,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Validator {
 
-	const WIDGETS      = array( 'heading', 'text-editor', 'image', 'button', 'icon', 'icon-list', 'video', 'divider', 'spacer', 'html' );
+	const WIDGETS      = array( 'heading', 'text-editor', 'image', 'button', 'icon', 'icon-list', 'video', 'divider', 'spacer', 'html', 'nested-accordion' );
+	const NESTED       = array( 'nested-accordion' );
 	const ATOMIC       = array( 'e-flexbox', 'e-div-block', 'e-grid', 'e-heading', 'e-paragraph', 'e-button', 'e-image', 'e-svg', 'e-divider', 'e-youtube' );
 	const MAX_DEPTH    = 30;
 	const MAX_ELEMENTS = 10000;
@@ -136,6 +137,22 @@ final class Validator {
 					'settings'   => $this->settings( (array) ( $el['settings'] ?? array() ), $el['widgetType'] ),
 					'elements'   => array(),
 				);
+				// Nested widgets (Accordion) hold one container per item.
+				if ( in_array( $el['widgetType'], self::NESTED, true ) ) {
+					$children = array_values(
+						array_filter(
+							(array) ( $el['elements'] ?? array() ),
+							static function ( $c ) {
+								return is_array( $c ) && 'container' === ( $c['elType'] ?? '' );
+							}
+						)
+					);
+					$children = $this->elements( $children, $depth + 1 );
+					if ( is_wp_error( $children ) ) {
+						return $children;
+					}
+					$clean['elements'] = $children;
+				}
 			} else {
 				return new WP_Error(
 					'ai2kit_invalid_element',
@@ -150,14 +167,14 @@ final class Validator {
 	}
 
 	/**
-	 * CSS blocks per breakpoint: declarations only (no rules, at-rules or markup).
+	 * CSS blocks per breakpoint (and the hover state): declarations only (no rules, at-rules or markup).
 	 *
-	 * @param mixed $css Map of breakpoint => declarations.
+	 * @param mixed $css Map of breakpoint/state => declarations.
 	 * @return array<string, string>
 	 */
 	private function css( $css ) {
 		$out = array();
-		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $bp ) {
+		foreach ( array( 'desktop', 'tablet', 'mobile', 'hover' ) as $bp ) {
 			if ( isset( $css[ $bp ] ) && is_string( $css[ $bp ] ) && strlen( $css[ $bp ] ) < 8000 ) {
 				$clean = preg_replace( '/[{}<>@\\\\]|\/\*|expression\s*\(|javascript:/i', '', $css[ $bp ] );
 				if ( '' !== trim( (string) $clean ) ) {

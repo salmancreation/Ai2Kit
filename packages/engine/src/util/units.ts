@@ -167,21 +167,46 @@ export function normalizeGradient( v: string ): string {
 	return `linear-gradient(${ round( angle ) }deg, ${ stops.join( ', ' ) })`;
 }
 
+export type TransformParts = { x: number; y: number; rotate: number; scaleX: number; scaleY: number };
+
+/**
+ * A computed transform as translate (px) / rotate (deg) / scale numbers.
+ * `none` is the identity; skewed or 3D matrices return null.
+ */
+export function matrixParts( v: string | undefined ): TransformParts | null {
+	const s = ( v ?? '' ).trim();
+	if ( s === 'none' ) return { x: 0, y: 0, rotate: 0, scaleX: 1, scaleY: 1 };
+	const m = s.match( /^matrix\(([^)]+)\)$/ );
+	if ( ! m ) return null;
+	const n = m[ 1 ]!.split( ',' ).map( ( x ) => parseFloat( x ) );
+	if ( n.length !== 6 || n.some( ( x ) => Number.isNaN( x ) ) ) return null;
+	const [ a, b, c, d, e, f ] = n as [ number, number, number, number, number, number ];
+	if ( Math.abs( a * c + b * d ) > 1e-4 ) return null; // Skew.
+	const sx = Math.sqrt( a * a + b * b );
+	const sy = ( a * d - b * c ) / ( sx || 1 );
+	return { x: e, y: f, rotate: ( Math.atan2( b, a ) * 180 ) / Math.PI, scaleX: sx, scaleY: sy };
+}
+
+/** Seconds from a computed `transition-duration` list (its first non-zero value), or null. */
+export function transitionSeconds( v: string | undefined ): number | null {
+	for ( const part of ( v ?? '' ).split( ',' ) ) {
+		const m = part.trim().match( /^([\d.]+)(ms|s)$/ );
+		if ( ! m ) continue;
+		const sec = m[ 2 ] === 'ms' ? parseFloat( m[ 1 ]! ) / 1000 : parseFloat( m[ 1 ]! );
+		if ( sec > 0 ) return round( sec );
+	}
+	return null;
+}
+
 /**
  * Decompose a computed `matrix(a, b, c, d, e, f)` into translate/rotate/scale
  * functions (what Elementor's converter understands). Returns the input when
  * the matrix has skew or isn't a 2D matrix.
  */
 export function decomposeMatrix( v: string ): string {
-	const m = v.trim().match( /^matrix\(([^)]+)\)$/ );
-	if ( ! m ) return v;
-	const n = m[ 1 ]!.split( ',' ).map( ( x ) => parseFloat( x ) );
-	if ( n.length !== 6 || n.some( ( x ) => Number.isNaN( x ) ) ) return v;
-	const [ a, b, c, d, e, f ] = n as [ number, number, number, number, number, number ];
-	if ( Math.abs( a * c + b * d ) > 1e-4 ) return v; // Skew.
-	const sx = Math.sqrt( a * a + b * b );
-	const sy = ( a * d - b * c ) / ( sx || 1 );
-	const rot = ( Math.atan2( b, a ) * 180 ) / Math.PI;
+	const p = matrixParts( v );
+	if ( ! p ) return v;
+	const { x: e, y: f, rotate: rot, scaleX: sx, scaleY: sy } = p;
 	const fns: string[] = [];
 	if ( Math.abs( e ) > 0.01 || Math.abs( f ) > 0.01 ) fns.push( `translate(${ round( e ) }px, ${ round( f ) }px)` );
 	if ( Math.abs( rot ) > 0.01 ) fns.push( `rotate(${ round( rot ) }deg)` );

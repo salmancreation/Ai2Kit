@@ -32,12 +32,14 @@ describe.each( cases )( 'real capture: $name', ( { name, labels, tokens, min } )
 	} );
 } );
 
-it( 'reports what the Lovable FAQ lost', () => {
-	const faq = convert( load( 'lovable-spa-dist' ), 'x' ).sections.find( ( s ) => s.label === 'FAQ' )!;
+it( 'maps the Lovable (Radix) FAQ to a native Accordion with every answer', () => {
+	const result = convert( load( 'lovable-spa-dist' ), 'x' );
+	const faq = result.sections.find( ( s ) => s.label === 'FAQ' )!;
 	expect( faq.patterns ).toContain( 'accordion' );
-	expect( faq.proHints ).toContain( 'Pro: map as Accordion' );
-	expect( faq.warnings.join( ' ' ) ).toMatch( /accordion answers/ );
-	expect( faq.score.score ).toBeLessThan( 95 );
+	expect( faq.widgets[ 'nested-accordion' ] ).toBe( 1 );
+	expect( faq.warnings.join( ' ' ) ).not.toMatch( /accordion answers/ );
+	const json = JSON.stringify( result.document.content );
+	for ( const a of [ 'free for personal use', 'shared goals', 'never used to train models' ] ) expect( json ).toContain( a );
 } );
 
 it( 'keeps Tailwind gradient text and transforms as residual CSS', () => {

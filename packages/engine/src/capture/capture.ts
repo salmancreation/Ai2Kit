@@ -2,9 +2,11 @@
  * DOM capture (FR-6 … FR-10). Runs on the main thread against the sandbox
  * iframe's document. Everything after capture is pure.
  */
-import type { Breakpoint, Capture, CaptureMeta, CapturedNode, Rect, StyleMap } from '../ir/types';
+import type { Breakpoint, Capture, CaptureMeta, CapturedNode, PanelCapture, Rect, StyleMap } from '../ir/types';
 import { STYLE_PROPS, TEXT_PROPS, isDefault } from './styleProps';
 import { freezeElement, sanitizeInline, serializeSvg } from './freeze';
+import { captureHover } from './hover';
+import { captureCollapsed } from './collapsed';
 
 export const KEY_ATTR = 'data-a2k-key';
 
@@ -183,6 +185,8 @@ function walk( el: Element, ctx: WalkCtx ): CapturedNode | null {
 			const cls = svg.getAttribute( 'class' );
 			if ( cls ) node.attrs[ 'data-a2k-icon' ] = cls;
 			node.attrs[ 'data-a2k-icon-pos' ] = iconPosition( el, svg );
+			const iconW = ctx.measure( svg ).w;
+			if ( iconW ) node.attrs[ 'data-a2k-icon-size' ] = String( iconW );
 		}
 		return node;
 	}
@@ -351,6 +355,28 @@ export function applyBreakpoint(
 	visit( root );
 }
 
+/** Attach accordion panels (from captureCollapsed) to their triggers. */
+export function applyPanels( root: CapturedNode, panels: Map< string, PanelCapture > ): void {
+	if ( ! panels.size ) return;
+	const visit = ( node: CapturedNode ): void => {
+		const p = panels.get( node.key );
+		if ( p ) node.panel = p;
+		node.children.forEach( visit );
+	};
+	visit( root );
+}
+
+/** Attach hover diffs (from captureHover) to their nodes. */
+export function applyHover( root: CapturedNode, hover: Map< string, StyleMap > ): void {
+	if ( ! hover.size ) return;
+	const visit = ( node: CapturedNode ): void => {
+		const h = hover.get( node.key );
+		if ( h ) node.styles.hover = h;
+		node.children.forEach( visit );
+	};
+	visit( root );
+}
+
 function defaultFor( prop: string ): string {
 	const map: Record< string, string > = {
 		'background-color': 'rgba(0, 0, 0, 0)',
@@ -432,6 +458,8 @@ export async function captureAll(
 	await resize( viewport.desktop );
 	const root = captureTree( env );
 	const meta = captureMeta( env, viewport );
+	applyHover( root, captureHover( env.doc, env.win, KEY_ATTR ) );
+	applyPanels( root, ( await captureCollapsed( env.doc, env.win, KEY_ATTR, readStyles ) ).panels );
 
 	onStage?.( 'tablet' );
 	await resize( viewport.tablet );

@@ -92,7 +92,7 @@ export function validateAgainstRegistry( elements: Array< V3Element | V4Element 
 			else checkTyped( value, pt, `${ path }.${ key }`, errors );
 		}
 		for ( const [ bp, css ] of Object.entries( el.css ?? {} ) ) {
-			if ( ! [ 'desktop', 'tablet', 'mobile' ].includes( bp ) || typeof css !== 'string' || /[{}<>]/.test( css ) ) errors.push( `${ path }: bad css block ${ bp }` );
+			if ( ! [ 'desktop', 'tablet', 'mobile', 'hover' ].includes( bp ) || typeof css !== 'string' || /[{}<>]/.test( css ) ) errors.push( `${ path }: bad css block ${ bp }` );
 		}
 	};
 	const visit = ( node: V3Element | V4Element, path: string ): void => {

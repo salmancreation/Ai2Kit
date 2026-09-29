@@ -13,16 +13,18 @@
  */
 import type { IRNode, StyleMap } from '../ir/types';
 import { isTransparent } from '../util/color';
-import { decomposeMatrix, firstFamily, normalizeGradient, parseShadow, px, round } from '../util/units';
+import { decomposeMatrix, firstFamily, normalizeGradient, parseShadow, px, round, transitionSeconds } from '../util/units';
 import { effective } from './settings';
 import { emitNode as emitV3Node, emptyStats, gridColumns, type EmitContext, type NodeStats, type V3Element } from './v3';
 import { explicitMinHeight, innerBox, isRowParent, parentCenters, placement } from './placement';
 import lucideFa from '../../data/lucide-fa-map.json';
+import { accordionMeta } from '../recognize/patterns';
+import { canEmitAccordion } from './accordion';
 
 type Typed = { $$type: string; value: unknown };
 const t = ( $$type: string, value: unknown ): Typed => ( { $$type, value } );
 
-export type V4Css = { desktop?: string; tablet?: string; mobile?: string };
+export type V4Css = { desktop?: string; tablet?: string; mobile?: string; hover?: string };
 
 export type V4Element = {
 	id: string;
@@ -292,10 +294,61 @@ function toCss( d: Decls ): string {
 		.join( ' ' );
 }
 
-/** Desktop CSS plus tablet/mobile diffs (values the breakpoint changes or resets). */
+/** CSS property a hover diff key animates (for the `transition` list). */
+const HOVER_CSS: Record< string, string > = {
+	color: 'color',
+	'background-color': 'background-color',
+	'background-image': 'background-image',
+	'border-top-color': 'border-color',
+	'border-right-color': 'border-color',
+	'border-bottom-color': 'border-color',
+	'border-left-color': 'border-color',
+	'box-shadow': 'box-shadow',
+	transform: 'transform',
+	opacity: 'opacity',
+	filter: 'filter',
+};
+
+/**
+ * Hover state declarations (FR-22) and the normal-state `transition` that
+ * animates them. Atomic styles have a real hover state, so every captured
+ * property maps (no per-widget control subset as in v3).
+ */
+export function hoverDecls( node: IRNode ): { hover: Decls; transition?: string } {
+	const h = node.styles.hover;
+	const hover: Decls = {};
+	if ( ! h ) return { hover };
+	if ( h.color !== undefined ) hover.color = h.color;
+	if ( h[ 'background-image' ] !== undefined && h[ 'background-image' ] !== 'none' ) hover[ 'background-image' ] = normalizeGradient( h[ 'background-image' ] );
+	if ( h[ 'background-color' ] !== undefined ) hover[ 'background-color' ] = h[ 'background-color' ];
+	const bc = h[ 'border-top-color' ] ?? h[ 'border-bottom-color' ] ?? h[ 'border-left-color' ] ?? h[ 'border-right-color' ];
+	if ( bc !== undefined ) hover[ 'border-color' ] = bc;
+	if ( h[ 'box-shadow' ] !== undefined ) {
+		const sh = parseShadow( h[ 'box-shadow' ] );
+		if ( ! sh ) hover[ 'box-shadow' ] = '0px 0px 0px 0px rgba(0, 0, 0, 0)';
+		else if ( ! sh.inset ) hover[ 'box-shadow' ] = `${ sh.x }px ${ sh.y }px ${ sh.blur }px ${ sh.spread }px ${ sh.color }`;
+	}
+	if ( h.transform !== undefined ) hover.transform = decomposeMatrix( h.transform );
+	if ( h.opacity !== undefined ) hover.opacity = h.opacity;
+	if ( h[ 'text-decoration-line' ] !== undefined ) hover[ 'text-decoration' ] = h[ 'text-decoration-line' ];
+	if ( h.filter !== undefined ) hover.filter = h.filter;
+	const sec = transitionSeconds( h[ 'transition-duration' ] );
+	if ( sec === null ) return { hover };
+	const animated = ( h[ 'transition-property' ] ?? 'all' ).split( ',' ).map( ( p ) => p.trim() );
+	const props = [ ...new Set( Object.keys( h ).map( ( k ) => HOVER_CSS[ k ] ).filter( ( p ): p is string => !! p ) ) ];
+	const list = animated.includes( 'all' ) ? props : props.filter( ( p ) => animated.includes( p ) || ( p === 'border-color' && animated.some( ( a ) => a.startsWith( 'border' ) ) ) );
+	return list.length ? { hover, transition: list.map( ( p ) => `${ p } ${ sec }s` ).join( ', ' ) } : { hover };
+}
+
+/** Desktop CSS plus tablet/mobile diffs (values the breakpoint changes or resets), and the hover state. */
 export function cssFor( node: IRNode, parent: IRNode | undefined, isSection = false ): V4Css {
 	const d = declsAt( node, parent, 'desktop', isSection );
 	const out: V4Css = {};
+	const hv = hoverDecls( node );
+	if ( Object.keys( hv.hover ).length ) {
+		out.hover = toCss( hv.hover );
+		if ( hv.transition ) d.transition = hv.transition;
+	}
 	if ( Object.keys( d ).length ) out.desktop = toCss( d );
 	let prev = d;
 	for ( const bp of [ 'tablet', 'mobile' ] as const ) {
@@ -307,7 +360,7 @@ export function cssFor( node: IRNode, parent: IRNode | undefined, isSection = fa
 			continue;
 		}
 		// Sizing is desktop-only; carry it so it isn't reported as a reset.
-		for ( const k of [ 'width', 'max-width', 'align-self', 'flex-shrink' ] ) if ( prev[ k ] !== undefined && cur[ k ] === undefined && cur.display !== 'none' ) cur[ k ] = prev[ k ]!;
+		for ( const k of [ 'width', 'max-width', 'align-self', 'flex-shrink', 'transition' ] ) if ( prev[ k ] !== undefined && cur[ k ] === undefined && cur.display !== 'none' ) cur[ k ] = prev[ k ]!;
 		const diff: Decls = {};
 		for ( const k of new Set( [ ...Object.keys( prev ), ...Object.keys( cur ) ] ) ) {
 			if ( prev[ k ] === cur[ k ] ) continue;
@@ -432,6 +485,8 @@ function atomicLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V4Elemen
 }
 
 export function emitV4Node( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V4Element | V3Element | null {
+	// Accordion has no atomic element yet: the v3 Nested Accordion, mixed into the v4 tree (PRD §8.2).
+	if ( node.kind === 'container' && ! node.fallback && ! isSection && canEmitAccordion( accordionMeta( node.pattern ) ) ) return emitV3Node( node, ctx, parent );
 	if ( node.kind === 'container' && ! node.fallback ) {
 		const settings: Record< string, unknown > = {};
 		common( node, settings );

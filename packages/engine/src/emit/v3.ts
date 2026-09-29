@@ -8,10 +8,12 @@
 import type { IRNode, NodeStyles, ResidualRule, StyleMap } from '../ir/types';
 import type { TokenIndex } from '../tokens/tokens';
 import { isTransparent, normalizeColor } from '../util/color';
-import { firstFamily, parseBox, parseLinearGradient, parseShadow, px, round } from '../util/units';
+import { firstFamily, matrixParts, parseBox, parseLinearGradient, parseShadow, px, round, transitionSeconds } from '../util/units';
 import { dims, effective, gaps, link, responsive, slider, type Settings } from './settings';
 import lucideFa from '../../data/lucide-fa-map.json';
 import { explicitMinHeight, isRowParent, parentCenters, placement } from './placement';
+import { accordionMeta } from '../recognize/patterns';
+import { canEmitAccordion, emitAccordion } from './accordion';
 
 export type V3Element = {
 	id: string;
@@ -99,7 +101,7 @@ function track( ctx: EmitContext, s: StyleMap, consumed: Set< string >, kind: st
 	}
 }
 
-function colorSetting( out: Settings, key: string, css: string | undefined, ctx: EmitContext ): boolean {
+export function colorSetting( out: Settings, key: string, css: string | undefined, ctx: EmitContext ): boolean {
 	if ( ! css || isTransparent( css ) ) return false;
 	const gid = ctx.tokens.color( css );
 	if ( gid ) {
@@ -117,7 +119,7 @@ function colorSetting( out: Settings, key: string, css: string | undefined, ctx:
 const ALIGN_TEXT: Record< string, string > = { center: 'center', right: 'end', end: 'end', justify: 'justify' };
 const ALIGN_BUTTON: Record< string, string > = { center: 'center', right: 'right', end: 'right', justify: 'justify' };
 
-function typography( out: Settings, prefix: string, node: IRNode, ctx: EmitContext, consumed: Set< string > ): void {
+export function typography( out: Settings, prefix: string, node: IRNode, ctx: EmitContext, consumed: Set< string > ): void {
 	const s = node.styles.desktop;
 	const token = ctx.tokens.font( node );
 	const g = `${ prefix }_typography`;
@@ -171,7 +173,7 @@ function align( out: Settings, key: string, styles: NodeStyles, map: Record< str
 	if ( styles.desktop[ 'text-align' ] ) consumed.add( 'text-align' );
 }
 
-function boxSetting( out: Settings, key: string, styles: NodeStyles, prop: 'padding' | 'margin', consumed: Set< string >, verticalOnly = false, always = false ): void {
+export function boxSetting( out: Settings, key: string, styles: NodeStyles, prop: 'padding' | 'margin', consumed: Set< string >, verticalOnly = false, always = false ): void {
 	responsive( out, key, styles, ( st ) => {
 		const b = parseBox( st, prop );
 		if ( ! b ) return always ? dims( { top: 0, right: 0, bottom: 0, left: 0 } ) : undefined;
@@ -195,7 +197,7 @@ function radius( s: StyleMap ): ReturnType< typeof dims > | undefined {
 	return dims( { top: clamp( r[ 0 ]! ), right: clamp( r[ 1 ]! ), bottom: clamp( r[ 2 ]! ), left: clamp( r[ 3 ]! ) } );
 }
 
-function borderSettings( out: Settings, prefix: string, s: StyleMap, ctx: EmitContext, consumed: Set< string >, radiusKey?: string ): void {
+export function borderSettings( out: Settings, prefix: string, s: StyleMap, ctx: EmitContext, consumed: Set< string >, radiusKey?: string ): void {
 	const w = parseBox( s, 'border-width' );
 	// Style and color come from the first side that has a border (bottom-only dividers are common).
 	const side = ( [ 'top', 'bottom', 'left' ] as const ).find( ( sd ) => ( px( s[ `border-${ sd }-width` ] ) ?? 0 ) > 0 && ( s[ `border-${ sd }-style` ] ?? 'none' ) !== 'none' );
@@ -221,6 +223,129 @@ function shadowSettings( out: Settings, prefix: string, s: StyleMap, consumed: S
 	consumed.add( 'box-shadow' );
 }
 
+/* ------------------------------------------------------------------ */
+/* Hover (FR-22)                                                       */
+/* ------------------------------------------------------------------ */
+
+export type HoverKind = 'button' | 'heading' | 'text' | 'icon' | 'image' | 'container';
+
+function hoverBorderColor( h: Partial< StyleMap > ): string | undefined {
+	return h[ 'border-top-color' ] ?? h[ 'border-bottom-color' ] ?? h[ 'border-left-color' ] ?? h[ 'border-right-color' ];
+}
+
+/** Hover background: a solid color or a 2-stop gradient, on a `{prefix}_background` group. */
+function hoverBackground( out: Settings, prefix: string, h: Partial< StyleMap >, ctx: EmitContext ): void {
+	const grad = h[ 'background-image' ] ? parseLinearGradient( h[ 'background-image' ] ) : null;
+	if ( grad ) {
+		out[ `${ prefix }_background` ] = 'gradient';
+		colorSetting( out, `${ prefix }_color`, grad.from, ctx );
+		out[ `${ prefix }_color_stop` ] = slider( grad.fromStop, '%' );
+		colorSetting( out, `${ prefix }_color_b`, grad.to, ctx );
+		out[ `${ prefix }_color_b_stop` ] = slider( grad.toStop, '%' );
+		out[ `${ prefix }_gradient_angle` ] = slider( grad.angle, 'deg' );
+		return;
+	}
+	const bg = h[ 'background-color' ];
+	if ( bg === undefined ) return;
+	out[ `${ prefix }_background` ] = 'classic';
+	// Transparent on hover (ghost buttons) is a real value, not "unset".
+	if ( ! colorSetting( out, `${ prefix }_color`, bg, ctx ) ) out[ `${ prefix }_color` ] = '#00000000';
+}
+
+/** A hover box-shadow; `none` on hover clears a normal-state shadow. */
+function hoverShadow( out: Settings, prefix: string, h: Partial< StyleMap > ): void {
+	const v = h[ 'box-shadow' ];
+	if ( v === undefined ) return;
+	const sh = parseShadow( v );
+	if ( sh?.inset ) return;
+	out[ `${ prefix }_box_shadow_type` ] = 'yes';
+	out[ `${ prefix }_box_shadow` ] = sh
+		? { horizontal: sh.x, vertical: sh.y, blur: sh.blur, spread: sh.spread, color: sh.color }
+		: { horizontal: 0, vertical: 0, blur: 0, spread: 0, color: 'rgba(0,0,0,0)' };
+}
+
+/** Hover transform through Elementor's Transform → Hover controls (every widget and container has them). */
+function hoverTransform( out: Settings, h: Partial< StyleMap >, seconds: number | null ): void {
+	if ( h.transform === undefined ) return;
+	const t = matrixParts( h.transform );
+	if ( ! t ) return;
+	if ( Math.abs( t.x ) > 0.01 || Math.abs( t.y ) > 0.01 ) {
+		out._transform_translate_popover_hover = 'transform';
+		if ( Math.abs( t.x ) > 0.01 ) out._transform_translateX_effect_hover = slider( round( t.x ) );
+		if ( Math.abs( t.y ) > 0.01 ) out._transform_translateY_effect_hover = slider( round( t.y ) );
+	}
+	if ( Math.abs( t.rotate ) > 0.01 ) {
+		out._transform_rotate_popover_hover = 'transform';
+		out._transform_rotateZ_effect_hover = slider( round( t.rotate ), 'deg' );
+	}
+	if ( Math.abs( t.scaleX - 1 ) > 0.001 ) {
+		out._transform_scale_popover_hover = 'transform';
+		out._transform_scale_effect_hover = slider( round( t.scaleX ), 'px' );
+	}
+	if ( seconds !== null ) out._transform_transition_hover = slider( Math.round( seconds * 1000 ), 'ms' );
+}
+
+/**
+ * Map a node's captured hover diff to the hover controls of its widget. Each
+ * Elementor widget exposes a different subset; what it lacks is dropped.
+ */
+export function hoverSettings( out: Settings, node: IRNode, kind: HoverKind, ctx: EmitContext ): void {
+	const h = node.styles.hover;
+	if ( ! h ) return;
+	const sec = transitionSeconds( h[ 'transition-duration' ] );
+	const html = node.content?.html ?? '';
+	switch ( kind ) {
+		case 'button':
+			colorSetting( out, 'hover_color', h.color, ctx );
+			hoverBackground( out, 'button_background_hover', h, ctx );
+			colorSetting( out, 'button_hover_border_color', hoverBorderColor( h ), ctx );
+			hoverShadow( out, 'button_hover_box_shadow', h );
+			if ( sec !== null ) out.button_hover_transition_duration = slider( sec, 's' );
+			break;
+		case 'heading':
+			// The heading's hover color targets its link.
+			if ( /<a[\s>]/.test( html ) || node.content?.href ) {
+				colorSetting( out, 'title_hover_color', h.color, ctx );
+				if ( sec !== null && h.color ) out.title_hover_color_transition_duration = slider( sec, 's' );
+			}
+			break;
+		case 'text':
+			if ( /<a[\s>]/.test( html ) ) {
+				colorSetting( out, 'link_hover_color', h.color, ctx );
+				if ( sec !== null && h.color ) out.link_hover_color_transition_duration = slider( sec, 's' );
+			}
+			break;
+		case 'icon':
+			colorSetting( out, 'hover_primary_color', h.color, ctx );
+			break;
+		case 'image':
+			if ( h.opacity !== undefined ) out.opacity_hover = slider( parseFloat( h.opacity ), '' );
+			if ( sec !== null ) out.background_hover_transition = slider( sec, 'px' );
+			break;
+		case 'container': {
+			hoverBackground( out, 'background_hover', h, ctx );
+			const bc = hoverBorderColor( h );
+			const base = node.styles.desktop;
+			const side = ( [ 'top', 'bottom', 'left', 'right' ] as const ).find( ( sd ) => ( px( base[ `border-${ sd }-width` ] ) ?? 0 ) > 0 && ( base[ `border-${ sd }-style` ] ?? 'none' ) !== 'none' );
+			if ( bc && side ) {
+				// The hover border color only applies with a hover border style.
+				const style = base[ `border-${ side }-style` ]!;
+				out.border_hover_border = [ 'solid', 'double', 'dotted', 'dashed', 'groove' ].includes( style ) ? style : 'solid';
+				const w = parseBox( base, 'border-width' );
+				if ( w ) out.border_hover_width = dims( w );
+				colorSetting( out, 'border_hover_color', bc, ctx );
+			}
+			hoverShadow( out, 'box_shadow_hover', h );
+			if ( sec !== null ) {
+				out.background_hover_transition = slider( sec, 'px' );
+				out.border_hover_transition = slider( sec, 'px' );
+			}
+			break;
+		}
+	}
+	hoverTransform( out, h, sec );
+}
+
 function extractUrl( bgImage: string | undefined ): string | undefined {
 	const m = bgImage?.match( /url\(["']?([^"')]+)["']?\)/ );
 	return m ? m[ 1 ] : undefined;
@@ -231,7 +356,7 @@ function asset( ctx: EmitContext, url: string ): { url: string; id: number | str
 	return a ? { url: a.url, id: a.id ?? '' } : { url, id: '' };
 }
 
-function backgroundSettings( out: Settings, prefix: string, s: StyleMap, ctx: EmitContext, consumed: Set< string > ): void {
+export function backgroundSettings( out: Settings, prefix: string, s: StyleMap, ctx: EmitContext, consumed: Set< string > ): void {
 	const img = s[ 'background-image' ];
 	const grad = parseLinearGradient( img );
 	if ( grad ) {
@@ -453,6 +578,7 @@ function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, 
 
 	positionSettings( out, node, parent, consumed );
 	responsiveHide( out, node.styles );
+	hoverSettings( out, node, 'container', ctx );
 	const rc = residual( node, ctx, consumed );
 	if ( rc ) out.css_classes = rc;
 	track( ctx, s, consumed, 'container' );
@@ -509,7 +635,7 @@ function responsiveHide( out: Settings, styles: NodeStyles ): void {
 /* Widgets                                                             */
 /* ------------------------------------------------------------------ */
 
-function commonWidget( out: Settings, node: IRNode, ctx: EmitContext, parent: IRNode | undefined, consumed: Set< string >, opts: { boxStyles?: boolean; sizing?: boolean } = {} ): void {
+export function commonWidget( out: Settings, node: IRNode, ctx: EmitContext, parent: IRNode | undefined, consumed: Set< string >, opts: { boxStyles?: boolean; sizing?: boolean } = {} ): void {
 	if ( node.anchor ) out._element_id = node.anchor;
 	boxSetting( out, '_margin', node.styles, 'margin', consumed, true );
 	if ( opts.boxStyles ) {
@@ -544,19 +670,19 @@ function innerAlign( node: IRNode, parent: IRNode | undefined ): 'center' | 'end
 	return p.align === 'center' ? 'center' : p.align === 'flex-end' ? 'end' : undefined;
 }
 
-function iconValue( name: string | undefined ): { value: string; library: string } | undefined {
+export function iconValue( name: string | undefined ): { value: string; library: string } | undefined {
 	if ( ! name ) return undefined;
 	const fa = ( lucideFa as Record< string, string > )[ name ];
 	if ( ! fa ) return undefined;
 	return { value: fa, library: fa.startsWith( 'fab ' ) ? 'fa-brands' : 'fa-solid' };
 }
 
-function svgDataUri( svg: string ): string {
+export function svgDataUri( svg: string ): string {
 	const b64 = typeof btoa === 'function' ? btoa( unescape( encodeURIComponent( svg ) ) ) : Buffer.from( svg, 'utf8' ).toString( 'base64' );
 	return `data:image/svg+xml;base64,${ b64 }`;
 }
 
-function widget( type: string, settings: Settings, ctx: EmitContext ): V3Element {
+export function widget( type: string, settings: Settings, ctx: EmitContext ): V3Element {
 	if ( ctx.stats ) ctx.stats.widgets[ type ] = ( ctx.stats.widgets[ type ] ?? 0 ) + 1;
 	return { id: ctx.nextId(), elType: 'widget', widgetType: type, settings, elements: [] };
 }
@@ -590,6 +716,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			colorSetting( out, 'title_color', s.color, ctx ) && consumed.add( 'color' );
 			typography( out, 'typography', node, ctx, consumed );
 			commonWidget( out, node, ctx, parent, consumed, { boxStyles: true, sizing: true } );
+			hoverSettings( out, node, 'heading', ctx );
 			el = widget( 'heading', out, ctx );
 			break;
 		}
@@ -604,6 +731,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			out.paragraph_spacing = slider( 0 );
 			typography( out, 'typography', node, ctx, consumed );
 			commonWidget( out, node, ctx, parent, consumed, { boxStyles: true, sizing: true } );
+			hoverSettings( out, node, 'text', ctx );
 			el = widget( 'text-editor', out, ctx );
 			break;
 		}
@@ -650,6 +778,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			shadowSettings( out, 'button_box_shadow', s, consumed );
 			boxSetting( out, 'text_padding', node.styles, 'padding', consumed );
 			commonWidget( out, node, ctx, parent, consumed );
+			hoverSettings( out, node, 'button', ctx );
 			el = widget( 'button', out, ctx );
 			break;
 		}
@@ -680,6 +809,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 				consumed.add( 'opacity' );
 			}
 			commonWidget( out, node, ctx, parent, consumed );
+			hoverSettings( out, node, 'image', ctx );
 			el = widget( 'image', out, ctx );
 			break;
 		}
@@ -699,6 +829,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			out.align = innerAlign( node, parent ) ?? 'start';
 			if ( node.content?.href ) out.link = link( node.content.href );
 			commonWidget( out, node, ctx, parent, consumed );
+			hoverSettings( out, node, 'icon', ctx );
 			el = widget( 'icon', out, ctx );
 			break;
 		}
@@ -784,6 +915,8 @@ export function emitNode( node: IRNode, ctx: EmitContext, parent?: IRNode, isSec
 	}
 	if ( node.kind !== 'container' ) return emitLeaf( node, ctx, parent );
 	if ( node.fallback ) return emitLeaf( node, ctx, parent );
+	const acc = accordionMeta( node.pattern );
+	if ( ! isSection && canEmitAccordion( acc ) ) return emitAccordion( node, acc, ctx, parent );
 	const settings = containerSettings( node, ctx, isSection, parent );
 	const elements = node.children.map( ( c ) => emitNode( c, ctx, node ) ).filter( ( e ): e is V3Element => e !== null );
 	const el: V3Element = { id: ctx.nextId(), elType: 'container', settings, elements };

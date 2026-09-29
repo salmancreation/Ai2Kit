@@ -80,8 +80,8 @@ export function ScoreBadge( { score, title }: { score: number; title?: string } 
 	);
 }
 
-/** Overall score ring: counts up over 800ms, color settles at the end (§5.8, §9). */
-export function ScoreRing( { score, size = 64 }: { score: number; size?: number } ) {
+/** Overall score ring: counts up over 800ms, color settles at the end (§5.8, §9). `compact` is the table-row size. */
+export function ScoreRing( { score, size = 64, compact }: { score: number; size?: number; compact?: boolean } ) {
 	const [ shown, setShown ] = useState( 0 );
 	useEffect( () => {
 		const reduce = window.matchMedia?.( '(prefers-reduced-motion: reduce)' ).matches;
@@ -100,11 +100,12 @@ export function ScoreRing( { score, size = 64 }: { score: number; size?: number 
 		raf = requestAnimationFrame( tick );
 		return () => cancelAnimationFrame( raf );
 	}, [ score ] );
-	const r = ( size - 8 ) / 2;
+	const stroke = compact ? 4 : 6;
+	const r = ( size - stroke - 2 ) / 2;
 	const c = 2 * Math.PI * r;
 	const done = shown === score;
 	return (
-		<div className={ s.ring } style={ { width: size, height: size } } role="img" aria-label={ `${ score }%` }>
+		<div className={ cx( s.ring, compact && s.ringCompact ) } style={ { width: size, height: size } } role="img" aria-label={ `${ score }%` }>
 			<svg width={ size } height={ size } aria-hidden="true">
 				<circle cx={ size / 2 } cy={ size / 2 } r={ r } className={ s.ringTrack } />
 				<circle

@@ -46,6 +46,24 @@ final class ResidualCss {
 		'inset-block-start',
 		'inset-inline-start',
 		'z-index',
+		// Hover state leftovers (FR-22).
+		'opacity',
+		'box-shadow',
+		'background-color',
+		'border-color',
+		'text-decoration',
+		'transition',
+		'transition-duration',
+		'transition-property',
+		'transition-timing-function',
+	);
+
+	/**
+	 * Allowed states → selector suffix.
+	 */
+	const STATES = array(
+		''      => '',
+		'hover' => ':hover',
 	);
 
 	const TARGETS = array( '', ' .elementor-heading-title', ' .elementor-widget-container', ' .elementor-button', ' img' );
@@ -101,7 +119,8 @@ final class ResidualCss {
 			$class  = isset( $rule['className'] ) ? (string) $rule['className'] : '';
 			$bp     = isset( $rule['breakpoint'] ) ? (string) $rule['breakpoint'] : 'desktop';
 			$target = isset( $rule['target'] ) ? (string) $rule['target'] : '';
-			if ( ! preg_match( '/^(a2k-[a-z0-9-]{1,40}|e-[0-9a-f]{7}-a2k)$/', $class ) || ! isset( self::MEDIA[ $bp ] ) || ! in_array( $target, self::TARGETS, true ) ) {
+			$state  = isset( $rule['state'] ) ? (string) $rule['state'] : '';
+			if ( ! preg_match( '/^(a2k-[a-z0-9-]{1,40}|e-[0-9a-f]{7}-a2k)$/', $class ) || ! isset( self::MEDIA[ $bp ] ) || ! in_array( $target, self::TARGETS, true ) || ! isset( self::STATES[ $state ] ) ) {
 				continue;
 			}
 			$decls = array();
@@ -114,7 +133,7 @@ final class ResidualCss {
 				continue;
 			}
 			$label       = isset( $rule['label'] ) ? preg_replace( '/[^\p{L}\p{N} ?!.,\'-]/u', '', (string) $rule['label'] ) : '';
-			$by[ $bp ][] = ( $label ? '/* ' . substr( $label, 0, 60 ) . " */\n" : '' ) . $scope . ' .' . $class . $target . '{' . implode( ';', $decls ) . '}';
+			$by[ $bp ][] = ( $label ? '/* ' . substr( $label, 0, 60 ) . " */\n" : '' ) . $scope . ' .' . $class . self::STATES[ $state ] . $target . '{' . implode( ';', $decls ) . '}';
 		}
 		$css = implode( "\n", $by['desktop'] );
 		foreach ( array( 'tablet', 'mobile' ) as $bp ) {

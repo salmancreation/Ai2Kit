@@ -31,6 +31,16 @@ final class AtomicWriter {
 	const BREAKPOINTS = array( 'desktop', 'tablet', 'mobile' );
 
 	/**
+	 * CSS blocks sent by the engine → style variant meta (breakpoint, state).
+	 */
+	const VARIANTS = array(
+		'desktop' => array( 'desktop', null ),
+		'tablet'  => array( 'tablet', null ),
+		'mobile'  => array( 'mobile', null ),
+		'hover'   => array( 'desktop', 'hover' ),
+	);
+
+	/**
 	 * Converter instance.
 	 *
 	 * @var Css_Converter|null
@@ -106,22 +116,22 @@ final class AtomicWriter {
 
 		$style_id = 'e-' . $el['id'] . '-a2k';
 		$variants = array();
-		foreach ( self::BREAKPOINTS as $bp ) {
-			if ( empty( $css[ $bp ] ) || ! is_string( $css[ $bp ] ) ) {
+		foreach ( self::VARIANTS as $block => $meta ) {
+			if ( empty( $css[ $block ] ) || ! is_string( $css[ $block ] ) ) {
 				continue;
 			}
-			$result = $this->converter()->convert( $css[ $bp ] );
+			$result = $this->converter()->convert( $css[ $block ] );
 			if ( ! empty( $result['props'] ) ) {
 				$variants[] = array(
 					'meta'       => array(
-						'breakpoint' => $bp,
-						'state'      => null,
+						'breakpoint' => $meta[0],
+						'state'      => $meta[1],
 					),
 					'props'      => $result['props'],
 					'custom_css' => null,
 				);
 			}
-			$this->leftovers( (string) ( $result['customCss'] ?? '' ), $style_id, $bp );
+			$this->leftovers( (string) ( $result['customCss'] ?? '' ), $style_id, $meta[0], (string) $meta[1] );
 		}
 
 		$settings = (array) ( $el['settings'] ?? array() );
@@ -172,9 +182,10 @@ final class AtomicWriter {
 	 * @param string $css      Leftover declarations.
 	 * @param string $style_id Style class.
 	 * @param string $bp       Breakpoint.
+	 * @param string $state    State ('' or 'hover').
 	 * @return void
 	 */
-	private function leftovers( $css, $style_id, $bp ) {
+	private function leftovers( $css, $style_id, $bp, $state = '' ) {
 		$decls = array();
 		foreach ( explode( ';', $css ) as $decl ) {
 			$parts = explode( ':', $decl, 2 );
@@ -183,11 +194,15 @@ final class AtomicWriter {
 			}
 		}
 		if ( $decls ) {
-			$this->residual[] = array(
+			$rule = array(
 				'className'  => $style_id,
 				'breakpoint' => $bp,
 				'decls'      => $decls,
 			);
+			if ( $state ) {
+				$rule['state'] = $state;
+			}
+			$this->residual[] = $rule;
 		}
 	}
 

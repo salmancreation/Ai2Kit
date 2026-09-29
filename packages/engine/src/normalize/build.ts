@@ -93,6 +93,7 @@ function isPlainWrapper( n: IRNode ): boolean {
 		! n.content?.href &&
 		! SEMANTIC_TAGS.has( n.tag ?? '' ) &&
 		! hasOwnVisual( n.styles.desktop ) &&
+		! n.styles.hover &&
 		! n.styles.tablet?.display &&
 		! n.styles.mobile?.display
 	);
