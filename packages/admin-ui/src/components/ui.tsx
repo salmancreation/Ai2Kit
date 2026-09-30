@@ -249,6 +249,7 @@ export function Tooltip( { content, children }: { content: ReactNode; children: 
 export function UpsellChip( { children, detail }: { children: ReactNode; detail: string } ) {
 	const [ open, setOpen ] = useState( false );
 	const ref = useRef< HTMLSpanElement >( null );
+	const hasPro = !! window.ai2kitConfig.pro;
 	useEffect( () => {
 		if ( ! open ) return;
 		const close = ( e: MouseEvent | KeyboardEvent ): void => {
@@ -261,6 +262,8 @@ export function UpsellChip( { children, detail }: { children: ReactNode; detail:
 			document.removeEventListener( 'keydown', close );
 		};
 	}, [ open ] );
+	// With Pro active there's nothing to upsell.
+	if ( hasPro ) return null;
 	return (
 		<span className={ s.upsellWrap } ref={ ref }>
 			<button type="button" className={ s.upsell } onClick={ () => setOpen( ! open ) } aria-expanded={ open }>

@@ -12,7 +12,8 @@ Ai2Kit converts websites built with AI tools — Lovable, Bolt, v0, Claude, Chat
 6. [Settings](settings.md)
 7. [Troubleshooting](troubleshooting.md)
 8. [Privacy and security](privacy.md)
-9. [Developers](developers.md) — filters, building from source, contributing translations.
+9. [AI agents (MCP)](agents.md) — let Claude, Cursor and other agents prepare conversions, read reports and undo imports.
+10. [Developers](developers.md) — filters, building from source, contributing translations.
 
 **Requirements:** WordPress 6.5+, PHP 7.4+, Elementor (Free is enough) with Flexbox Container on.
 

@@ -4,9 +4,10 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { detectSource, emit, type Analysis, type ConversionResult, type SourceInfo } from '@ai2kit/engine';
-import { api, asApiError, type ApiError, type ImportResult, type Preflight, type UploadedJob } from '../lib/api';
-import { CancelledError, runConversion, type StageId, type StageState } from '../lib/runner';
+import { detectSource, emit, type Analysis, type ConversionResult, type SourceInfo, type TokenTable } from '@ai2kit/engine';
+import { api, asApiError, type ApiError, type ImportPayload, type ImportResult, type Preflight, type UploadedJob } from '../lib/api';
+import { applyFilters } from '@wordpress/hooks';
+import { CancelledError, runSite, type RunOutput, type StageId, type StageState } from '../lib/runner';
 import { ActionBar, PageTitle, Shell } from '../components/Shell';
 import { Stepper, type StepIndex } from '../components/Stepper';
 import { DropZone } from '../components/DropZone';
@@ -28,11 +29,28 @@ const STEP_INDEX: Record< Step, StepIndex > = { upload: 0, check: 1, convert: 2,
 const STAGES: StageId[] = [ 'render', 'capture', 'sections', 'tokens', 'build' ];
 const freshStages = (): StageState[] => STAGES.map( ( id ) => ( { id, status: 'pending' } ) );
 
-type Conv = {
+type Modes = Record< string, 'native' | 'html' >;
+
+/** One converted page. A job has one page, or several when an add-on converts the site's other routes. */
+type Page = {
+	route: string;
+	label: string;
+	url: string;
 	analysis: Analysis;
 	result: ConversionResult;
 	frozen: Record< string, string >;
-	modes: Record< string, 'native' | 'html' >;
+	modes: Modes;
+	include: boolean;
+};
+
+/** Pages share one set of design tokens (the entry page's), so every page binds to the same Global Colors & Fonts. */
+type Conv = { pages: Page[]; active: number; tokens: TokenTable };
+
+/** What an add-on's `ai2kit.import` filter receives to import several pages. */
+export type SiteImport = {
+	jobUuid: string;
+	/** Each page, with the kind of each top-level element of its document (header, hero, footer …). */
+	pages: Array< { route: string; label: string; payload: ImportPayload; semantics: string[] } >;
 };
 
 export function Convert() {
@@ -80,6 +98,26 @@ export function Convert() {
 	/* Preflight runs quietly in the background (§6.1). */
 	useEffect( () => {
 		api.preflight().then( setPreflight ).catch( () => setPreflight( null ) );
+	}, [] );
+
+	/* ?job=<uuid>: continue a job created elsewhere (Ai2Kit agent tools) at the Check step. */
+	useEffect( () => {
+		const url = new URL( window.location.href );
+		const uuid = url.searchParams.get( 'job' );
+		if ( ! uuid ) return;
+		url.searchParams.delete( 'job' );
+		window.history.replaceState( null, '', url.toString() );
+		setUploading( true );
+		api.uploadedJob( uuid )
+			.then( ( j ) => {
+				setJob( j );
+				setTitle( j.title );
+				setSource( detectSource( { files: j.files, html: j.entryHtml } ) );
+				setWelcome( false );
+				setStep( 'check' );
+			} )
+			.catch( ( e ) => setUploadError( asApiError( e ) ) )
+			.finally( () => setUploading( false ) );
 	}, [] );
 
 	const fix = async ( id: string ): Promise< void > => {
@@ -136,7 +174,7 @@ export function Convert() {
 		setRunError( null );
 		const started: Partial< Record< StageId, number > > = {};
 		try {
-			const out = await runConversion( frameRef.current, job.entryUrl, job.uuid, {
+			const out = await runSite( frameRef.current, job.entryUrl, job.uuid, {
 				signal: controller.signal,
 				format: resolvedFormat,
 				onLog: ( line ) => setLog( ( l ) => [ ...l, `[${ new Date().toLocaleTimeString() }] ${ line }` ] ),
@@ -149,7 +187,19 @@ export function Convert() {
 					);
 				},
 			} );
-			setConv( out );
+			const tokens = out[ 0 ]!.analysis.tokens;
+			const pages = out.map( ( o: RunOutput, i ): Page => ( {
+				route: o.route,
+				label: o.label,
+				url: o.url,
+				analysis: o.analysis,
+				frozen: o.frozen,
+				modes: o.modes,
+				// Further pages re-emitted against the entry page's tokens.
+				result: i === 0 ? o.result : emit( { ...o.analysis, tokens }, { frozen: o.frozen, modes: o.modes, title: o.label, format: resolvedFormat } ),
+				include: true,
+			} ) );
+			setConv( { pages, active: 0, tokens } );
 			setStep( 'review' );
 		} catch ( e ) {
 			if ( e instanceof CancelledError ) return;
@@ -168,44 +218,78 @@ export function Convert() {
 	};
 
 	/* Review: optimistic re-emit on every toggle / rename. */
-	const reemit = ( analysis: Analysis, modes: Record< string, 'native' | 'html' >, frozen: Record< string, string > ): ConversionResult => emit( analysis, { frozen, modes, title, format: resolvedFormat } );
+	const pageTitle = ( p: Page, i: number ): string => ( i === 0 ? title : p.label );
+	const reemit = ( p: Page, i: number, modes: Modes, tokens: TokenTable ): ConversionResult =>
+		emit( { ...p.analysis, tokens }, { frozen: p.frozen, modes, title: pageTitle( p, i ), format: resolvedFormat } );
+	const updatePage = ( i: number, patch: Partial< Page > ): void => {
+		if ( ! conv ) return;
+		setConv( { ...conv, pages: conv.pages.map( ( p, j ) => ( j === i ? { ...p, ...patch } : p ) ) } );
+	};
 
 	const setMode = ( id: string, m: 'native' | 'html' ): void => {
 		if ( ! conv ) return;
-		const modes = { ...conv.modes, [ id ]: m };
-		setConv( { ...conv, modes, result: reemit( conv.analysis, modes, conv.frozen ) } );
+		const i = conv.active;
+		const p = conv.pages[ i ]!;
+		const modes = { ...p.modes, [ id ]: m };
+		updatePage( i, { modes, result: reemit( p, i, modes, conv.tokens ) } );
 	};
 
 	const rename = ( kind: 'colors' | 'fonts', id: string, name: string ): void => {
 		if ( ! conv ) return;
 		const tokens = {
-			...conv.analysis.tokens,
-			colors: kind === 'colors' ? conv.analysis.tokens.colors.map( ( c ) => ( c.id === id ? { ...c, title: name } : c ) ) : conv.analysis.tokens.colors,
-			fonts: kind === 'fonts' ? conv.analysis.tokens.fonts.map( ( f ) => ( f.id === id ? { ...f, title: name } : f ) ) : conv.analysis.tokens.fonts,
+			...conv.tokens,
+			colors: kind === 'colors' ? conv.tokens.colors.map( ( c ) => ( c.id === id ? { ...c, title: name } : c ) ) : conv.tokens.colors,
+			fonts: kind === 'fonts' ? conv.tokens.fonts.map( ( f ) => ( f.id === id ? { ...f, title: name } : f ) ) : conv.tokens.fonts,
 		};
-		const analysis = { ...conv.analysis, tokens };
-		setConv( { ...conv, analysis, result: reemit( analysis, conv.modes, conv.frozen ) } );
+		setConv( { ...conv, tokens, pages: conv.pages.map( ( p, i ) => ( { ...p, result: reemit( p, i, p.modes, tokens ) } ) ) } );
 	};
 
 	const doImport = async (): Promise< void > => {
 		if ( ! conv || ! job ) return;
 		setStep( 'importing' );
 		setImportError( null );
-		const result = reemit( conv.analysis, conv.modes, conv.frozen );
-		try {
-			const res = await api.importJob( job.uuid, {
-				document: { ...result.document, title },
+		const payloadFor = ( p: Page, i: number ): ImportPayload => {
+			const result = reemit( p, i, p.modes, conv.tokens );
+			const t = pageTitle( p, i );
+			return {
+				document: { ...result.document, title: t },
 				tokens: result.tokens,
 				applyTokens,
 				output,
 				kitMode,
-				title,
+				title: t,
 				score: result.overall,
 				sourceType: source?.type ?? '',
 				keepForCompare: true,
 				format: resolvedFormat,
 				report: result.sections.map( ( x ) => ( { label: x.label, mode: x.mode, score: x.score.score } ) ),
-			} );
+			};
+		};
+		const included = conv.pages.map( ( p, i ) => ( { p, i } ) ).filter( ( { p } ) => p.include );
+		try {
+			let res: ImportResult | null = null;
+			if ( included.length > 1 ) {
+				const site: SiteImport = {
+					jobUuid: job.uuid,
+					pages: included.map( ( { p, i } ) => {
+						const payload = payloadFor( p, i );
+						// One per top-level element when every section produced one (else unknown: []).
+						const semantics = p.result.sections.map( ( x ) => x.semantic ?? '' );
+						return { route: p.route, label: p.label, payload, semantics: semantics.length === payload.document.content.length ? semantics : [] };
+					} ),
+				};
+				/**
+				 * Import several pages at once (an add-on that converts whole sites provides this).
+				 *
+				 * @param {Promise<ImportResult>|null} result Default null.
+				 * @param {SiteImport}                 site   The pages to import.
+				 */
+				res = await Promise.resolve( applyFilters( 'ai2kit.import', null, site ) as Promise< ImportResult > | null );
+			}
+			if ( ! res ) {
+				const one = included[ 0 ] ?? { p: conv.pages[ 0 ]!, i: 0 };
+				res = await api.importJob( job.uuid, payloadFor( one.p, one.i ) );
+			}
 			setImported( res );
 			setStep( 'done' );
 		} catch ( e ) {
@@ -261,7 +345,8 @@ export function Convert() {
 
 	const blocking = preflight?.checks.filter( ( c ) => c.status === 'blocking' ) ?? [];
 	const isSourceZip = source?.type === 'source-zip';
-	const highlight = useMemo( () => conv?.result.sections.find( ( x ) => x.id === hovered )?.rect ?? null, [ conv, hovered ] );
+	const activePage = conv ? conv.pages[ conv.active ] : undefined;
+	const highlight = useMemo( () => activePage?.result.sections.find( ( x ) => x.id === hovered )?.rect ?? null, [ activePage, hovered ] );
 
 	/* ------------------------------------------------------------ */
 
@@ -371,15 +456,24 @@ export function Convert() {
 										</select>
 									) }
 								</Field>
-								<div className={ s.routeRow }>
-									<span>
-										<strong>{ __( 'Pages', 'ai2kit' ) }</strong>
-										<span className={ s.muted }>{ __( 'The page at "/" is converted.', 'ai2kit' ) }</span>
-									</span>
-									<UpsellChip detail={ __( 'Ai2Kit Pro discovers every route of your site and converts them in one job, with header, footer and menus.', 'ai2kit' ) }>
-										{ __( 'Convert all routes', 'ai2kit' ) }
-									</UpsellChip>
-								</div>
+								{
+									/**
+									 * The "Pages" row of the Check step (an add-on shows its own options).
+									 *
+									 * @param {JSX.Element|null} row Default null (the built-in row).
+									 */
+									( applyFilters( 'ai2kit.check.pages', null, { hasScripts: job.hasScripts, source: source?.type ?? '' } ) as JSX.Element | null ) ?? (
+										<div className={ s.routeRow }>
+											<span>
+												<strong>{ __( 'Pages', 'ai2kit' ) }</strong>
+												<span className={ s.muted }>{ __( 'The page at "/" is converted.', 'ai2kit' ) }</span>
+											</span>
+											<UpsellChip detail={ __( 'Ai2Kit Pro discovers every route of your site and converts them in one job, with header, footer and menus.', 'ai2kit' ) }>
+												{ __( 'Convert all routes', 'ai2kit' ) }
+											</UpsellChip>
+										</div>
+									)
+								}
 							</div>
 						</Card>
 						<Card>
@@ -437,7 +531,8 @@ export function Convert() {
 		}
 
 		if ( ( step === 'review' || step === 'importing' ) && conv && job ) {
-			const res = conv.result;
+			const page = conv.pages[ conv.active ]!;
+			const res = page.result;
 			return (
 				<>
 					<PageTitle
@@ -465,16 +560,39 @@ export function Convert() {
 							<ErrorNotice title={ importError.message } next={ importError.data?.hint } details={ JSON.stringify( importError ) } />
 						</div>
 					) }
+					{ conv.pages.length > 1 && (
+						<div className={ r.pageBar } role="tablist" aria-label={ __( 'Pages', 'ai2kit' ) }>
+							{ conv.pages.map( ( p, i ) => (
+								<div key={ p.route } className={ `${ r.pageTab } ${ i === conv.active ? r.pageTabActive : '' }` }>
+									<input
+										type="checkbox"
+										checked={ p.include }
+										disabled={ i === 0 || step === 'importing' }
+										aria-label={ sprintf(
+											/* translators: %s: page name. */
+											__( 'Import %s', 'ai2kit' ),
+											p.label
+										) }
+										onChange={ ( e ) => updatePage( i, { include: e.target.checked } ) }
+									/>
+									<button type="button" role="tab" aria-selected={ i === conv.active } onClick={ () => setConv( { ...conv, active: i } ) }>
+										<span className={ r.pageName }>{ p.label }</span>
+										<span className={ r.pageScore }>{ `${ p.result.overall }%` }</span>
+									</button>
+								</div>
+							) ) }
+						</div>
+					) }
 					{ tab === 'sections' ? (
 						<div className={ r.reviewGrid }>
 							<ul className={ r.rows } aria-label={ __( 'Sections', 'ai2kit' ) }>
 								{ res.sections.map( ( sec ) => {
-									const key = conv.analysis.sections.find( ( x ) => x.id === sec.id )?.key;
+									const key = page.analysis.sections.find( ( x ) => x.id === sec.id )?.key;
 									return (
 										<SectionRow
 											key={ sec.id }
 											report={ sec }
-											frozen={ key ? conv.frozen[ key ] : undefined }
+											frozen={ key ? page.frozen[ key ] : undefined }
 											expanded={ expanded === sec.id }
 											onToggle={ () => setExpanded( expanded === sec.id ? null : sec.id ) }
 											onMode={ ( m ) => setMode( sec.id, m ) }
@@ -484,11 +602,11 @@ export function Convert() {
 								} ) }
 							</ul>
 							<div className={ r.compareCol }>
-								<ComparePanel source={ job.entryUrl ?? '' } score={ res.overall } highlight={ highlight } />
+								<ComparePanel key={ page.url } source={ page.url } score={ res.overall } highlight={ highlight } />
 							</div>
 						</div>
 					) : (
-						<TokenCard tokens={ conv.analysis.tokens } onRename={ rename } apply={ applyTokens } onApply={ setApplyTokens } kitMode={ kitMode } onKitMode={ setKitMode } />
+						<TokenCard tokens={ conv.tokens } onRename={ rename } apply={ applyTokens } onApply={ setApplyTokens } kitMode={ kitMode } onKitMode={ setKitMode } />
 					) }
 				</>
 			);
@@ -565,8 +683,8 @@ export function Convert() {
 								? sprintf(
 										/* translators: 1: native sections, 2: HTML sections. */
 										__( '%1$d native · %2$d kept as HTML', 'ai2kit' ),
-										conv.result.sections.filter( ( x ) => x.mode === 'native' ).length,
-										conv.result.sections.filter( ( x ) => x.mode === 'html' ).length
+										activePage!.result.sections.filter( ( x ) => x.mode === 'native' ).length,
+										activePage!.result.sections.filter( ( x ) => x.mode === 'html' ).length
 								  )
 								: undefined
 						}

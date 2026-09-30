@@ -22,8 +22,11 @@
     "e2e:icons": "node tests/e2e/icons.mjs",
     "e2e:interactions": "node tests/e2e/interactions.mjs",
     "e2e:accordions": "node tests/e2e/accordions.mjs",
+    "e2e:agent": "node tests/e2e/agent.mjs",
     "lint:php": "cd plugin/ai2kit && composer lint && composer stan",
-    "plugin-check": "node scripts/release.mjs --skip-tests && wp-env run cli wp plugin check ai2kit-release --slug=ai2kit"
+    "plugin-check": "node scripts/release.mjs --skip-tests && wp-env run cli wp plugin check ai2kit-release --slug=ai2kit",
+    "lint:php:pro": "cd plugin/ai2kit-pro && ../ai2kit/vendor/bin/phpcs",
+    "e2e:site": "node tests/e2e/site.mjs"
   },
   "devDependencies": {
     "@wordpress/env": "^10.0.0",

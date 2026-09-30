@@ -19,6 +19,14 @@ final class AssetRewriter {
 	const MAX_FILE_BYTES = 15728640; // Skip rewriting files over 15 MB.
 
 	/**
+	 * Injected at the top of <head>: a CSP for the sandbox and the route shim. The shim
+	 * presents the app at "/" (builds assume they're served from the root), or at the
+	 * route in `?a2k_route=/about`, so single-page apps render any of their routes.
+	 */
+	const SANDBOX_HEAD = '<meta http-equiv="Content-Security-Policy" content="connect-src \'self\' data: blob:; form-action \'none\'; base-uri \'self\'">'
+		. '<script data-ai2kit-shim>(function(){try{window.__A2K_JOB_PATH__=location.pathname;var r=new URLSearchParams(location.search).get("a2k_route");history.replaceState(null,"",(r&&/^\/[^\/]/.test(r)||r==="/"?r:"/")+location.hash);}catch(e){}})();</script>';
+
+	/**
 	 * Build root (directory of the entry file).
 	 *
 	 * @var string
@@ -212,9 +220,7 @@ final class AssetRewriter {
 		if ( false !== strpos( $html, 'data-ai2kit-shim' ) ) {
 			return $html;
 		}
-		$csp  = '<meta http-equiv="Content-Security-Policy" content="connect-src \'self\' data: blob:; form-action \'none\'; base-uri \'self\'">';
-		$shim = '<script data-ai2kit-shim>(function(){try{window.__A2K_JOB_PATH__=location.pathname;history.replaceState(null,"","/"+location.search+location.hash);}catch(e){}})();</script>';
-		$head = $csp . $shim;
+		$head = self::SANDBOX_HEAD;
 		if ( preg_match( '/<head\b[^>]*>/i', $html, $m, PREG_OFFSET_CAPTURE ) ) {
 			$at = $m[0][1] + strlen( $m[0][0] );
 			return substr( $html, 0, $at ) . $head . substr( $html, $at );
@@ -224,5 +230,15 @@ final class AssetRewriter {
 			return substr( $html, 0, $at ) . '<head>' . $head . '</head>' . substr( $html, $at );
 		}
 		return '<!doctype html><html><head>' . $head . '<meta charset="utf-8"></head><body>' . $html . '</body></html>';
+	}
+
+	/**
+	 * The entry HTML as uploaded (without what inject_sandbox() added), for source detection.
+	 *
+	 * @param string $html Markup.
+	 * @return string
+	 */
+	public static function strip_sandbox( $html ) {
+		return str_replace( self::SANDBOX_HEAD, '', $html );
 	}
 }

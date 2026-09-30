@@ -98,6 +98,7 @@ Today there are three ways to get there, and all of them are bad:
 | G10 | Silent failures (blank page when Flexbox Containers is off) | Preflight checks with one-click fixes |
 | G11 | Stingy free tiers | Unlimited local single-page conversions in Free |
 | G12 | Can't convert a live URL without a Chrome extension | Pro Chrome companion captures any tab (e.g. Lovable preview) and sends it to the site via an Application Password |
+| G13 | AI agents (Claude, Cursor, Novamira) can reach WordPress but improvise every change, with raw PHP or hand-written Elementor JSON | **Agent tools:** Ai2Kit registers purpose-built WordPress Abilities, exposed as MCP tools by the official MCP Adapter. Agents call a tested converter and get predictable, validated Elementor output. Positioning: *"Other tools let AI touch WordPress; Ai2Kit makes AI-built sites convert correctly."* |
 
 ---
 
@@ -131,6 +132,11 @@ Today there are three ways to get there, and all of them are bad:
 - Residual scoped CSS for unmappable styles
 - Preflight checks with one-click fixes (Flexbox Containers, SVG upload, memory limits)
 - Export the result as Elementor template JSON
+- **Agent tools** (v0.4, after wp.org approval; §15 M5.5; built 2026-09-30 in `includes/Abilities.php`). Built on the WordPress Abilities API (core 6.9+; skipped when it is missing). The MCP Adapter's default server exposes them. Elementor 4.3+ bundles the adapter; otherwise it's the official MCP Adapter plugin. Clients: Claude Desktop/Code, Cursor, VS Code. Free makes no external requests, so these are local only:
+  - `ai2kit/preflight`, `ai2kit/list-jobs` (status filter), `ai2kit/get-job` (pages, scores, sections, checks): read only
+  - `ai2kit/create-job`: from HTML the agent has, or a Media Library ZIP/HTML (an attachment ID, **never a remote URL**, to avoid SSRF and remote code). Returns `review_url` (`admin.php?page=ai2kit&job=…`): conversion needs a real browser, and import needs the browser's converted document, so the user converts, reviews and imports there.
+  - `ai2kit/undo-import`: refuses when the pages were edited since import unless `confirm_edited` (the agent must ask the user)
+  - Every ability: `manage_options`, JSON-schema input and output (validated by the Abilities API), annotations (readonly/destructive/idempotent)
 
 ### 5.2 In scope — Pro (Freemius add-on plugin `ai2kit-pro`)
 - **Multi-page / multi-route** conversion in one job: route discovery and bulk import
@@ -146,7 +152,12 @@ Today there are three ways to get there, and all of them are bad:
 - **Kit export:** a ZIP in Elementor Kit import format (site settings + templates + content), so the same conversion can be reused on other sites
 - **Cloud build service** (opt-in): upload a *source* ZIP or connect a GitHub repo (Lovable GitHub sync) → sandboxed `npm ci && npm run build` → build ZIP returned to the plugin
 - **Chrome companion extension:** capture any open tab (e.g. a Lovable preview URL) and send the snapshot to a connected WordPress site
-- **AI assist** (optional, BYO Anthropic API key or credits): section labeling, widget-choice tie-breaking, CPT field naming, alt-text generation
+- **AI assist** (optional, BYO Anthropic API key or credits): section labeling, widget-choice tie-breaking, CPT field naming, alt-text generation. Rules:
+  - The deterministic engine stays the converter. AI is only asked about **low-confidence sections**, and it chooses between candidates the engine already produced. It never writes Elementor JSON.
+  - Results are cached per section hash, so a re-run gives the same output.
+  - Everything is still re-validated by PHP.
+  - Disclosed in the Pro readme under "External services", with the Anthropic terms and privacy links. Off until the user adds a key or credits.
+- **Agent conversion, end to end:** the cloud headless render (M8) lets an agent convert without a browser tab open. Adds the agent tools `convert-job`, `batch-import` (multi-route) and `make-section-dynamic` (repeat → CPT + loop, M7) and `regenerate-global-styles`.
 - Priority support
 
 ### 5.3 Out of scope (v1)
@@ -599,9 +610,10 @@ pnpm run release                     # lint, test, PCP, zip → dist/ai2kit-x.y.
 | **M3 Lovable/SPA support** | 6 | Vite/Next dist detection, asset rewrite, render-wait, route capture (single route in Free), shadcn tokens → globals | 15 Lovable fixtures ≥ 85% visual similarity |
 | **M4 Fidelity & v4** | 7–8 | Fidelity scoring, section toggle, residual scoped CSS, emit-v4 (Variables/Classes) | Median similarity ≥ 90%; v4 output imports and edits cleanly on Elementor 4.x |
 | **M5 wp.org submission** | 9 | Readme, screenshots, i18n, PCP clean, docs site | Submitted; approval typically takes 1–4 weeks, so continue working |
-| **M6 Pro core** | 10–12 | Multi-route, site assembly (header/footer/menus/front page), interactive mapping, forms, animations | 5-page Lovable site → full site in < 5 min |
+| **M5.5 Agent tools (Free 0.4)** ✅ built | 10 | Abilities from §5.1 plus an ability category; guarded by `function_exists( 'wp_register_ability' )`; integration tests; `docs/agents.md` (MCP client setup) | `npm run e2e:agent` over real MCP (STDIO): the agent runs preflight and creates a job, the user converts and imports from `review_url`, then the agent reads the report, lists the job and undoes it. Plugin Check clean. |
+| **M6 Pro core** ✅ built 2026-10-01 (add-on `plugin/ai2kit-pro` + `packages/pro`, via Free's extension API) | 10–12 | Multi-route, site assembly (header/footer/menus/front page), interactive mapping, forms, animations | 5-page Lovable site → full site in < 5 min |
 | **M7 Pro dynamic + export** | 13–14 | Repeat → CPT + loop + demo posts, Kit export ZIP | Kit imports on a fresh site with one click |
-| **M8 Cloud + Chrome** | 15–18 | Build service (GitHub App + ZIP), Chrome companion, AI labeling | Source ZIP → converted site end-to-end; sandbox escape tests pass |
+| **M8 Cloud + Chrome + AI** | 15–18 | Build service (GitHub App + ZIP), Chrome companion, headless render (browserless agent conversion), AI assist (BYOK + credits) | Source ZIP → converted site end-to-end; sandbox escape tests pass |
 | **M9 Launch** | 19–20 | Freemius, pricing page, affiliate program, launch campaign (§16) | First 50 paying customers |
 
 Later (v2+): WooCommerce product pages, Bricks/Gutenberg emitters, Figma source, template marketplace, and a team workspace (SaaS dashboard).
@@ -678,6 +690,8 @@ Later (v2+): WooCommerce product pages, Bricks/Gutenberg emitters, Figma source,
 | wp.org rejection | Launch delay | PCP clean, strict separation of Free/Pro, no external calls, early pre-review by an experienced reviewer |
 | Security incident via uploaded JS | Reputational | Capability gating, CSP, cleanup, no PHP execution, iframe restrictions; cloud builds in gVisor with no network |
 | Copyright misuse ("clone any site") | Legal/reputational | No arbitrary-URL cloning in Free; the Chrome companion requires an "I own or have rights to this design" confirmation; terms of use |
+| AI assist makes output unpredictable or costly | Inconsistent results, API bills | AI only picks among engine candidates for low-confidence sections; cache per section hash; credits metered in the cloud; the engine works fully without AI |
+| Agent tools misused (an agent imports or undoes without the user knowing) | Data loss | `manage_options` only; imports are drafts; undo is always available; no remote-URL inputs |
 | Solo-dev bandwidth | Delays | Claude Code with strict milestones; the engine is shared across all surfaces; defer cloud to M8 |
 
 ---

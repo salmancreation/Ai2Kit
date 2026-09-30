@@ -27,6 +27,13 @@ abstract class TestCase extends \WP_UnitTestCase {
 		update_option( 'ai2kit_settings', array( 'importRemote' => false ) );
 	}
 
+	protected function assert_post_conditions() {
+		// Elementor's bundled MCP Adapter looks up its own abilities on first use, which the
+		// Abilities API reports as incorrect usage when they aren't registered. Not ours.
+		unset( $this->caught_doing_it_wrong['WP_Abilities_Registry::get_registered'] );
+		parent::assert_post_conditions();
+	}
+
 	/**
 	 * Golden engine output for a named source.
 	 *
@@ -57,7 +64,13 @@ abstract class TestCase extends \WP_UnitTestCase {
 	 * @return \WP_REST_Response
 	 */
 	protected function rest( $method, $route, array $body = array(), array $files = array() ) {
+		$query = array();
+		if ( false !== strpos( $route, '?' ) ) {
+			list( $route, $qs ) = explode( '?', $route, 2 );
+			parse_str( $qs, $query );
+		}
 		$req = new \WP_REST_Request( $method, '/ai2kit/v1' . $route );
+		$req->set_query_params( $query );
 		if ( $body ) {
 			$req->set_header( 'content-type', 'application/json' );
 			$req->set_body( wp_json_encode( $body ) );

@@ -49,10 +49,26 @@ export async function launch() {
 
 /** Log in with the local wp-env test account (override with A2K_USER / A2K_PASS). */
 export async function login( page ) {
-	await page.goto( `${ BASE }/wp-login.php` );
-	await page.fill( '#user_login', process.env.A2K_USER ?? 'admin' );
-	await page.fill( '#user_pass', process.env.A2K_PASS ?? 'password' );
-	await Promise.all( [ page.waitForNavigation(), page.click( '#wp-submit' ) ] );
+	const user = process.env.A2K_USER ?? 'admin';
+	const pass = process.env.A2K_PASS ?? 'password';
+	await page.goto( `${ BASE }/wp-login.php`, { waitUntil: 'load' } );
+	// wp-login.php focuses and selects the username field shortly after load: let it, then fill and check.
+	await page.waitForTimeout( 400 );
+	for ( let attempt = 0; attempt < 3; attempt++ ) {
+		await page.fill( '#user_login', user );
+		await page.fill( '#user_pass', pass );
+		if ( ( await page.inputValue( '#user_login' ) ) === user && ( await page.inputValue( '#user_pass' ) ) === pass ) break;
+		await page.waitForTimeout( 300 );
+	}
+	// The first request after a rebuild can be slow: wait for the login to land, not for one navigation.
+	await page.click( '#wp-submit' );
+	for ( let waited = 0; new URL( page.url() ).pathname.endsWith( '/wp-login.php' ); waited += 250 ) {
+		if ( waited > 90000 ) {
+			const why = ( await page.locator( '#login_error' ).textContent().catch( () => '' ) ) || '';
+			throw new Error( `Login did not complete (still on wp-login.php). ${ why.trim() }` );
+		}
+		await page.waitForTimeout( 250 );
+	}
 }
 
 export async function shot( page, url, width ) {

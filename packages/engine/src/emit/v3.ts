@@ -5,7 +5,7 @@
  * against the control registry exported from a real Elementor install
  * (tests/fixtures/elementor/controls-v3.json).
  */
-import type { BgOverlay, IRNode, NodeStyles, ResidualRule, StyleMap } from '../ir/types';
+import type { BgOverlay, IRNode, NodeStyles, PatternType, ResidualRule, StyleMap } from '../ir/types';
 import type { TokenIndex } from '../tokens/tokens';
 import { isTransparent, normalizeColor } from '../util/color';
 import { firstFamily, matrixParts, parseBox, parseLinearGradient, parseShadow, px, round, transitionSeconds } from '../util/units';
@@ -14,6 +14,7 @@ import lucideFa from '../../data/lucide-fa-map.json';
 import { explicitMinHeight, isRowParent, parentCenters, placement } from './placement';
 import { accordionMeta } from '../recognize/patterns';
 import { canEmitAccordion, emitAccordion } from './accordion';
+import { extensions } from '../extend';
 
 export type V3Element = {
 	id: string;
@@ -38,6 +39,8 @@ export type NodeStats = {
 	unmapped: Record< string, number >;
 	/** Visible losses the structure can't show (substituted icons, lost pseudo content…), in score points. */
 	penalty: number;
+	/** Interactive patterns an emitter mapped to a native widget (no "kept static" penalty or warning). */
+	handled: PatternType[];
 };
 
 export type EmitContext = {
@@ -495,7 +498,7 @@ function residual( node: IRNode, ctx: EmitContext, consumed: Set< string >, targ
 
 const HTML_TAGS = new Set( [ 'header', 'footer', 'main', 'article', 'section', 'aside', 'nav' ] );
 
-function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, parent?: IRNode ): Settings {
+export function containerSettings( node: IRNode, ctx: EmitContext, isSection: boolean, parent?: IRNode ): Settings {
 	const s = node.styles.desktop;
 	const out: Settings = {};
 	const consumed = new Set< string >();
@@ -909,7 +912,7 @@ function emitLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V3Element 
 			const items = node.content?.items ?? [];
 			out.icon_list = items.map( ( it ) => {
 				const item: Settings = { _id: ctx.nextId(), text: it.text };
-				item.selected_icon = iconSetting( it.iconName, it.svg ) ?? { value: 'fas fa-check', library: 'fa-solid' };
+				item.selected_icon = node.content?.noIcons ? { value: '', library: '' } : iconSetting( it.iconName, it.svg ) ?? { value: 'fas fa-check', library: 'fa-solid' };
 				if ( it.href ) item.link = link( it.href );
 				return item;
 			} );
@@ -984,9 +987,22 @@ function svgColor( svg: string | undefined ): string | undefined {
 }
 
 export function emitNode( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V3Element | null {
+	const el = emitNodeInner( node, ctx, parent, isSection );
+	if ( el ) for ( const ext of extensions() ) ext.afterEmitV3?.( node, el, ctx );
+	return el;
+}
+
+function emitNodeInner( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V3Element | null {
 	if ( node.pseudo && ctx.stats && ! node.fallback ) {
 		ctx.stats.penalty += 1;
 		ctx.stats.unmapped[ '::before/::after' ] = ( ctx.stats.unmapped[ '::before/::after' ] ?? 0 ) + 1;
+	}
+	// Extensions first: they claim nodes by the pattern they recognized (any kind, even a fallback).
+	if ( ! isSection && node.pattern ) {
+		for ( const ext of extensions() ) {
+			const el = ext.emitV3?.( node, ctx, parent );
+			if ( el !== undefined ) return el;
+		}
 	}
 	if ( node.kind !== 'container' ) return emitLeaf( node, ctx, parent );
 	if ( node.fallback ) return emitLeaf( node, ctx, parent );
@@ -1000,7 +1016,7 @@ export function emitNode( node: IRNode, ctx: EmitContext, parent?: IRNode, isSec
 }
 
 export function emptyStats(): NodeStats {
-	return { relevant: 0, mapped: 0, leaves: 0, nativeLeaves: 0, fallbacks: 0, widgets: {}, warnings: [], unmapped: {}, penalty: 0 };
+	return { relevant: 0, mapped: 0, leaves: 0, nativeLeaves: 0, fallbacks: 0, widgets: {}, warnings: [], unmapped: {}, penalty: 0, handled: [] };
 }
 
 /** Emit one section, honoring its Native/HTML mode. */

@@ -149,6 +149,17 @@ final class Importer {
 			'sections' => $this->report( $params['report'] ?? array() ),
 		);
 
+		/**
+		 * Filters an import's result before it is stored with the job (add-ons add what they created).
+		 * Anything added under `created` is trashed by Undo when it carries the `_ai2kit_job` meta.
+		 *
+		 * @param array<string, mixed> $result  Result (created, media, kit, checks, sections).
+		 * @param array<string, mixed> $job     Job row.
+		 * @param array<string, mixed> $params  Request body.
+		 * @param array<string, mixed> $created The created page or template.
+		 */
+		$result = (array) apply_filters( 'ai2kit_import_result', $result, $job, $params, $created );
+
 		JobStore::update(
 			$job['uuid'],
 			array(

@@ -162,12 +162,14 @@ export function emit( analysis: Analysis, opts: EmitOptions = {} ): ConversionRe
 		const patterns = patternsIn( section );
 		// Interactive blocks kept static: hidden panels are content the page lost.
 		// Accordions whose answers were captured become a native Accordion (no loss).
-		const staticAccordion = patterns.includes( 'accordion' ) && ! nativeStats.widgets[ 'nested-accordion' ];
-		if ( staticAccordion || patterns.includes( 'tabs' ) ) nativeStats.penalty += 10;
-		if ( patterns.includes( 'carousel' ) ) nativeStats.penalty += 5;
+		// Patterns an extension mapped to a native widget (nativeStats.handled) lose nothing.
+		const kept = ( p: PatternType ): boolean => patterns.includes( p ) && ! nativeStats.handled.includes( p );
+		const staticAccordion = kept( 'accordion' ) && ! nativeStats.widgets[ 'nested-accordion' ];
+		if ( staticAccordion || kept( 'tabs' ) ) nativeStats.penalty += 10;
+		if ( kept( 'carousel' ) ) nativeStats.penalty += 5;
 		if ( staticAccordion ) nativeStats.warnings.push( 'Collapsed accordion answers couldn\'t be opened while converting, so they weren\'t captured. Add them in Elementor.' );
-		if ( patterns.includes( 'tabs' ) ) nativeStats.warnings.push( 'Only the open tab was captured. Pro maps tabs to a native Tabs widget.' );
-		if ( patterns.includes( 'carousel' ) ) nativeStats.warnings.push( 'Carousel slides are kept as static content. Pro maps carousels to a native carousel.' );
+		if ( kept( 'tabs' ) ) nativeStats.warnings.push( 'Only the open tab was captured. Pro maps tabs to a native Tabs widget.' );
+		if ( kept( 'carousel' ) ) nativeStats.warnings.push( 'Carousel slides are kept as static content. Pro maps carousels to a native carousel.' );
 		const score = scoreSection( nativeStats );
 		reports.push( {
 			id: section.id,
@@ -180,7 +182,7 @@ export function emit( analysis: Analysis, opts: EmitOptions = {} ): ConversionRe
 			patterns,
 			warnings: [ ...new Set( nativeStats.warnings ) ],
 			mode: opts.modes?.[ section.id ] ?? 'native',
-			proHints: patterns.map( ( p ) => PRO_HINTS[ p ] ).filter( ( h ): h is string => !! h ),
+			proHints: patterns.filter( ( p ) => ! nativeStats.handled.includes( p ) ).map( ( p ) => PRO_HINTS[ p ] ).filter( ( h ): h is string => !! h ),
 		} );
 	}
 

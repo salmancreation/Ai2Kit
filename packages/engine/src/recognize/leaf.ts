@@ -57,11 +57,26 @@ function videoFromIframe( src: string ): NodeContent | null {
 	return null;
 }
 
-/** Icon list: a ul/ol whose items each carry an icon. */
+/**
+ * Icon list: a ul/ol whose items each carry an icon — or an unbulleted list of
+ * text/link items (footer and nav link lists), which becomes an Icon List
+ * without icons: native, keeping the spacing and the links.
+ */
 export function asIconList( node: CapturedNode ): NodeContent | null {
 	if ( node.tag !== 'ul' && node.tag !== 'ol' ) return null;
 	const items = node.children.filter( ( c ) => c.tag === 'li' );
 	if ( items.length < 2 || items.length !== node.children.length ) return null;
+	const unbulleted = node.styles.desktop[ 'list-style-type' ] === 'none' && items.every( ( li ) => ! findSvg( li ) && li.children.length === 0 && !! textOf( li ) );
+	if ( unbulleted ) {
+		return {
+			tag: node.tag,
+			noIcons: true,
+			items: items.map( ( li ) => {
+				const href = li.attrs.href ?? /<a\b[^>]*href="([^"]+)"/.exec( li.html ?? '' )?.[ 1 ];
+				return { text: textOf( li ), ...( href ? { href: href.replace( /&amp;/g, '&' ) } : {} ) };
+			} ),
+		};
+	}
 	const out: NonNullable< NodeContent[ 'items' ] > = [];
 	for ( const li of items ) {
 		const svg = findSvg( li );

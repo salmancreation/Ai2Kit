@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin bootstrap: wires admin, REST and cron.
+ * Plugin bootstrap: wires admin, REST, agent abilities and cron.
  *
  * @package Ai2Kit
  */
@@ -53,6 +53,7 @@ final class Plugin {
 				( new Routes() )->register();
 			}
 		);
+		Abilities::register();
 		add_action( Cleanup::HOOK, array( Cleanup::class, 'run' ) );
 		add_action( 'elementor/frontend/before_get_builder_content', array( ResidualCss::class, 'enqueue' ) );
 

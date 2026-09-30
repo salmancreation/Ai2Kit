@@ -117,7 +117,27 @@ final class Menu {
 		}
 		$asset = require $asset_file;
 
-		wp_enqueue_script( 'ai2kit-admin', AI2KIT_URL . 'build/index.js', $asset['dependencies'], $asset['version'], true );
+		// The conversion engine is its own script (window.ai2kit.engine) so add-ons extend the same instance.
+		$engine = file_exists( AI2KIT_DIR . 'build/engine.asset.php' ) ? require AI2KIT_DIR . 'build/engine.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => AI2KIT_VERSION,
+		);
+		wp_register_script( 'ai2kit-engine', AI2KIT_URL . 'build/engine.js', $engine['dependencies'], $engine['version'], true );
+
+		/**
+		 * Fires before the admin app is enqueued, on Ai2Kit screens. Add-ons register their
+		 * scripts here (depending on `ai2kit-engine`) and add the handles with the
+		 * `ai2kit_admin_script_dependencies` filter, so they run before the app renders.
+		 */
+		do_action( 'ai2kit_enqueue_admin_scripts' );
+
+		/**
+		 * Script handles the admin app loads after (add-on extensions).
+		 *
+		 * @param string[] $handles Handles. Default empty.
+		 */
+		$extra = array_map( 'strval', (array) apply_filters( 'ai2kit_admin_script_dependencies', array() ) );
+		wp_enqueue_script( 'ai2kit-admin', AI2KIT_URL . 'build/index.js', array_merge( $asset['dependencies'], $extra ), $asset['version'], true );
 		wp_set_script_translations( 'ai2kit-admin', 'ai2kit', AI2KIT_DIR . 'languages' );
 		if ( file_exists( AI2KIT_DIR . 'build/index.css' ) ) {
 			wp_enqueue_style( 'ai2kit-admin', AI2KIT_URL . 'build/index.css', array(), $asset['version'] );
@@ -145,6 +165,12 @@ final class Menu {
 			'isRtl'         => is_rtl(),
 			'logo'          => self::logo_svg(),
 		);
+		/**
+		 * Admin app configuration (window.ai2kitConfig). Add-ons add their own keys.
+		 *
+		 * @param array<string, mixed> $config Config.
+		 */
+		$config = (array) apply_filters( 'ai2kit_admin_config', $config );
 		wp_add_inline_script( 'ai2kit-admin', 'window.ai2kitConfig = ' . wp_json_encode( $config ) . ';', 'before' );
 	}
 

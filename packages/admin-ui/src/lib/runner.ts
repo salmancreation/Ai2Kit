@@ -4,12 +4,14 @@
  * Capture needs the DOM, so it stays on the main thread (PRD §7).
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { sectionLabel } from './engineText';
 import {
 	analyze,
 	captureAll,
 	DEFAULT_VIEWPORT,
 	emit,
+	extensions,
 	freezeElement,
 	injectSettleStyles,
 	KEY_ATTR,
@@ -26,6 +28,11 @@ export type StageId = 'render' | 'capture' | 'sections' | 'tokens' | 'build';
 export type StageState = { id: StageId; status: 'pending' | 'active' | 'done' | 'error'; ms?: number; detail?: string };
 
 export type RunOutput = {
+	/** Route of the page in the site ("/" for the entry page), and its name. */
+	route: string;
+	label: string;
+	/** URL the page was rendered from (the compare view shows it). */
+	url: string;
 	analysis: Analysis;
 	result: ConversionResult;
 	frozen: Record< string, string >;
@@ -38,6 +45,26 @@ export type RunHooks = {
 	onLog: ( line: string ) => void;
 	signal: AbortSignal;
 	format: 'v3' | 'v4';
+	/** Route and name of the page at `entryUrl` (default "/" and the document title). */
+	route?: string;
+	label?: string;
+	/** Only this page: don't ask extensions for more (they convert further pages through `run`). */
+	single?: boolean;
+};
+
+/**
+ * What the `ai2kit.convert.morePages` filter receives after the entry page is
+ * converted. An add-on reads the rendered page (e.g. its links) synchronously,
+ * then returns a promise of further pages converted with `run`.
+ */
+export type MorePagesContext = {
+	doc: Document;
+	win: Window;
+	entryUrl: string;
+	seed: string;
+	signal: AbortSignal;
+	onLog: ( line: string ) => void;
+	run: ( url: string, seed: string, page: { route: string; label: string } ) => Promise< RunOutput >;
 };
 
 export class CancelledError extends Error {
@@ -71,7 +98,28 @@ function loadFrame( iframe: HTMLIFrameElement, url: string, signal: AbortSignal 
 	} );
 }
 
-export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string, seed: string, hooks: RunHooks ): Promise< RunOutput > {
+/** Convert the entry page, then any further pages an extension adds (Pro: the site's other routes). */
+export async function runSite( iframe: HTMLIFrameElement, entryUrl: string, seed: string, hooks: RunHooks ): Promise< RunOutput[] > {
+	let ctx: MorePagesContext | null = null;
+	const first = await runConversion( iframe, entryUrl, seed, hooks, ( c ) => ( ctx = c ) );
+	if ( hooks.single || ! ctx ) return [ first ];
+	/**
+	 * Further pages to convert in this job.
+	 *
+	 * @param {RunOutput[]}     pages Default none.
+	 * @param {MorePagesContext} ctx   The converted entry page and a converter for more.
+	 */
+	const more = await Promise.resolve( applyFilters( 'ai2kit.convert.morePages', [], ctx ) as RunOutput[] | Promise< RunOutput[] > );
+	return [ first, ...( Array.isArray( more ) ? more : [] ) ];
+}
+
+export async function runConversion(
+	iframe: HTMLIFrameElement,
+	entryUrl: string,
+	seed: string,
+	hooks: RunHooks,
+	onRendered?: ( ctx: MorePagesContext ) => void
+): Promise< RunOutput > {
 	const { onStage, onLog, signal, format } = hooks;
 	const check = (): void => {
 		if ( signal.aborted ) throw new CancelledError();
@@ -82,6 +130,8 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	iframe.style.width = `${ DEFAULT_VIEWPORT.desktop }px`;
 	const win = await loadFrame( iframe, entryUrl, signal );
 	const doc = win.document;
+	// Extensions observe the page while it renders (e.g. numbers counting up).
+	for ( const ext of extensions() ) ext.watch?.( { doc, win } );
 	/* translators: %s: URL of the uploaded page. */
 	onLog( sprintf( __( 'Loaded %s', 'ai2kit' ), entryUrl ) );
 	const stable = await waitForStable( win, { quietMs: 500, timeoutMs: 15000 } );
@@ -170,5 +220,14 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	);
 	onStage( 'build', 'done' );
 
-	return { analysis, result, frozen, modes, timedOut: stable.timedOut };
+	onRendered?.( {
+		doc,
+		win,
+		entryUrl,
+		seed,
+		signal,
+		onLog,
+		run: ( url, pageSeed, page ) => runConversion( iframe, url, pageSeed, { ...hooks, ...page, single: true } ),
+	} );
+	return { route: hooks.route ?? '/', label: hooks.label ?? analysis.title, url: entryUrl, analysis, result, frozen, modes, timedOut: stable.timedOut };
 }

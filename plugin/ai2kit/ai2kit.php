@@ -24,6 +24,8 @@ define( 'AI2KIT_FILE', __FILE__ );
 define( 'AI2KIT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AI2KIT_URL', plugin_dir_url( __FILE__ ) );
 define( 'AI2KIT_MIN_ELEMENTOR', '3.25.0' );
+// Extension API revision (engine extensions, admin script hooks, import/undo hooks) that add-ons check for.
+define( 'AI2KIT_EXTENSION_API', 1 );
 
 /*
  * PSR-4 autoloader for ModinaTheme\Ai2Kit\ → includes/. Kept in-house so the

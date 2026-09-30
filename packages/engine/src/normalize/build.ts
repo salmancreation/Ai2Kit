@@ -3,6 +3,7 @@
  * (FR-13) and flex-child widths.
  */
 import type { CapturedNode, IRNode, StyleMap } from '../ir/types';
+import { extensions } from '../extend';
 import { classify, hasVisualBox } from '../recognize/leaf';
 import { layoutOf } from '../recognize/layout';
 import { detectPattern } from '../recognize/patterns';
@@ -22,6 +23,7 @@ export function buildIR( captured: CapturedNode, nextId: () => string ): IRNode 
 		children: [],
 	};
 	if ( captured.rects ) node.rects = captured.rects;
+	if ( captured.extra ) node.extra = captured.extra;
 	if ( captured.pseudo ) node.pseudo = captured.pseudo;
 	if ( captured.pseudoLayers ) node.pseudoLayers = captured.pseudoLayers;
 	if ( c.content ) node.content = c.content;
@@ -31,9 +33,18 @@ export function buildIR( captured: CapturedNode, nextId: () => string ): IRNode 
 	}
 	if ( captured.attrs.id && /^[A-Za-z][\w-]*$/.test( captured.attrs.id ) ) node.anchor = captured.attrs.id;
 
+	// Extensions may recognize any node (a form kept as HTML by the core rules, a counting number …).
+	for ( const ext of extensions() ) {
+		const p = ext.detect?.( captured, { toIR: ( c ) => buildIR( c, nextId ) } );
+		if ( p ) {
+			node.pattern = p;
+			break;
+		}
+	}
+
 	if ( node.kind === 'container' ) {
 		node.layout = layoutOf( captured.styles.desktop );
-		const pattern = detectPattern( captured );
+		const pattern = node.pattern ?? detectPattern( captured );
 		if ( pattern ) node.pattern = pattern;
 		if ( captured.attrs.href ) node.content = { ...node.content, href: captured.attrs.href };
 		node.children = captured.children.map( ( ch ) => buildIR( ch, nextId ) ).filter( ( ch ) => ! isHidden( ch ) );
@@ -91,6 +102,7 @@ function isPlainWrapper( n: IRNode ): boolean {
 	return (
 		n.kind === 'container' &&
 		! n.pattern &&
+		! n.extra &&
 		! n.content?.href &&
 		! SEMANTIC_TAGS.has( n.tag ?? '' ) &&
 		! hasOwnVisual( n.styles.desktop ) &&

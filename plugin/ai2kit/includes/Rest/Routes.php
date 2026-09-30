@@ -205,6 +205,14 @@ final class Routes {
 		if ( ! $job ) {
 			return new WP_Error( 'ai2kit_not_found', __( 'This conversion no longer exists.', 'ai2kit' ), array( 'status' => 404 ) );
 		}
+		// ?upload=1: everything the Convert screen needs to continue an uploaded job (opened by link).
+		if ( $request->get_param( 'upload' ) ) {
+			$view = Jobs::upload_view( $job );
+			if ( ! $view ) {
+				return new WP_Error( 'ai2kit_not_convertible', __( 'This conversion was already imported, or its files were cleaned up. Start a new one.', 'ai2kit' ), array( 'status' => 410 ) );
+			}
+			return rest_ensure_response( $view );
+		}
 		return rest_ensure_response( Jobs::public_view( $job ) );
 	}
 

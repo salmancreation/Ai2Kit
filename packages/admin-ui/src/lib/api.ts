@@ -70,6 +70,10 @@ export const api = {
 	job( uuid: string ): Promise< Job > {
 		return apiFetch( { path: `${ NS }/jobs/${ uuid }` } );
 	},
+	/** An uploaded job, ready to convert (opened by link, e.g. one an agent created). */
+	uploadedJob( uuid: string ): Promise< UploadedJob > {
+		return apiFetch( { path: `${ NS }/jobs/${ uuid }?upload=1` } );
+	},
 	discard( uuid: string ): Promise< { deleted: boolean } > {
 		return apiFetch( { path: `${ NS }/jobs/${ uuid }`, method: 'DELETE' } );
 	},

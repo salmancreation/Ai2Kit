@@ -189,3 +189,20 @@ describe( 'grids on mobile', () => {
 		expect( validateAgainstRegistry( els ) ).toEqual( [] );
 	} );
 } );
+
+describe( 'icon list without icons', () => {
+	it( 'emits empty icons, the gap and links, valid against the registry', async () => {
+		const { capture, cn, text, validateAgainstRegistry } = await import( './helpers' );
+		const { convert } = await import( '../src/pipeline' );
+		const li = ( t: string ) => text( 'li', t, { color: 'rgb(100, 116, 139)' }, { html: `<a href="https://x.test/${ t.toLowerCase() }">${ t }</a>` } );
+		const ul = cn( 'ul', { display: 'flex', 'flex-direction': 'column', 'row-gap': '8px', 'list-style-type': 'none' }, [ li( 'About' ), li( 'Contact' ) ] );
+		const r = convert( capture( cn( 'body', {}, [ cn( 'footer', { 'padding-top': '48px' }, [ text( 'h4', 'Company' ), ul ] ) ] ) ), 'ul' );
+		const all = ( e: { elements: unknown[] } ): Array< { widgetType?: string; settings: Record< string, unknown >; elements: unknown[] } > => [ e as never, ...( e.elements as never[] ).flatMap( all ) ];
+		const list = r.document.content.flatMap( all ).find( ( e ) => e.widgetType === 'icon-list' )!;
+		const items = list.settings.icon_list as Array< { selected_icon: unknown; link: { url: string } } >;
+		expect( items.map( ( i ) => i.selected_icon ) ).toEqual( [ { value: '', library: '' }, { value: '', library: '' } ] );
+		expect( items[ 1 ]!.link.url ).toBe( 'https://x.test/contact' );
+		expect( list.settings.space_between ).toEqual( { unit: 'px', size: 8, sizes: [] } );
+		expect( validateAgainstRegistry( r.document.content ) ).toEqual( [] );
+	} );
+} );

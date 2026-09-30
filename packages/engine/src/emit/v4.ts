@@ -20,6 +20,7 @@ import { explicitMinHeight, innerBox, isRowParent, parentCenters, placement } fr
 import lucideFa from '../../data/lucide-fa-map.json';
 import { accordionMeta } from '../recognize/patterns';
 import { canEmitAccordion } from './accordion';
+import { extensions } from '../extend';
 import { withAlpha } from '../normalize/layers';
 
 type Typed = { $$type: string; value: unknown };
@@ -36,6 +37,8 @@ export type V4Element = {
 	css?: V4Css;
 	elements: Array< V4Element | V3Element >;
 	isInner?: boolean;
+	/** Elementor Interactions (entrance animations), `{ version: 1, items: [ interaction-item props ] }`. */
+	interactions?: { version: number; items: unknown[] };
 };
 
 type Decls = Record< string, string >;
@@ -518,7 +521,19 @@ function atomicLeaf( node: IRNode, ctx: EmitContext, parent?: IRNode ): V4Elemen
 }
 
 export function emitV4Node( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V4Element | V3Element | null {
+	const el = emitV4NodeInner( node, ctx, parent, isSection );
+	if ( el ) for ( const ext of extensions() ) ext.afterEmitV4?.( node, el, ctx );
+	return el;
+}
+
+function emitV4NodeInner( node: IRNode, ctx: EmitContext, parent?: IRNode, isSection = false ): V4Element | V3Element | null {
 	// Accordion has no atomic element yet: the v3 Nested Accordion, mixed into the v4 tree (PRD §8.2).
+	if ( ! isSection && node.pattern ) {
+		for ( const ext of extensions() ) {
+			const el = ext.emitV4 ? ext.emitV4( node, ctx, parent ) : ext.emitV3?.( node, ctx, parent );
+			if ( el !== undefined ) return el;
+		}
+	}
 	if ( node.kind === 'container' && ! node.fallback && ! isSection && canEmitAccordion( accordionMeta( node.pattern ) ) ) return emitV3Node( node, ctx, parent );
 	if ( node.kind === 'container' && ! node.fallback ) {
 		const settings: Record< string, unknown > = {};

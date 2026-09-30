@@ -202,3 +202,21 @@ describe( 'sections & semantic labels (FR-18)', () => {
 		expect( classifySection( a, 3, 10, 'hero' ) ).toBeUndefined();
 	} );
 } );
+
+describe( 'unbulleted link lists (footer / nav columns)', () => {
+	const li = ( t: string, href: string ) => text( 'li', t, {}, { html: `<a href="${ href }">${ t }</a>` } );
+	const list = cn( 'ul', { display: 'flex', 'flex-direction': 'column', 'row-gap': '8px', 'list-style-type': 'none' }, [ li( 'About', 'https://x.test/about' ), li( 'Pricing', 'https://x.test/pricing?a=1&amp;b=2' ) ] );
+
+	it( 'becomes an Icon List without icons, keeping the links', () => {
+		expect( asIconList( list ) ).toEqual( {
+			tag: 'ul',
+			noIcons: true,
+			items: [ { text: 'About', href: 'https://x.test/about' }, { text: 'Pricing', href: 'https://x.test/pricing?a=1&b=2' } ],
+		} );
+	} );
+
+	it( 'leaves bulleted lists alone', () => {
+		const bulleted = cn( 'ul', {}, [ li( 'One', '#1' ), li( 'Two', '#2' ) ] );
+		expect( asIconList( bulleted ) ).toBeNull();
+	} );
+} );
