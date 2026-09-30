@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ai2Kit Documentation</title>
+<meta name="description" content="How to convert AI-built websites into editable Elementor pages with Ai2Kit (Free).">
+<style>
+:root{--bg:#fbfaff;--surface:#ffffff;--subtle:#f4f2fb;--text:#1b1530;--muted:#5b5570;--faint:#8a849c;--border:#e6e2f0;--brand:#7c3aed;--brand-strong:#6d28d9;--brand-soft:#f1ebff;--ok:#15803d;--ok-soft:#ecfdf3;--warn:#b45309;--warn-soft:#fff7e6;--code:#f3f0fa;--shadow:0 1px 2px rgba(27,21,48,.06),0 8px 24px -12px rgba(27,21,48,.12)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0c18;--surface:#17131f;--subtle:#1e1929;--text:#ece8f6;--muted:#aaa3bd;--faint:#7d7690;--border:#2c2638;--brand:#a78bfa;--brand-strong:#c4b5fd;--brand-soft:#261d3d;--ok:#4ade80;--ok-soft:#10291a;--warn:#fbbf24;--warn-soft:#2b2110;--code:#221c30;--shadow:none}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--brand-strong);text-underline-offset:2px}a:hover{color:var(--brand)}
+.hero{background:linear-gradient(135deg,#6d28d9 0%,#7c3aed 45%,#a855f7 100%);color:#fff;padding:56px 16px 48px}
+.hero-inner{max-width:1120px;margin:0 auto}
+.hero .kicker{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;background:rgba(255,255,255,.16);padding:4px 12px;border-radius:999px}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.02em;margin:16px 0 12px}
+.hero p{font-size:clamp(16px,2.2vw,19px);max-width:720px;margin:0;color:rgba(255,255,255,.9)}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.hero .meta span{font-size:13px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);padding:4px 10px;border-radius:8px}
+.layout{max-width:1120px;margin:0 auto;padding:32px 16px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px}
+nav.toc{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:14px}
+nav.toc strong{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+nav.toc a{display:block;padding:5px 10px;border-left:2px solid var(--border);color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--text);border-left-color:var(--brand)}
+main{min-width:0;max-width:780px}
+section{margin-bottom:56px}
+h2{font-size:28px;line-height:1.2;letter-spacing:-.01em;margin:0 0 16px;padding-top:8px}
+h3{font-size:19px;margin:28px 0 10px}
+p,li{color:var(--text)}.muted{color:var(--muted)}
+code{font:0.9em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code);padding:2px 6px;border-radius:6px}
+pre{background:var(--code);padding:14px 16px;border-radius:12px;overflow:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+pre code{background:none;padding:0}
+kbd{font:13px ui-monospace,monospace;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--surface)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
+.feature h4{margin:0 0 6px;font-size:16px}.feature p{margin:0;color:var(--muted);font-size:15px}
+.feature .ic{width:36px;height:36px;border-radius:10px;background:var(--brand-soft);color:var(--brand-strong);display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:18px}
+ol.steps{list-style:none;padding:0;margin:16px 0;counter-reset:s}
+ol.steps>li{position:relative;padding:2px 0 18px 52px;counter-increment:s}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+ol.steps>li:not(:last-child)::after{content:"";position:absolute;left:16px;top:38px;bottom:4px;width:2px;background:var(--border)}
+ol.steps strong{display:block;font-size:17px}
+.table-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--subtle);font-size:13px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.note{border-radius:12px;padding:14px 16px;margin:16px 0;border:1px solid var(--border);background:var(--subtle)}
+.note.tip{background:var(--brand-soft);border-color:transparent}
+.note.ok{background:var(--ok-soft);border-color:transparent}
+.note.warn{background:var(--warn-soft);border-color:transparent}
+.note strong:first-child{display:block;margin-bottom:2px}
+.badge{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-strong);vertical-align:middle}
+.badge.new{background:var(--ok-soft);color:var(--ok)}
+details{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 16px;margin:10px 0}
+details summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";float:right;color:var(--faint);font-weight:400}
+details[open] summary::after{content:"−"}
+details>div{padding:0 0 14px;color:var(--text)}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--faint)}
+footer.foot{border-top:1px solid var(--border);padding:24px 16px;text-align:center;color:var(--faint);font-size:14px}
+@media (max-width:860px){.layout{grid-template-columns:1fr;gap:24px}nav.toc{position:static;max-height:none;border:1px solid var(--border);border-radius:14px;padding:14px;background:var(--surface)}nav.toc a{display:inline-block;border-left:0;padding:4px 8px}}
+@media print{nav.toc,.hero .meta{display:none}.layout{display:block}.hero{background:#6d28d9;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-inner">
+<span class="kicker">Ai2Kit · Free</span>
+<h1>Ai2Kit documentation</h1>
+<p>Turn websites built with AI tools — Lovable, Bolt, v0, Claude, ChatGPT, Gemini Canvas — and HTML templates into native, editable Elementor pages, right inside WordPress.</p>
+<div class="meta"><span>Version 0.3 · 0.4 notes marked <b>New in 0.4</b></span><span>WordPress 6.5+</span><span>PHP 7.4+</span><span>Elementor (Free is enough)</span></div>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#overview">Overview</a><a href="#requirements">Requirements</a><a href="#install">Install</a><a href="#quick-start">Quick start</a><a href="#prepare">Preparing your site</a><a href="#review">Reviewing a conversion</a><a href="#converted">What gets converted</a><a href="#import">Import, History &amp; Undo</a><a href="#settings">Settings</a><a href="#agents">AI agents (MCP)</a><a href="#privacy">Privacy &amp; security</a><a href="#troubleshooting">Troubleshooting</a><a href="#developers">Developers</a><a href="#free-vs-pro">Free vs Pro</a><a href="#support">Support</a></nav>
+<main>
+<section id="overview">
+<h2>Overview</h2>
+<p>AI builders make beautiful sites in minutes, but the result is React code or a single HTML file — not something you can edit in WordPress. Ai2Kit reads the page the way a browser renders it and rebuilds it with Elementor's own containers and widgets, so every heading, button, image and section is editable like a page you built yourself.</p>
+<div class="grid">
+<div class="card feature"><div class="ic">◆</div><h4>Real Elementor, not an embed</h4><p>Flexbox and Grid containers, headings, text, buttons, images, icons, icon lists, videos and accordions.</p></div>
+<div class="card feature"><div class="ic">◎</div><h4>Local and private</h4><p>The conversion runs in your browser and saves on your server. Ai2Kit Free makes no requests to Ai2Kit's servers and collects no data.</p></div>
+<div class="card feature"><div class="ic">▣</div><h4>Your design system</h4><p>Colors and fonts become Elementor Global Colors &amp; Fonts, and widgets link to them.</p></div>
+<div class="card feature"><div class="ic">↺</div><h4>Review, then undo</h4><p>Every section gets a match score before import. One click undoes an import completely.</p></div>
+</div>
+</section>
+
+<section id="requirements">
+<h2>Requirements</h2>
+<div class="table-wrap"><table>
+<tr><th>Item</th><th>Minimum</th><th>Notes</th></tr>
+<tr><td>WordPress</td><td>6.5</td><td>Tested up to 7.1</td></tr>
+<tr><td>PHP</td><td>7.4</td><td>256 MB memory and a 60-second time limit are recommended for large sites</td></tr>
+<tr><td>Elementor</td><td>3.25</td><td>The free version is enough. <strong>Flexbox Container</strong> must be on (Ai2Kit can turn it on for you). Elementor 4's Atomic editor enables v4 output.</td></tr>
+<tr><td>Your account</td><td>Administrator</td><td>Converting pages that run JavaScript (React/Vite builds) needs the <code>unfiltered_html</code> capability</td></tr>
+</table></div>
+</section>
+
+<section id="install">
+<h2>Install</h2>
+<ol class="steps">
+<li><strong>Install Elementor</strong>Plugins → Add New → search “Elementor” → Install → Activate.</li>
+<li><strong>Install Ai2Kit</strong>Plugins → Add New → search “Ai2Kit”, or <em>Upload Plugin</em> and choose <code>ai2kit.zip</code>. Activate it.</li>
+<li><strong>Open Ai2Kit → Convert</strong>The first screen checks your site and tells you if anything needs attention.</li>
+</ol>
+</section>
+
+<section id="quick-start">
+<h2>Quick start</h2>
+<p>Ai2Kit works in four steps, shown at the top of the screen.</p>
+<ol class="steps">
+<li><strong>Upload</strong>Drop an <code>.html</code> file, a ZIP of an HTML template, or a ZIP of a built Lovable/Bolt/v0 site — or choose <em>Paste HTML instead</em>. Ai2Kit shows what it detected, for example <em>Lovable (Vite + React) · 96%</em>; click the badge to see why.</li>
+<li><strong>Check</strong>Preflight checks (Elementor version, Flexbox Container, PHP limits). Blocking problems show in red, often with a one-click <em>Enable</em> or <em>Fix</em>. Choose what to create (a draft page or an Elementor template), the title, and the Elementor format (Auto, v4 Atomic or v3 classic).</li>
+<li><strong>Review</strong>The page renders and converts in your browser at desktop, tablet and mobile widths. Every section gets a score, and you can switch any section between <em>Native</em> and <em>HTML</em>. The <em>Tokens</em> tab shows your colors and fonts.</li>
+<li><strong>Import</strong>Click <em>Import to WordPress</em>. Images go to the Media Library, tokens to your Elementor kit, and the page is created as a draft. Then click <em>Edit with Elementor</em>.</li>
+</ol>
+<div class="note tip"><strong>Tip</strong>On the Done screen, <em>Compare with the source</em> shows the original and the Elementor page side by side, with swipe and overlay views, at every width.</div>
+</section>
+
+<section id="prepare">
+<h2>Preparing your site</h2>
+<p>Ai2Kit converts what a browser can render. For single HTML pages that's the file itself; for React/Vite projects it's the <strong>built</strong> output, not the source code.</p>
+<h3>Lovable, Bolt and other Vite + React projects</h3>
+<ol>
+<li>Get the project locally (Lovable: GitHub sync or Download; Bolt: Download).</li>
+<li>Build it with a relative base so asset paths work from any folder:</li>
+</ol>
+<pre><code>npm install
+npm run build -- --base=./</code></pre>
+<ol start="3"><li>ZIP the <code>dist</code> folder and upload it.</li></ol>
+<p class="muted">Uploaded the source ZIP by mistake (with <code>package.json</code> and <code>src/</code>)? Ai2Kit tells you and shows these steps. Built without <code>--base=./</code>? Ai2Kit fixes most absolute <code>/assets/…</code> paths automatically and tells you how many.</p>
+<h3>v0 and Next.js</h3>
+<p>Use a static export (<code>output: 'export'</code> in <code>next.config.js</code>, then <code>next build</code>) and ZIP the <code>out</code> folder.</p>
+<h3>Claude, ChatGPT, Gemini Canvas</h3>
+<p>Copy the full page (from <code>&lt;!doctype html&gt;</code> to <code>&lt;/html&gt;</code>) and use <em>Paste HTML instead</em>, or save it as <code>index.html</code> and upload it. Pages that load Tailwind from its CDN work as they are.</p>
+<h3>HTML templates</h3>
+<p>ZIP the template folder with its HTML, CSS, JS and images. If the ZIP has several HTML files, <code>index.html</code> is converted.</p>
+<h3>Limits</h3>
+<ul>
+<li>Upload size: 50 MB by default (a filter can raise it — see <a href="#developers">Developers</a>).</li>
+<li>ZIPs are checked for unsafe paths and symbolic links, at most 5,000 files and 200 MB unpacked; PHP and other server-side files are left out.</li>
+<li>Free converts the page at <code>/</code> of a multi-page app. <a href="#free-vs-pro">Pro</a> converts every page.</li>
+</ul>
+</section>
+
+<section id="review">
+<h2>Reviewing a conversion</h2>
+<h3>Sections and scores</h3>
+<p>Each section (Header, Hero, Features grid, FAQ, Footer …) has a thumbnail, the widgets it became, and a score:</p>
+<div class="table-wrap"><table>
+<tr><th>Score</th><th>Meaning</th></tr>
+<tr><td><span class="yes">90%+</span></td><td>A close native match</td></tr>
+<tr><td style="color:var(--warn);font-weight:700">70–89%</td><td>Native, with differences worth a look</td></tr>
+<tr><td style="color:#dc2626;font-weight:700">below 70%</td><td>Ai2Kit suggests keeping it as HTML</td></tr>
+</table></div>
+<p>Hover a score for its breakdown: <strong>structure</strong> (how much became real widgets), <strong>styles</strong> (how many visual properties became Elementor controls) and <strong>HTML kept</strong>. The overall match at the top is weighted by section size.</p>
+<h3>Native or HTML</h3>
+<ul>
+<li><strong>Native</strong> — Elementor containers and widgets. Fully editable; small differences from the source are possible.</li>
+<li><strong>HTML</strong> — the section exactly as in the source, inside one Elementor HTML widget. Pixel-exact, but you edit it as HTML.</li>
+</ul>
+<p>You can mix both on one page.</p>
+<h3>Design tokens</h3>
+<p>The <em>Tokens</em> tab shows the colors and fonts Ai2Kit found — read directly from shadcn/ui theme variables (Lovable, v0), or the most-used colors and fonts on other sites. Rename them if you like. <strong>Merge</strong> adds them next to your existing globals; <strong>Replace</strong> overwrites the four system globals for the whole site (backed up, and restored by Undo).</p>
+</section>
+
+<section id="converted">
+<h2>What gets converted</h2>
+<p>Ai2Kit reads the page at 1440, 1024 and 390 px wide and writes responsive values only where tablet or mobile differ from desktop.</p>
+<div class="table-wrap"><table>
+<tr><th>In the source</th><th>In Elementor</th></tr>
+<tr><td>Sections, rows, columns, grids</td><td>Flexbox or Grid containers (padding, gaps, alignment, widths, boxed width)</td></tr>
+<tr><td><code>h1</code>–<code>h6</code>, large display text</td><td>Heading</td></tr>
+<tr><td>Paragraphs, rich text, lists</td><td>Text Editor</td></tr>
+<tr><td>Links and buttons that look like buttons</td><td>Button (with its icon)</td></tr>
+<tr><td><code>&lt;img&gt;</code></td><td>Image (imported to the Media Library)</td></tr>
+<tr><td>SVG icons</td><td>Icon — the site's <strong>own SVG</strong>, cleaned and uploaded</td></tr>
+<tr><td>Lists with icons; unbulleted link lists (footer columns)</td><td>Icon List</td></tr>
+<tr><td>YouTube, Vimeo, <code>&lt;video&gt;</code></td><td>Video</td></tr>
+<tr><td><code>&lt;hr&gt;</code>, empty spacers</td><td>Divider, Spacer</td></tr>
+<tr><td>Accordions and FAQs (Radix/shadcn, <code>&lt;details&gt;</code>)</td><td>Nested Accordion, with every answer captured</td></tr>
+<tr><td>Forms, tables, iframes, canvas</td><td>HTML widget (kept as is)</td></tr>
+</table></div>
+<h3>Hover effects</h3>
+<p><code>:hover</code> styles become Elementor's hover controls: background and text colors, borders, shadows, lift/scale and the transition duration. In v4 they become the element's hover state.</p>
+<h3>Backgrounds</h3>
+<p>Background colors, gradients and images map to Elementor's Background controls. A hero with a separate image layer and a dark overlay becomes the section's own background image with a Background Overlay.</p>
+<h3>v3 or v4</h3>
+<p>With <strong>Atomic elements (v4)</strong>, headings, paragraphs, buttons, images, icons and containers become Elementor 4 atomic elements; widgets without an atomic version stay classic on the same page.</p>
+<h3>Styles without an Elementor control</h3>
+<p>Gradient text, rotations, blur and similar effects are kept as a small stylesheet that applies only to the converted page. It is validated on your server before it's saved.</p>
+<h3>Not converted</h3>
+<ul>
+<li>App features: logins, dashboards, databases — anything that needs a backend.</li>
+<li><code>canvas</code>/WebGL and complex absolutely positioned layouts (kept as HTML).</li>
+<li>In Free: forms stay HTML; tabs and carousels stay as static content; only the page at <code>/</code> of a multi-page app.</li>
+</ul>
+</section>
+
+<section id="import">
+<h2>Import, History &amp; Undo</h2>
+<h3>What an import does</h3>
+<ol>
+<li><strong>Re-checks everything</strong> the browser sent — only known Elementor widgets and settings are accepted; text is sanitized and URLs are checked.</li>
+<li><strong>Imports images</strong> into the Media Library. Identical files are reused, not duplicated; SVGs are cleaned.</li>
+<li><strong>Adds design tokens</strong> to your Elementor kit, after backing up the current kit.</li>
+<li><strong>Creates the page</strong> (a draft) or template through Elementor's own document API, so revisions and CSS work normally.</li>
+</ol>
+<p>The Done screen lists what was created and <em>Things to check</em>: blocks kept as HTML, forms to connect, scoped CSS, icons or images that couldn't be imported.</p>
+<h3>History</h3>
+<p><strong>Ai2Kit → History</strong> lists every conversion with its date, source, pages, score and status. <em>View report</em> shows the section scores again; <em>Re-run</em> starts a new conversion.</p>
+<h3>Undo</h3>
+<p>Undo (from History or the Done screen) moves the created page to the trash, deletes the images the import added (images already in your library are left alone) and restores your Global Colors &amp; Fonts. If the page was edited after import, Ai2Kit warns you first.</p>
+</section>
+
+<section id="settings">
+<h2>Settings</h2>
+<p><strong>Ai2Kit → Settings</strong></p>
+<div class="table-wrap"><table>
+<tr><th>Setting</th><th>What it does</th></tr>
+<tr><td>Theme</td><td>Light, Dark or System. Only affects Ai2Kit's screens.</td></tr>
+<tr><td>Create</td><td>Default output: a new draft page or an Elementor template (changeable per conversion).</td></tr>
+<tr><td>Elementor format</td><td><strong>Auto</strong> uses v4 when Elementor's Atomic editor is on, otherwise v3. Or force one.</td></tr>
+<tr><td>Global Colors &amp; Fonts</td><td><strong>Merge</strong> adds tokens as custom globals; <strong>Replace</strong> overwrites the four system globals (always backed up).</td></tr>
+<tr><td>Import remote images</td><td>On (default): images from other hosts are downloaded into the Media Library. Off: they keep their original addresses.</td></tr>
+<tr><td>Keep uploaded files for re-runs</td><td>Off (default): uploads are deleted after import or after 24 hours.</td></tr>
+</table></div>
+</section>
+
+<section id="agents">
+<h2>AI agents (MCP) <span class="badge new">New in 0.4</span></h2>
+<p>Ai2Kit registers <strong>agent tools</strong> with WordPress. An AI agent connected over MCP (Claude Desktop, Claude Code, Cursor, VS Code) can prepare conversions, read reports and undo imports — using Ai2Kit's tested converter instead of improvising Elementor code.</p>
+<div class="table-wrap"><table>
+<tr><th>Tool</th><th>What it does</th></tr>
+<tr><td><code>ai2kit/preflight</code></td><td>Checks the site can import</td></tr>
+<tr><td><code>ai2kit/create-job</code></td><td>Prepares a conversion from HTML the agent has, or a .zip/.html in the Media Library; returns a review link</td></tr>
+<tr><td><code>ai2kit/list-jobs</code></td><td>Recent conversions, with edit links and scores</td></tr>
+<tr><td><code>ai2kit/get-job</code></td><td>One conversion's report</td></tr>
+<tr><td><code>ai2kit/undo-import</code></td><td>Undoes an import (asks first if the page was edited)</td></tr>
+</table></div>
+<p><strong>Converting needs one click from you:</strong> Ai2Kit renders the page in a real browser, so the agent gives you a link — open it, click <em>Start conversion</em>, review and import.</p>
+<h3>Requirements and setup</h3>
+<p>WordPress 6.9+ and the MCP Adapter (Elementor 4.3+ includes it). For a site on your computer, add this to your MCP client's configuration:</p>
+<pre><code>{
+  "mcpServers": {
+    "my-wordpress": {
+      "command": "wp",
+      "args": [ "--path=/path/to/wordpress", "mcp-adapter", "serve",
+                "--server=mcp-adapter-default-server", "--user=admin" ]
+    }
+  }
+}</code></pre>
+<p>For a site on a server, use <code>@automattic/mcp-wordpress-remote</code> with an Application Password (Users → Profile). For safety, agents can't pass a web address to download, only administrators can use the tools, and imports are always drafts.</p>
+</section>
+
+<section id="privacy">
+<h2>Privacy &amp; security</h2>
+<ul>
+<li>Uploads are stored in a private folder in your uploads directory, protected from listing and PHP execution, and deleted after import or 24 hours.</li>
+<li>The conversion runs in <strong>your browser</strong>; the result is saved on <strong>your server</strong>. Ai2Kit Free makes no requests to Ai2Kit's servers and collects no usage data.</li>
+<li>While converting, your browser loads what the uploaded page references (for example a Tailwind or Google Fonts CDN) — as when you open the page yourself. With <em>Import remote images</em> on, your server downloads the page's external images.</li>
+<li>The browser's output is never trusted: the server re-validates every element and setting, sanitizes text and URLs, and cleans SVGs with an allowlist. Every REST endpoint checks permissions and a nonce.</li>
+</ul>
+</section>
+
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+<details><summary>My React/Vite site converts to a blank page</summary><div>You uploaded the project source, or the build can't find its files. Upload the built <code>dist</code> folder as a ZIP, built with <code>npm run build -- --base=./</code>.</div></details>
+<details><summary>Images are missing</summary><div>The build uses absolute <code>/assets/…</code> paths. Ai2Kit fixes most automatically (the Check step says how many); building with <code>--base=./</code> fixes the rest. For images on other hosts, check <em>Settings → Import remote images</em>.</div></details>
+<details><summary>Imported pages render blank</summary><div>Elementor's Flexbox Container is off. Turn it on in <em>Elementor → Settings → Features</em>, or click <em>Enable</em> in the Check step.</div></details>
+<details><summary>A section looks different</summary><div>Switch it to <em>HTML</em> in Review to keep it pixel-exact, or keep it Native and adjust it in Elementor. A section's details show why it scored lower.</div></details>
+<details><summary>Fonts don't match</summary><div>Ai2Kit adds fonts to your Global Fonts and Elementor loads Google Fonts automatically. Fonts a site hosts itself must be added in Elementor → Custom Fonts (Elementor Pro) or by your theme.</div></details>
+<details><summary>“Your account can't run scripts”</summary><div>Pages that run JavaScript can only be converted by users allowed to add unfiltered HTML — administrators, or network super admins on multisite.</div></details>
+<details><summary>The upload fails or is rejected</summary><div>Remove large videos or unused files (50 MB limit by default), check the server upload limit shown in the Check step, and upload only the built site (at most 5,000 files, 200 MB unpacked).</div></details>
+<details><summary>The import times out</summary><div>Imports with many images can hit the PHP time limit; 60 seconds or more and 256 MB of memory are recommended.</div></details>
+</section>
+
+<section id="developers">
+<h2>Developers</h2>
+<h3>Filters</h3>
+<pre><code>// Raise the upload limit (default 50 MB).
+add_filter( 'ai2kit_max_upload_bytes', function () {
+	return 100 * MB_IN_BYTES;
+} );</code></pre>
+<h3>Extension API</h3>
+<p>Ai2Kit Free contains no locked features; add-ons extend it through documented hooks. Check the <code>AI2KIT_EXTENSION_API</code> constant (currently <code>1</code>) before using them.</p>
+<ul>
+<li><strong>Engine</strong> (<code>window.ai2kit.engine</code>, script handle <code>ai2kit-engine</code>): <code>registerExtension()</code> with capture, recognition and emit hooks.</li>
+<li><strong>Admin app</strong> (<code>@wordpress/hooks</code>): <code>ai2kit.check.pages</code>, <code>ai2kit.convert.morePages</code>, <code>ai2kit.import</code>.</li>
+<li><strong>PHP</strong>: <code>ai2kit_enqueue_admin_scripts</code>, <code>ai2kit_admin_script_dependencies</code>, <code>ai2kit_admin_config</code>, <code>ai2kit_allowed_widgets</code>, <code>ai2kit_nested_widgets</code>, <code>ai2kit_import_result</code>, <code>ai2kit_undo_import</code>.</li>
+</ul>
+<h3>Translations</h3>
+<p>All strings use the <code>ai2kit</code> text domain; language packs from translate.wordpress.org install automatically. Bangla is complete.</p>
+<p>Source code and build instructions: <a href="https://github.com/salmancreation/Ai2Kit">github.com/salmancreation/Ai2Kit</a>.</p>
+</section>
+
+<section id="free-vs-pro">
+<h2>Free vs Pro</h2>
+<p>Everything in Free stays free and unlimited. <strong>Ai2Kit Pro</strong> is a separate add-on for whole sites.</p>
+<div class="table-wrap"><table>
+<tr><th>Feature</th><th>Free</th><th>Pro</th></tr>
+<tr><td>Unlimited single-page conversions (HTML, Lovable, Bolt, v0, AI chat)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Native widgets, hover effects, backgrounds, exact SVG icons</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Accordions / FAQs</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Global Colors &amp; Fonts, v3 and v4 output, review, compare, undo</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>AI agent tools (MCP)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+<tr><td>Every page of a site in one job</td><td class="no">—</td><td class="yes">✓</td></tr>
+<tr><td>Shared header &amp; footer, WordPress menu, homepage</td><td class="no">—</td><td class="yes">✓</td></tr>
+<tr><td>Native tabs, carousels, counters and popups</td><td class="no">static</td><td class="yes">✓</td></tr>
+<tr><td>Working forms with email and spam protection</td><td class="no">HTML</td><td class="yes">✓</td></tr>
+<tr><td>Entrance animations</td><td class="no">—</td><td class="yes">✓</td></tr>
+</table></div>
+<p>See the separate <strong>Ai2Kit Pro documentation</strong> (<code>ai2kit-pro.html</code>).</p>
+</section>
+
+<section id="support">
+<h2>Support</h2>
+<p>Found a page that converts badly? <a href="https://github.com/salmancreation/Ai2Kit/issues">Open an issue</a> with the report from <em>History → View report</em>, your WordPress, Elementor and PHP versions, and — if you can share it — the file you converted.</p>
+</section>
+</main>
+</div>
+<footer class="foot">Ai2Kit by ModinaTheme · GPL-2.0-or-later · <a href="https://github.com/salmancreation/Ai2Kit">Source code</a></footer>
+</body>
+</html>
