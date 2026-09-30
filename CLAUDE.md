@@ -25,7 +25,11 @@ npm run e2e                                # Playwright: upload → convert → 
 npm run lint:php                           # PHPCS (WordPress + PHPCompatibility 7.4) and PHPStan level 6 — both must be clean
 npm run plugin-check                       # Official Plugin Check on the release build (mounted as ai2kit-release; checked as slug ai2kit)
 node scripts/release.mjs                   # tests + build + zip → dist/ai2kit-x.y.z.zip
+node scripts/i18n/build-po.mjs bn_BD       # Bangla .po from scripts/i18n/bn_BD.json (fails on missing/stale strings or placeholder mismatch)
+node tests/e2e/screenshots.mjs --out .wordpress-org   # wp.org screenshots (--locale bn_BD for QA)
+node scripts/wporg/assets.mjs              # wp.org icon + banners
 ```
+Docs: `docs/` (user docs + `docs/qa-checklist.md`, run before every release). CI: `.github/workflows/ci.yml`; tag `vX.Y.Z` → `deploy.yml` publishes to wp.org SVN.
 
 ## Elementor reference data (never guess the JSON format)
 - `tests/fixtures/elementor/controls-v3.json` — every control (name, type, options, responsive) for the container and each widget we emit, exported from a real install by `tests/tools/dump-controls.php` (run with `--context=admin`; see the file header). The emitter tests validate every emitted key and option value against it. Re-export when upgrading Elementor.
@@ -52,6 +56,9 @@ node scripts/release.mjs                   # tests + build + zip → dist/ai2kit
 - Elementor grids fall back to 1 column on mobile (`mobile_default`): write `grid_columns_grid_mobile` whenever the source isn't 1 column there. `line-height: normal` → 1.2em (unset, the theme's 1.5 applies).
 - Background layers (`normalize/layers.ts`): a content-free child that covers its parent (absolute, inset 0) and paints an image (`<img object-cover>` or a bg-image div) or a color/gradient (a `bg-black/50` div, or a `::before/::after` with `content:""` — captured as `pseudoLayers`) is merged into the parent as its background image + `bgOverlay` → v3 Background Overlay (opacity always stated; default is 0.5) / v4 top layer of the `background:` shorthand. Children are lifted first, so a layer may already carry its own overlay. v4 background images exist only after AtomicWriter converts CSS → `MediaImporter::process_styles` imports them.
 - `boxSection` merges a centered inner box into the section: carry the section's vertical placement (align-items/justify-content flex-end/center) into the merged column.
+- i18n: every visible string goes through `ai2kit`. Engine text (warnings, section labels, detection evidence) stays English in the engine (it's also Elementor `_title`s) and is translated in the UI by `packages/admin-ui/src/lib/engineText.ts` — add new engine messages there. Put `/* translators: */` directly before the `__()` call or minification drops it. After changing strings: rebuild the UI, `make-pot`, update `scripts/i18n/bn_BD.json`. WordPress.org language packs deliver translations (no `load_plugin_textdomain`); test locally by compiling into `wp-content/languages/plugins`.
+- RTL: `@wordpress/scripts` builds `index-rtl.css` with rtlcss, which mirrors left/right, `transform-origin` and `translateX` automatically — never add manual `.rtl` overrides (they get flipped a second time). Direction icons use `--a2k-dir` (a variable rtlcss leaves alone). Test RTL with a `gettext_with_context` 'text direction' filter (flipping `$wp_locale` at `init` is too late for the stylesheets).
+- Admin notices: core's common.js moves notices after the first `.wrap h1` — our React `<h1>` — unless there's an `hr.wp-header-end`; `Menu::render` prints one before the app root. Elementor's notices use `.e-notice`.
 - Unmappable styles (gradient text, transforms, filters) go to residual CSS: structured rules from the engine, validated and scoped to `.elementor-{id}` by `ResidualCss`, printed on `elementor/frontend/before_get_builder_content`.
 
 ## Coding rules (PRD §11)

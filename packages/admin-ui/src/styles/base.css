@@ -1,10 +1,8 @@
 /* App-level base: typography, focus, and the wp-admin integration. */
 
 .ai2kit-wrap { margin: 0 0 0 -20px; }
-.rtl .ai2kit-wrap { margin: 0 -20px 0 0; }
 @media (max-width: 782px) {
 	.ai2kit-wrap { margin: 0 0 0 -10px; }
-	.rtl .ai2kit-wrap { margin: 0 -10px 0 0; }
 }
 
 .ai2kit-app {
@@ -24,7 +22,19 @@
 .ai2kit-app code { font-family: var(--a2k-font-mono); font-size: var(--a2k-text-sm); background: var(--a2k-bg-subtle); padding: 1px 6px; border-radius: var(--a2k-radius-sm); }
 
 /* Other plugins' notices are gathered into the "Site notices" pill (DESIGN.md §4.1). */
+/* Direction icons (→, ←, ›) point the other way in RTL. A variable, so the generated
+   RTL stylesheet (rtlcss) can't flip it a second time. */
+.rtl .ai2kit-app { --a2k-dir: -1; }
+.a2k-dir-icon { transform: scaleX(var(--a2k-dir, 1)); }
+
+.ai2kit-wrap > .wp-header-end,
+.ai2kit-wrap > .notice,
+.ai2kit-wrap > .e-notice,
+.ai2kit-wrap > .update-nag,
+.ai2kit-wrap > .error,
+.ai2kit-wrap > .updated,
 .ai2kit-has-app #wpbody-content > .notice,
+.ai2kit-has-app #wpbody-content > .e-notice,
 .ai2kit-has-app #wpbody-content > .update-nag,
 .ai2kit-has-app #wpbody-content > .error,
 .ai2kit-has-app #wpbody-content > .updated { display: none; }

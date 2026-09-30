@@ -47,7 +47,7 @@ export function ImportSummary( { result, onAnother, onUndo, onCompare, canCompar
 		),
 		sprintf(
 			/* translators: %d: number of colors. */
-			_n( '%d colour', '%d colours', result.kit.colors, 'ai2kit' ),
+			_n( '%d color', '%d colors', result.kit.colors, 'ai2kit' ),
 			result.kit.colors
 		),
 		sprintf(
@@ -72,7 +72,7 @@ export function ImportSummary( { result, onAnother, onUndo, onCompare, canCompar
 				</h1>
 				<p className={ s.heroSub }>
 					{ sprintf(
-						/* translators: %s: list like "1 page, 12 images, 6 colours, 2 fonts". */
+						/* translators: %s: list like "1 page, 12 images, 6 colors, 2 fonts". */
 						__( 'Done — %s added.', 'ai2kit' ),
 						summary
 					) }
@@ -147,7 +147,7 @@ export function ImportSummary( { result, onAnother, onUndo, onCompare, canCompar
 				<Card className={ s.proCard }>
 					<div>
 						<strong>{ __( 'Convert all pages at once with Pro.', 'ai2kit' ) }</strong>
-						<p className={ s.muted }>{ __( 'Multi-route conversion, header and footer templates, menus, and native tabs, accordions and carousels.', 'ai2kit' ) }</p>
+						<p className={ s.muted }>{ __( 'Multi-route conversion, header and footer templates, menus, and native tabs and carousels.', 'ai2kit' ) }</p>
 					</div>
 					<Button variant="link" href={ `${ window.ai2kitConfig.adminUrl }admin.php?page=ai2kit-pro` }>
 						{ __( 'See what\'s in Pro', 'ai2kit' ) }

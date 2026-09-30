@@ -18,7 +18,7 @@ import { ComparePanel } from '../components/ComparePanel';
 import { TokenCard } from '../components/TokenCard';
 import { ImportSummary } from '../components/ImportSummary';
 import { Icon } from '../components/Icon';
-import { Button, Card, Checkbox, ErrorNotice, Field, Modal, Segmented, Spinner, UpsellChip, inputClass, useToast } from '../components/ui';
+import { Button, Card, ErrorNotice, Field, Modal, Segmented, Spinner, UpsellChip, inputClass, useToast } from '../components/ui';
 import s from '../components/convert.module.css';
 import r from '../components/review.module.css';
 
@@ -40,7 +40,6 @@ export function Convert() {
 	const toast = useToast();
 	const [ step, setStep ] = useState< Step >( 'upload' );
 	const [ welcome, setWelcome ] = useState( ! cfg.settings.welcomeDone );
-	const [ diagnostics, setDiagnostics ] = useState( cfg.settings.diagnosticsOptIn );
 	const [ preflight, setPreflight ] = useState< Preflight | null >( null );
 	const [ fixing, setFixing ] = useState< string | null >( null );
 
@@ -285,13 +284,12 @@ export function Convert() {
 									<Icon name="check" /> { __( 'Works on Elementor Free', 'ai2kit' ) }
 								</li>
 							</ul>
-							<Checkbox checked={ diagnostics } onChange={ setDiagnostics } label={ __( 'Share anonymous diagnostics to help improve conversions', 'ai2kit' ) } help={ __( 'Optional. Off unless you tick it.', 'ai2kit' ) } />
 							<Button
 								variant="primary"
 								iconAfter="arrowRight"
 								onClick={ () => {
 									setWelcome( false );
-									api.saveSettings( { welcomeDone: true, diagnosticsOptIn: diagnostics } ).catch( () => undefined );
+									api.saveSettings( { welcomeDone: true } ).catch( () => undefined );
 								} }
 							>
 								{ __( 'Start converting', 'ai2kit' ) }

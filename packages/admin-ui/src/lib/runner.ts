@@ -3,6 +3,8 @@
  * render → capture (3 breakpoints) → sections → tokens → Elementor layout.
  * Capture needs the DOM, so it stays on the main thread (PRD §7).
  */
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { sectionLabel } from './engineText';
 import {
 	analyze,
 	captureAll,
@@ -80,15 +82,20 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	iframe.style.width = `${ DEFAULT_VIEWPORT.desktop }px`;
 	const win = await loadFrame( iframe, entryUrl, signal );
 	const doc = win.document;
-	onLog( `Loaded ${ entryUrl }` );
+	/* translators: %s: URL of the uploaded page. */
+	onLog( sprintf( __( 'Loaded %s', 'ai2kit' ), entryUrl ) );
 	const stable = await waitForStable( win, { quietMs: 500, timeoutMs: 15000 } );
-	onLog( stable.timedOut ? 'Render did not settle within 15 s; capturing anyway.' : `Render settled in ${ stable.ms } ms.` );
+	onLog(
+		stable.timedOut
+			? __( 'Render did not settle within 15 s; capturing anyway.', 'ai2kit' )
+			: /* translators: %d: milliseconds. */ sprintf( __( 'Render settled in %d ms.', 'ai2kit' ), stable.ms )
+	);
 	check();
 	await scrollThrough( win );
 	injectSettleStyles( doc );
 	await waitForStable( win, { quietMs: 300, timeoutMs: 4000 } );
 	if ( ! doc.body || ! doc.body.innerText.trim() ) {
-		throw new Error( 'The page rendered no visible content. If this is a React build, make sure you uploaded the built dist folder.' );
+		throw new Error( __( 'The page rendered no visible content. If this is a React build, make sure you uploaded the built dist folder.', 'ai2kit' ) );
 	}
 	onStage( 'render', 'done' );
 	check();
@@ -104,7 +111,9 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	};
 	const capture = await captureAll( { doc, win }, resize, DEFAULT_VIEWPORT, ( bp: Breakpoint ) => {
 		onStage( 'capture', 'active', bp );
-		onLog( `Capturing ${ bp } (${ DEFAULT_VIEWPORT[ bp ] }px)` );
+		const bpName = { desktop: __( 'desktop', 'ai2kit' ), tablet: __( 'tablet', 'ai2kit' ), mobile: __( 'mobile', 'ai2kit' ) }[ bp ];
+		/* translators: 1: breakpoint name (desktop, tablet, mobile), 2: width in pixels. */
+		onLog( sprintf( __( 'Capturing %1$s (%2$dpx)', 'ai2kit' ), bpName, DEFAULT_VIEWPORT[ bp ] ) );
 	} );
 	onStage( 'capture', 'done' );
 	// Exposed for the e2e harness, which saves real captures as engine test fixtures.
@@ -115,14 +124,28 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	onStage( 'sections', 'active' );
 	await sleep( 0 );
 	const analysis = analyze( capture, seed );
-	onLog( `Found ${ analysis.sections.length } sections: ${ analysis.sections.map( ( s ) => s.label ).join( ', ' ) }` );
+	onLog(
+		sprintf(
+			/* translators: 1: number of sections, 2: their names. */
+			_n( 'Found %1$d section: %2$s', 'Found %1$d sections: %2$s', analysis.sections.length, 'ai2kit' ),
+			analysis.sections.length,
+			analysis.sections.map( ( s ) => sectionLabel( s.label ?? '' ) ).join( ', ' )
+		)
+	);
 	onStage( 'sections', 'done', String( analysis.sections.length ) );
 	check();
 
 	/* 4. Tokens (extracted during analysis; reported separately) */
 	onStage( 'tokens', 'active' );
 	await sleep( 0 );
-	onLog( `Design tokens (${ analysis.tokens.source }): ${ analysis.tokens.colors.length } colors, ${ analysis.tokens.fonts.length } fonts` );
+	onLog(
+		sprintf(
+			/* translators: 1: number of colors, 2: number of fonts. */
+			__( 'Design tokens: %1$d colors, %2$d fonts', 'ai2kit' ),
+			analysis.tokens.colors.length,
+			analysis.tokens.fonts.length
+		)
+	);
 	onStage( 'tokens', 'done' );
 
 	/* 5. Build Elementor layout */
@@ -136,7 +159,15 @@ export async function runConversion( iframe: HTMLIFrameElement, entryUrl: string
 	const first = emit( analysis, { frozen, format } );
 	const modes = suggestedModes( first );
 	const result = emit( analysis, { frozen, modes, format } );
-	onLog( `Built ${ result.document.content.length } sections as ${ format === 'v4' ? 'atomic (v4) elements' : 'containers + widgets (v3)' } · overall ${ result.overall }%` );
+	onLog(
+		sprintf(
+			/* translators: 1: number of sections, 2: output format, 3: overall match in percent. */
+			__( 'Built %1$d sections as %2$s · overall %3$d%%', 'ai2kit' ),
+			result.document.content.length,
+			format === 'v4' ? __( 'atomic (v4) elements', 'ai2kit' ) : __( 'containers + widgets (v3)', 'ai2kit' ),
+			result.overall
+		)
+	);
 	onStage( 'build', 'done' );
 
 	return { analysis, result, frozen, modes, timedOut: stable.timedOut };

@@ -1,0 +1,50 @@
+name: Deploy to WordPress.org
+
+# Publishes a release to the plugin's WordPress.org SVN when a version tag is
+# pushed (PRD §13). Needs repository secrets SVN_USERNAME and SVN_PASSWORD
+# (the WordPress.org account that owns the plugin). Listing assets (banner,
+# icon, screenshots) come from .wordpress-org/.
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+      - run: corepack enable && corepack pnpm@9.15.9 install --frozen-lockfile
+      - run: composer install -d plugin/ai2kit --no-interaction --no-progress
+
+      - name: Tag matches the plugin version
+        run: |
+          v=$(grep -oP 'Version:\s*\K[\d.]+' plugin/ai2kit/ai2kit.php)
+          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "Tag ${GITHUB_REF_NAME} ≠ plugin version $v"; exit 1; }
+
+      - name: Test, build and package
+        run: node scripts/release.mjs
+
+      - name: Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: ai2kit
+          BUILD_DIR: dist/ai2kit
+          ASSETS_DIR: .wordpress-org
+
+      - name: Attach the ZIP to the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ai2kit-*.zip

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { SourceInfo } from '@ai2kit/engine';
 import { Icon } from './Icon';
+import { evidenceText, sourceLabel } from '../lib/engineText';
 import s from './convert.module.css';
 
 const AI_SOURCES = new Set( [ 'lovable', 'bolt', 'next-export', 'vite-spa', 'ai-html' ] );
@@ -22,14 +23,14 @@ export function SourceBadge( { source }: { source: SourceInfo } ) {
 		<span className={ s.sourceWrap } ref={ ref }>
 			<button type="button" className={ `${ s.source } ${ AI_SOURCES.has( source.type ) ? s.sourceAi : '' }` } aria-expanded={ open } onClick={ () => setOpen( ! open ) }>
 				<Icon name="sparkle" size={ 14 } />
-				{ `${ source.label } · ${ Math.round( source.confidence * 100 ) }%` }
+				{ `${ sourceLabel( source.type, source.label ) } · ${ Math.round( source.confidence * 100 ) }%` }
 			</button>
 			{ open && (
 				<span className={ s.evidence } role="dialog" aria-label={ __( 'Why we think so', 'ai2kit' ) }>
 					<strong>{ __( 'Why we think so', 'ai2kit' ) }</strong>
 					<ul>
 						{ source.evidence.map( ( e ) => (
-							<li key={ e }>{ e }</li>
+							<li key={ e }>{ evidenceText( e ) }</li>
 						) ) }
 					</ul>
 				</span>

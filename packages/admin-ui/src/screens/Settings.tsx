@@ -86,7 +86,6 @@ export function Settings( { onTheme }: { onTheme: ( t: Ai2kitSettings[ 'theme' ]
 				<Card>
 					<h2 className={ s.h2 }>{ __( 'Privacy', 'ai2kit' ) }</h2>
 					<p className={ s.sub }>{ __( 'Ai2Kit converts in your browser and saves on your server. It makes no requests to Ai2Kit or any other service.', 'ai2kit' ) }</p>
-					<Toggle checked={ v.diagnosticsOptIn } onChange={ ( x ) => set( 'diagnosticsOptIn', x ) } label={ __( 'Share anonymous diagnostics', 'ai2kit' ) } help={ __( 'Optional and off by default.', 'ai2kit' ) } />
 				</Card>
 			</div>
 			<ActionBar

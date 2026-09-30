@@ -11,8 +11,6 @@
 /* Step transition (§9): incoming fades in from 8px */
 .stepEnter { animation: a2k-step-in var(--a2k-duration-base) var(--a2k-ease-enter); }
 @keyframes a2k-step-in { from { opacity: 0; transform: translateX(8px); } }
-:global(.rtl) .stepEnter { animation-name: a2k-step-in-rtl; }
-@keyframes a2k-step-in-rtl { from { opacity: 0; transform: translateX(-8px); } }
 
 /* Welcome (§6.1) */
 .welcome { margin-bottom: var(--a2k-space-4); display: flex; flex-direction: column; gap: var(--a2k-space-4); align-items: flex-start; }
@@ -88,7 +86,6 @@
 .pct { font-size: var(--a2k-text-2xl); font-weight: var(--a2k-weight-bold); font-variant-numeric: tabular-nums; }
 .bar { position: relative; height: 6px; border-radius: var(--a2k-radius-full); background: var(--a2k-bg-subtle); overflow: hidden; margin-bottom: var(--a2k-space-6); }
 .barFill { position: absolute; inset: 0; background: var(--a2k-bg-brand); transform-origin: left; transition: transform var(--a2k-duration-slow) var(--a2k-ease-standard); }
-:global(.rtl) .barFill { transform-origin: right; }
 .stages { margin: 0 0 var(--a2k-space-4); display: flex; flex-direction: column; gap: var(--a2k-space-1); }
 .stage { position: relative; overflow: hidden; display: flex; align-items: center; gap: var(--a2k-space-3); padding: var(--a2k-space-2) var(--a2k-space-3); border-radius: var(--a2k-radius-md); margin: 0; color: var(--a2k-text-tertiary); }
 .stageIcon { width: 20px; height: 20px; display: grid; place-items: center; flex: none; }

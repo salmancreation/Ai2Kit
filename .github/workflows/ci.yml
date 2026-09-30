@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    name: Engine and admin UI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: corepack enable
+      - run: corepack pnpm@9.15.9 install --frozen-lockfile
+      - run: corepack pnpm@9.15.9 --filter @ai2kit/engine typecheck
+      - run: corepack pnpm@9.15.9 --filter @ai2kit/engine test
+      - run: corepack pnpm@9.15.9 --filter @ai2kit/admin-ui typecheck
+      - run: corepack pnpm@9.15.9 --filter @ai2kit/admin-ui test
+      - run: corepack pnpm@9.15.9 --filter @ai2kit/admin-ui build
+      - name: Bangla translation is complete
+        run: node scripts/i18n/build-po.mjs bn_BD
+
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '7.4', '8.3' ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: zip, dom
+          tools: composer
+      - run: composer install -d plugin/ai2kit --no-interaction --no-progress
+      - run: cd plugin/ai2kit && vendor/bin/phpunit
+      - name: PHPCS
+        if: matrix.php == '8.3'
+        run: cd plugin/ai2kit && composer lint
+      - name: PHPStan (needs Elementor sources)
+        if: matrix.php == '8.3'
+        run: bash scripts/fetch-deps.sh && cd plugin/ai2kit && composer stan

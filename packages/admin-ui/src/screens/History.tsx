@@ -5,6 +5,7 @@ import { api, asApiError, type Job } from '../lib/api';
 import { localDate } from '../lib/format';
 import { PageTitle, Shell } from '../components/Shell';
 import { Badge, Button, Card, EmptyState, ErrorNotice, Modal, ScoreBadge, ScoreRing, Skeleton, useToast, type Tone } from '../components/ui';
+import { sectionLabel } from '../lib/engineText';
 import s from './screens.module.css';
 
 const STATUS: Record< Job[ 'status' ], { tone: Tone; label: () => string } > = {
@@ -134,7 +135,7 @@ export function History() {
 					<ul className={ s.report }>
 						{ report.result.sections.map( ( sec, i ) => (
 							<li key={ i }>
-								<span>{ sec.label }</span>
+								<span>{ sectionLabel( sec.label ) }</span>
 								<Badge tone={ sec.mode === 'html' ? 'warning' : 'neutral' }>{ sec.mode === 'html' ? __( 'HTML', 'ai2kit' ) : __( 'Native', 'ai2kit' ) }</Badge>
 								<ScoreBadge score={ sec.score } />
 							</li>

@@ -4,16 +4,8 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import type { SectionReport } from '@ai2kit/engine';
 import { Icon } from './Icon';
 import { ScoreBadge, Segmented, Tooltip, UpsellChip, Badge } from './ui';
+import { patternLabel, proHintText, sectionLabel, warningText, widgetSummary } from '../lib/engineText';
 import s from './review.module.css';
-
-const PATTERN_LABEL: Record< string, string > = {
-	accordion: 'Accordion',
-	tabs: 'Tabs',
-	carousel: 'Carousel',
-	dialog: 'Popup',
-	counter: 'Counter',
-	repeat: 'Repeated cards',
-};
 
 export function SectionRow( {
 	report,
@@ -34,7 +26,7 @@ export function SectionRow( {
 	const lowScore = score.score < 70;
 	const breakdown = sprintf(
 		/* translators: 1: structure %, 2: styles %, 3: fallback %. */
-		__( 'Structure %1$d% · Styles %2$d% · HTML kept %3$d%', 'ai2kit' ),
+		__( 'Structure %1$d%% · Styles %2$d%% · HTML kept %3$d%%', 'ai2kit' ),
 		Math.round( score.structure * 100 ),
 		Math.round( score.styles * 100 ),
 		Math.round( score.fallbackRatio * 100 )
@@ -50,11 +42,11 @@ export function SectionRow( {
 			onFocus={ () => onHover( report.id ) }
 		>
 			<div className={ s.rowMain }>
-				<Thumb html={ frozen } label={ report.label } />
+				<Thumb html={ frozen } label={ sectionLabel( report.label ) } />
 				<div className={ s.rowBody }>
 					<div className={ s.rowTop }>
 						<button type="button" className={ s.rowTitle } onClick={ onToggle } aria-expanded={ expanded } aria-controls={ detailsId }>
-							{ report.label }
+							{ sectionLabel( report.label ) }
 						</button>
 						<Tooltip content={ breakdown }>
 							<span tabIndex={ 0 }>
@@ -63,12 +55,12 @@ export function SectionRow( {
 						</Tooltip>
 						{ report.patterns.filter( ( p ) => p !== 'repeat' ).map( ( p ) => (
 							<Badge key={ p } tone="brand">
-								{ PATTERN_LABEL[ p ] ?? p }
+								{ patternLabel( p ) }
 							</Badge>
 						) ) }
 					</div>
 					<button type="button" className={ s.rowMeta } onClick={ onToggle } tabIndex={ -1 }>
-						{ report.summary || __( 'Layout only', 'ai2kit' ) }
+						{ widgetSummary( report.widgets ) || __( 'Layout only', 'ai2kit' ) }
 						{ warnings > 0 && (
 							<span className={ s.warn }>
 								{ ' · ' }
@@ -88,7 +80,7 @@ export function SectionRow( {
 						label={ sprintf(
 							/* translators: %s: section name. */
 							__( 'Output for %s', 'ai2kit' ),
-							report.label
+							sectionLabel( report.label )
 						) }
 						value={ report.mode }
 						onChange={ ( m ) => ( m === 'html' && ! frozen ? undefined : onMode( m ) ) }
@@ -107,7 +99,7 @@ export function SectionRow( {
 						<ul className={ s.widgets }>
 							{ Object.entries( report.widgets ).map( ( [ w, n ] ) => (
 								<li key={ w }>
-									<Badge tone="neutral">{ `${ w } × ${ n }` }</Badge>
+									<Badge tone="neutral">{ widgetSummary( { [ w ]: n } ) || `${ w } × ${ n }` }</Badge>
 								</li>
 							) ) }
 						</ul>
@@ -118,7 +110,7 @@ export function SectionRow( {
 							<ul className={ s.warnList }>
 								{ report.warnings.map( ( w ) => (
 									<li key={ w }>
-										<Icon name="alert" size={ 14 } /> { w }
+										<Icon name="alert" size={ 14 } /> { warningText( w ) }
 									</li>
 								) ) }
 							</ul>
@@ -130,8 +122,8 @@ export function SectionRow( {
 				{ report.proHints.length > 0 && (
 					<div className={ s.hints }>
 						{ report.proHints.map( ( h ) => (
-							<UpsellChip key={ h } detail={ __( 'Ai2Kit Pro maps interactive blocks (accordions, tabs, carousels, popups) to native Elementor widgets. In Free they are kept as static, editable content.', 'ai2kit' ) }>
-								{ h.replace( /^Pro:\s*/, '' ) }
+							<UpsellChip key={ h } detail={ __( 'Ai2Kit Pro maps tabs, carousels and popups to native Elementor widgets. In Free they are kept as static, editable content.', 'ai2kit' ) }>
+								{ proHintText( h ).replace( /^Pro:\s*/, '' ) }
 							</UpsellChip>
 						) ) }
 					</div>

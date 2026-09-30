@@ -88,7 +88,6 @@
 .toggleOn { background: var(--a2k-bg-brand); }
 .toggleThumb { display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--a2k-ink-0); box-shadow: var(--a2k-shadow-sm); transition: transform var(--a2k-duration-fast) var(--a2k-ease-standard); }
 .toggleOn .toggleThumb { transform: translateX(16px); }
-:global(.rtl) .toggleOn .toggleThumb { transform: translateX(-16px); }
 .toggleLabel { display: flex; flex-direction: column; gap: 2px; cursor: pointer; font-weight: var(--a2k-weight-medium); }
 .checkbox { margin: 3px 0 0 !important; accent-color: var(--a2k-bg-brand); width: 16px; height: 16px; }
 .help { color: var(--a2k-text-secondary); font-size: var(--a2k-text-sm); line-height: var(--a2k-lh-sm); font-weight: var(--a2k-weight-regular); }
@@ -114,7 +113,6 @@ select.input { max-width: none; }
 	font-size: var(--a2k-text-xs); line-height: var(--a2k-lh-xs); padding: 6px 8px; border-radius: 6px;
 	white-space: nowrap; pointer-events: none; box-shadow: var(--a2k-shadow-md);
 }
-:global(.rtl) .tip { transform: translateX(50%); }
 
 /* Upsell (§5.11) */
 .upsellWrap { position: relative; display: inline-flex; }

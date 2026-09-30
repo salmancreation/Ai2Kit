@@ -45,7 +45,7 @@ export function Pro() {
 	const features = [
 		__( 'Convert every route of a site in one job', 'ai2kit' ),
 		__( 'Header and footer templates, and real WordPress menus', 'ai2kit' ),
-		__( 'Native tabs, accordions, carousels, counters and popups', 'ai2kit' ),
+		__( 'Native tabs, carousels, counters and popups', 'ai2kit' ),
 		__( 'Forms with email delivery and spam protection', 'ai2kit' ),
 		__( 'Repeated cards → custom post types with loop templates', 'ai2kit' ),
 		__( 'Entrance animations and Elementor v4 classes & variables', 'ai2kit' ),

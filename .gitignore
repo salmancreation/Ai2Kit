@@ -13,3 +13,4 @@ packages/*/dist/
 .phpunit.cache/
 .deps/
 tests/e2e/output/
+tests/tools/.l10n/

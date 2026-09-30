@@ -66,7 +66,7 @@ function SiteNotices() {
 	const [ open, setOpen ] = useState( false );
 	const panel = useRef< HTMLDivElement >( null );
 	useEffect( () => {
-		const found = Array.from( document.querySelectorAll< HTMLElement >( '#wpbody-content > .notice, #wpbody-content > .update-nag, #wpbody-content > .error, #wpbody-content > .updated' ) );
+		const found = Array.from( document.querySelectorAll< HTMLElement >( [ '#wpbody-content', '.ai2kit-wrap' ].flatMap( ( p ) => [ '.notice', '.e-notice', '.update-nag', '.error', '.updated' ].map( ( n ) => `${ p } > ${ n }` ) ).join( ', ' ) ) );
 		setNotices( found );
 	}, [] );
 	// Move the real notice nodes (keeping their dismiss handlers) into the panel.

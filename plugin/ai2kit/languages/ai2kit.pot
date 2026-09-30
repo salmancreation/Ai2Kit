@@ -1,0 +1,1824 @@
+# Copyright (C) 2026 ModinaTheme
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Ai2Kit – AI Website to Elementor Converter 0.3.0\n"
+"Report-Msgid-Bugs-To: https://github.com/salmancreation/Ai2Kit/issues\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-29T20:07:21+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: ai2kit\n"
+
+#. Plugin Name of the plugin
+#: ai2kit.php
+msgid "Ai2Kit – AI Website to Elementor Converter"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: ai2kit.php
+msgid "https://ai2kit.com"
+msgstr ""
+
+#. Description of the plugin
+#: ai2kit.php
+msgid "Convert AI-built sites (Lovable, Bolt, v0, Gemini, HTML templates) into editable Elementor pages — locally, inside wp-admin."
+msgstr ""
+
+#. Author of the plugin
+#: ai2kit.php
+msgid "ModinaTheme"
+msgstr ""
+
+#. Author URI of the plugin
+#: ai2kit.php
+msgid "https://modinatheme.com"
+msgstr ""
+
+#: includes/Admin/Menu.php:59
+#: build/index.js:26
+msgid "Ai2Kit"
+msgstr ""
+
+#: includes/Admin/Menu.php:60
+#: includes/Admin/Menu.php:158
+#: build/index.js:43
+msgid "Convert"
+msgstr ""
+
+#: includes/Admin/Menu.php:61
+#: build/index.js:50
+msgid "History"
+msgstr ""
+
+#: includes/Admin/Menu.php:62
+#: build/index.js:50
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/Menu.php:63
+#: build/index.js:50
+msgid "Help"
+msgstr ""
+
+#: includes/Admin/Menu.php:64
+msgid "Go Pro"
+msgstr ""
+
+#: includes/Admin/Menu.php:97
+msgid "The Ai2Kit admin app has not been built yet. Run the build and reload this page."
+msgstr ""
+
+#: includes/Admin/Menu.php:99
+msgid "Ai2Kit needs JavaScript to convert pages."
+msgstr ""
+
+#: includes/Rest/Routes.php:170
+msgid "Choose a file or paste some HTML to convert."
+msgstr ""
+
+#: includes/Rest/Routes.php:206
+#: includes/Rest/Routes.php:220
+#: includes/Rest/Routes.php:235
+#: includes/Rest/Routes.php:257
+#: includes/Rest/Routes.php:271
+msgid "This conversion no longer exists."
+msgstr ""
+
+#: includes/Rest/Routes.php:238
+msgid "This conversion was already imported. Start a new one to import again."
+msgstr ""
+
+#: includes/Rest/Routes.php:274
+msgid "Only imported conversions can be undone."
+msgstr ""
+
+#: includes/Services/ElementorWriter.php:34
+msgid "Converted page"
+msgstr ""
+
+#: includes/Services/ElementorWriter.php:47
+msgid "Elementor couldn't create the page."
+msgstr ""
+
+#: includes/Services/ElementorWriter.php:58
+msgid "Elementor couldn't save the converted layout."
+msgstr ""
+
+#: includes/Services/Importer.php:29
+msgid "Elementor is not active."
+msgstr ""
+
+#: includes/Services/Importer.php:32
+msgid "Flexbox Container is off, so imported pages would render blank."
+msgstr ""
+
+#: includes/Services/Importer.php:36
+msgid "Elementor's site settings (kit) are missing and couldn't be recreated."
+msgstr ""
+
+#: includes/Services/Importer.php:60
+msgid "Elementor v4 output needs Elementor 4 with the Atomic editor turned on. Choose classic widgets (v3) instead."
+msgstr ""
+
+#. translators: %d: number of blocks kept as HTML.
+#: includes/Services/Importer.php:104
+#, php-format
+msgid "%d block was kept as HTML — review it in Elementor."
+msgid_plural "%d blocks were kept as HTML — review them in Elementor."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Services/Importer.php:110
+msgid "A form was kept as HTML. Connect it to an email address or a form plugin before going live."
+msgstr ""
+
+#. translators: %d: number of CSS rules.
+#: includes/Services/Importer.php:117
+#, php-format
+msgid "%d style no Elementor control covers (like gradient text) was kept as CSS scoped to this page."
+msgid_plural "%d styles no Elementor control covers (like gradient text or rotation) were kept as CSS scoped to this page."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of icons.
+#: includes/Services/Importer.php:124
+#, php-format
+msgid "%d icon couldn't be imported as SVG and uses the closest Font Awesome icon instead."
+msgid_plural "%d icons couldn't be imported as SVG and use the closest Font Awesome icon instead."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of images.
+#: includes/Services/Importer.php:131
+#, php-format
+msgid "%d image couldn't be imported and still points to its original address."
+msgid_plural "%d images couldn't be imported and still point to their original addresses."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Services/Jobs.php:29
+#: includes/Services/Jobs.php:42
+msgid "The upload didn't finish."
+msgstr ""
+
+#: includes/Services/Jobs.php:29
+msgid "Check your connection and the server upload limit, then try again."
+msgstr ""
+
+#: includes/Services/Jobs.php:42
+msgid "Try again."
+msgstr ""
+
+#. translators: %d: size limit in megabytes.
+#: includes/Services/Jobs.php:49
+#, php-format
+msgid "This file is larger than %d MB."
+msgstr ""
+
+#: includes/Services/Jobs.php:50
+msgid "Remove large videos or unused files, or raise the limit with the ai2kit_max_upload_bytes filter."
+msgstr ""
+
+#: includes/Services/Jobs.php:57
+msgid "This file type isn't supported."
+msgstr ""
+
+#: includes/Services/Jobs.php:57
+#: build/index.js:28
+msgid "Upload an .html file or a .zip of your built site."
+msgstr ""
+
+#: includes/Services/Jobs.php:66
+msgid "This isn't a valid ZIP file."
+msgstr ""
+
+#: includes/Services/Jobs.php:66
+#: includes/Services/ZipIngest.php:97
+#: includes/Services/ZipIngest.php:147
+msgid "Re-create the ZIP and try again."
+msgstr ""
+
+#: includes/Services/Jobs.php:94
+msgid "The pasted HTML is larger than 5 MB."
+msgstr ""
+
+#: includes/Services/Jobs.php:94
+msgid "Save it as an .html file and upload that instead."
+msgstr ""
+
+#: includes/Services/Jobs.php:100
+msgid "Pasted HTML"
+msgstr ""
+
+#: includes/Services/Jobs.php:118
+msgid "We couldn't create a working folder in wp-content/uploads."
+msgstr ""
+
+#: includes/Services/Jobs.php:118
+msgid "Check that the uploads folder is writable."
+msgstr ""
+
+#: includes/Services/Jobs.php:140
+#: build/index.js:44
+msgid "This ZIP is the project source, not the built site."
+msgstr ""
+
+#: includes/Services/Jobs.php:140
+msgid "This ZIP has no index.html."
+msgstr ""
+
+#: includes/Services/Jobs.php:141
+#: build/index.js:44
+msgid "Run \"npm run build -- --base=./\" and upload the dist folder as a ZIP."
+msgstr ""
+
+#: includes/Services/Jobs.php:141
+msgid "Upload the built dist folder, not the source."
+msgstr ""
+
+#: includes/Services/Jobs.php:149
+msgid "This site runs JavaScript, and your account isn't allowed to run scripts on this site."
+msgstr ""
+
+#: includes/Services/Jobs.php:150
+msgid "Ask an administrator (or a network super admin on multisite) to convert it."
+msgstr ""
+
+#: includes/Services/Jobs.php:182
+msgid "We couldn't save this conversion."
+msgstr ""
+
+#: includes/Services/Jobs.php:182
+msgid "Deactivate and reactivate Ai2Kit to repair its database table."
+msgstr ""
+
+#: includes/Services/Preflight.php:58
+msgid "Elementor is not active"
+msgstr ""
+
+#: includes/Services/Preflight.php:58
+msgid "Install and activate Elementor (the free version works)."
+msgstr ""
+
+#. translators: %s: installed Elementor version.
+#: includes/Services/Preflight.php:64
+#, php-format
+msgid "Elementor %s is too old"
+msgstr ""
+
+#. translators: %s: minimum Elementor version.
+#: includes/Services/Preflight.php:66
+#, php-format
+msgid "Update Elementor to %s or newer."
+msgstr ""
+
+#. translators: %s: Elementor version.
+#: includes/Services/Preflight.php:70
+#, php-format
+msgid "Elementor %s"
+msgstr ""
+
+#. translators: %s: Elementor version.
+#: includes/Services/Preflight.php:70
+msgid "Supported version."
+msgstr ""
+
+#: includes/Services/Preflight.php:75
+msgid "Flexbox Container is on"
+msgstr ""
+
+#: includes/Services/Preflight.php:75
+msgid "Converted layouts use containers."
+msgstr ""
+
+#: includes/Services/Preflight.php:77
+msgid "Flexbox Container is off"
+msgstr ""
+
+#: includes/Services/Preflight.php:77
+msgid "Imported pages would render blank."
+msgstr ""
+
+#: includes/Services/Preflight.php:77
+msgid "Enable"
+msgstr ""
+
+#: includes/Services/Preflight.php:83
+msgid "Atomic editor (v4) is on"
+msgstr ""
+
+#: includes/Services/Preflight.php:83
+#: build/index.js:44
+#: build/index.js:50
+msgid "Classic widgets (v3)"
+msgstr ""
+
+#: includes/Services/Preflight.php:84
+msgid "Pages use atomic elements (v4). Widgets without an atomic version stay classic, on the same page."
+msgstr ""
+
+#: includes/Services/Preflight.php:84
+msgid "Pages use containers and classic widgets."
+msgstr ""
+
+#: includes/Services/Preflight.php:89
+msgid "Elementor Pro detected"
+msgstr ""
+
+#: includes/Services/Preflight.php:89
+msgid "Elementor Free"
+msgstr ""
+
+#: includes/Services/Preflight.php:90
+msgid "Everything Ai2Kit Free does works without Elementor Pro."
+msgstr ""
+
+#: includes/Services/Preflight.php:95
+msgid "ZIP uploads are unavailable"
+msgstr ""
+
+#: includes/Services/Preflight.php:95
+msgid "The PHP zip extension is missing. You can still upload a single HTML file."
+msgstr ""
+
+#. translators: %s: memory limit, e.g. 128M.
+#: includes/Services/Preflight.php:101
+#, php-format
+msgid "PHP memory limit is %s"
+msgstr ""
+
+#. translators: %s: memory limit, e.g. 128M.
+#: includes/Services/Preflight.php:101
+msgid "Large sites may fail to import. 256M or more is recommended."
+msgstr ""
+
+#. translators: %d: seconds.
+#: includes/Services/Preflight.php:106
+#, php-format
+msgid "PHP time limit is %d seconds"
+msgstr ""
+
+#. translators: %d: seconds.
+#: includes/Services/Preflight.php:106
+msgid "Imports with many images may time out. 60 seconds or more is recommended."
+msgstr ""
+
+#. translators: %s: size, e.g. 8 MB.
+#: includes/Services/Preflight.php:111
+#, php-format
+msgid "Upload limit is %s"
+msgstr ""
+
+#. translators: %s: size, e.g. 8 MB.
+#: includes/Services/Preflight.php:111
+msgid "Larger ZIPs will be rejected by the server."
+msgstr ""
+
+#: includes/Services/Preflight.php:114
+msgid "Your account can't run scripts"
+msgstr ""
+
+#: includes/Services/Preflight.php:114
+msgid "You can convert plain HTML. React/Vite builds need an administrator."
+msgstr ""
+
+#: includes/Services/Preflight.php:140
+msgid "This check has no automatic fix."
+msgstr ""
+
+#: includes/Services/Validator.php:53
+msgid "The converted page is empty or malformed."
+msgstr ""
+
+#: includes/Services/Validator.php:80
+msgid "The converted page is nested too deeply."
+msgstr ""
+
+#: includes/Services/Validator.php:85
+msgid "The converted page has too many elements."
+msgstr ""
+
+#: includes/Services/Validator.php:88
+msgid "The converted page contains an invalid element."
+msgstr ""
+
+#. translators: %s: element type.
+#: includes/Services/Validator.php:98
+#: includes/Services/Validator.php:160
+#, php-format
+msgid "The converted page contains an unsupported element (%s)."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:93
+msgid "This server cannot open ZIP files (the PHP zip extension is missing)."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:93
+msgid "Ask your host to enable the PHP \"zip\" extension, or upload a single HTML file instead."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:97
+msgid "We couldn't open this ZIP file."
+msgstr ""
+
+#. translators: 1: number of files in the ZIP, 2: maximum allowed.
+#: includes/Services/ZipIngest.php:103
+#, php-format
+msgid "This ZIP has %1$d files; the limit is %2$d."
+msgstr ""
+
+#. translators: 1: number of files in the ZIP, 2: maximum allowed.
+#: includes/Services/ZipIngest.php:103
+msgid "Upload only the built site (the dist folder), not the whole project."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:118
+msgid "This ZIP contains an unsafe file path."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:118
+msgid "Re-create the ZIP from the site folder and try again."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:121
+msgid "This ZIP contains a symbolic link, which isn't allowed."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:121
+msgid "Re-create the ZIP without links."
+msgstr ""
+
+#. translators: %d: size limit in megabytes.
+#: includes/Services/ZipIngest.php:130
+#: includes/Services/ZipIngest.php:156
+#, php-format
+msgid "This ZIP unpacks to more than %d MB."
+msgstr ""
+
+#. translators: %d: size limit in megabytes.
+#: includes/Services/ZipIngest.php:130
+#: includes/Services/ZipIngest.php:156
+msgid "Remove large videos or unused files and try again."
+msgstr ""
+
+#: includes/Services/ZipIngest.php:147
+msgid "A file in this ZIP couldn't be read."
+msgstr ""
+
+#: build/index.js:1
+msgid "About Ai2Kit Pro"
+msgstr ""
+
+#: build/index.js:1
+#: build/index.js:37
+msgid "Dismiss"
+msgstr ""
+
+#: build/index.js:1
+msgid "Copied"
+msgstr ""
+
+#: build/index.js:1
+msgid "Copy"
+msgstr ""
+
+#: build/index.js:1
+msgid "Copy details"
+msgstr ""
+
+#: build/index.js:1
+msgid "Header"
+msgstr ""
+
+#: build/index.js:1
+msgid "Navigation"
+msgstr ""
+
+#: build/index.js:1
+msgid "Hero"
+msgstr ""
+
+#: build/index.js:1
+msgid "Features grid"
+msgstr ""
+
+#: build/index.js:1
+msgid "Pricing"
+msgstr ""
+
+#: build/index.js:1
+msgid "Testimonials"
+msgstr ""
+
+#: build/index.js:1
+msgid "FAQ"
+msgstr ""
+
+#: build/index.js:1
+msgid "Call to action"
+msgstr ""
+
+#: build/index.js:1
+msgid "Footer"
+msgstr ""
+
+#: build/index.js:1
+msgid "Gallery"
+msgstr ""
+
+#: build/index.js:1
+msgid "Stats"
+msgstr ""
+
+#: build/index.js:1
+msgid "Team"
+msgstr ""
+
+#: build/index.js:1
+msgid "Logos"
+msgstr ""
+
+#: build/index.js:1
+msgid "Blog"
+msgstr ""
+
+#: build/index.js:1
+msgid "Section"
+msgstr ""
+
+#. translators: 1: section name, 2: its number among sections with the same name.
+#: build/index.js:2
+#, js-format
+msgid "%1$s %2$s"
+msgstr ""
+
+#. translators: %d: number of headings.
+#: build/index.js:4
+#, js-format
+msgid "%d heading"
+msgid_plural "%d headings"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of text blocks.
+#: build/index.js:6
+#, js-format
+msgid "%d text"
+msgid_plural "%d texts"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of buttons.
+#: build/index.js:8
+#, js-format
+msgid "%d button"
+msgid_plural "%d buttons"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of images.
+#: build/index.js:10
+#: build/index.js:34
+#, js-format
+msgid "%d image"
+msgid_plural "%d images"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of icons.
+#: build/index.js:12
+#, js-format
+msgid "%d icon"
+msgid_plural "%d icons"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of icon lists.
+#: build/index.js:14
+#, js-format
+msgid "%d icon list"
+msgid_plural "%d icon lists"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of videos.
+#: build/index.js:16
+#, js-format
+msgid "%d video"
+msgid_plural "%d videos"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of dividers.
+#: build/index.js:18
+#, js-format
+msgid "%d divider"
+msgid_plural "%d dividers"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of accordions.
+#: build/index.js:20
+#, js-format
+msgid "%d accordion"
+msgid_plural "%d accordions"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of HTML blocks.
+#: build/index.js:22
+#, js-format
+msgid "%d HTML block"
+msgid_plural "%d HTML blocks"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: the reason, e.g. "embedded frame".
+#: build/index.js:23
+#, js-format
+msgid "Kept as HTML — %s."
+msgstr ""
+
+#. translators: %s: HTML tag name, e.g. <table>.
+#: build/index.js:24
+#, js-format
+msgid "no Elementor widget for <%s>"
+msgstr ""
+
+#: build/index.js:24
+msgid "embedded frame"
+msgstr ""
+
+#: build/index.js:24
+msgid "forms need Pro to map natively"
+msgstr ""
+
+#: build/index.js:24
+msgid "switched to HTML in review"
+msgstr ""
+
+#: build/index.js:24
+msgid "unrecognized block"
+msgstr ""
+
+#: build/index.js:24
+msgid "Some styles no Elementor control covers were kept as scoped CSS."
+msgstr ""
+
+#: build/index.js:24
+msgid "Some accordion answers were empty in the source."
+msgstr ""
+
+#: build/index.js:24
+msgid "Collapsed accordion answers couldn't be opened while converting, so they weren't captured. Add them in Elementor."
+msgstr ""
+
+#: build/index.js:24
+msgid "Only the open tab was captured. Pro maps tabs to a native Tabs widget."
+msgstr ""
+
+#: build/index.js:24
+msgid "Carousel slides are kept as static content. Pro maps carousels to a native carousel."
+msgstr ""
+
+#: build/index.js:24
+msgid "Custom icon uploaded as SVG."
+msgstr ""
+
+#: build/index.js:24
+msgid "Pro: map as Tabs"
+msgstr ""
+
+#: build/index.js:24
+msgid "Pro: map as Carousel"
+msgstr ""
+
+#: build/index.js:24
+msgid "Pro: map as Popup"
+msgstr ""
+
+#. translators: %d: number of inline scripts.
+#: build/index.js:25
+#, js-format
+msgid "%d inline script"
+msgid_plural "%d inline scripts"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of HTML files.
+#: build/index.js:26
+#, js-format
+msgid "%d HTML file with asset folders"
+msgid_plural "%d HTML files with asset folders"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:26
+msgid "Found package.json but no built index.html"
+msgstr ""
+
+#: build/index.js:26
+msgid "Found package.json and src/*.tsx without a dist/ build"
+msgstr ""
+
+#: build/index.js:26
+msgid "Found _next/static assets"
+msgstr ""
+
+#: build/index.js:26
+msgid "v0 generator hint"
+msgstr ""
+
+#: build/index.js:26
+msgid "Found <div id=\"root\">"
+msgstr ""
+
+#: build/index.js:26
+msgid "Found /assets/index-*.js (Vite build)"
+msgstr ""
+
+#: build/index.js:26
+msgid "Lovable markers in index.html"
+msgstr ""
+
+#: build/index.js:26
+msgid "Bolt/StackBlitz markers"
+msgstr ""
+
+#: build/index.js:26
+msgid "Tailwind CDN script"
+msgstr ""
+
+#: build/index.js:26
+msgid "Claude artifact hint"
+msgstr ""
+
+#: build/index.js:26
+msgid "Gemini Canvas hint"
+msgstr ""
+
+#: build/index.js:26
+msgid "Plain HTML document"
+msgstr ""
+
+#: build/index.js:26
+msgid "No HTML entry file found"
+msgstr ""
+
+#: build/index.js:26
+msgid "Accordion"
+msgstr ""
+
+#: build/index.js:26
+msgid "Tabs"
+msgstr ""
+
+#: build/index.js:26
+msgid "Carousel"
+msgstr ""
+
+#: build/index.js:26
+msgid "Popup"
+msgstr ""
+
+#: build/index.js:26
+msgid "Counter"
+msgstr ""
+
+#: build/index.js:26
+msgid "Repeated cards"
+msgstr ""
+
+#: build/index.js:26
+msgid "Docs"
+msgstr ""
+
+#: build/index.js:26
+msgid "Pro"
+msgstr ""
+
+#. translators: %d: number of notices from WordPress and other plugins.
+#: build/index.js:27
+#, js-format
+msgid "Site notice (%d)"
+msgid_plural "Site notices (%d)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:27
+msgid "Upload"
+msgstr ""
+
+#: build/index.js:27
+#: build/index.js:44
+msgid "Check"
+msgstr ""
+
+#: build/index.js:27
+#: build/index.js:47
+msgid "Review"
+msgstr ""
+
+#: build/index.js:27
+msgid "Import"
+msgstr ""
+
+#: build/index.js:27
+msgid "Conversion steps"
+msgstr ""
+
+#: build/index.js:27
+msgid "ZIP"
+msgstr ""
+
+#: build/index.js:27
+#: build/index.js:28
+#: build/index.js:31
+#: build/index.js:49
+#: build/index.js:50
+msgid "HTML"
+msgstr ""
+
+#: build/index.js:27
+msgid "Remove file"
+msgstr ""
+
+#: build/index.js:27
+msgid "Drop your site here"
+msgstr ""
+
+#: build/index.js:27
+msgid "HTML file, template ZIP, or built Lovable/Bolt/v0 folder (ZIP)"
+msgstr ""
+
+#. translators: %d: upload limit in megabytes.
+#: build/index.js:28
+#, js-format
+msgid "Up to %d MB. Your files stay on this site."
+msgstr ""
+
+#: build/index.js:28
+msgid "Choose file"
+msgstr ""
+
+#: build/index.js:28
+msgid "Paste HTML instead"
+msgstr ""
+
+#: build/index.js:28
+msgid "Project source (not built)"
+msgstr ""
+
+#: build/index.js:28
+msgid "v0 (Next.js export)"
+msgstr ""
+
+#: build/index.js:28
+msgid "Next.js static export"
+msgstr ""
+
+#: build/index.js:28
+msgid "Lovable (Vite + React)"
+msgstr ""
+
+#: build/index.js:28
+msgid "Bolt (Vite + React)"
+msgstr ""
+
+#: build/index.js:28
+msgid "Vite + React app"
+msgstr ""
+
+#: build/index.js:28
+msgid "AI-generated HTML"
+msgstr ""
+
+#: build/index.js:28
+msgid "HTML template"
+msgstr ""
+
+#: build/index.js:28
+msgid "Unknown"
+msgstr ""
+
+#: build/index.js:28
+msgid "Why we think so"
+msgstr ""
+
+#: build/index.js:28
+msgid "OK"
+msgstr ""
+
+#: build/index.js:28
+msgid "Warning"
+msgstr ""
+
+#: build/index.js:28
+msgid "Blocking"
+msgstr ""
+
+#: build/index.js:28
+msgid "Fix"
+msgstr ""
+
+#: build/index.js:28
+msgid "Rendering"
+msgstr ""
+
+#: build/index.js:28
+msgid "Capturing tablet"
+msgstr ""
+
+#: build/index.js:28
+msgid "Capturing mobile"
+msgstr ""
+
+#: build/index.js:28
+msgid "Capturing desktop / tablet / mobile"
+msgstr ""
+
+#: build/index.js:28
+msgid "Detecting sections"
+msgstr ""
+
+#: build/index.js:28
+msgid "Extracting design tokens"
+msgstr ""
+
+#: build/index.js:28
+msgid "Building Elementor layout"
+msgstr ""
+
+#: build/index.js:28
+msgid "Converting your site"
+msgstr ""
+
+#: build/index.js:28
+msgid "Conversion progress"
+msgstr ""
+
+#: build/index.js:28
+msgid "Done"
+msgstr ""
+
+#: build/index.js:28
+#: build/index.js:50
+msgid "Failed"
+msgstr ""
+
+#: build/index.js:28
+msgid "Show technical log"
+msgstr ""
+
+#: build/index.js:28
+#: build/index.js:49
+msgid "Cancel"
+msgstr ""
+
+#: build/index.js:28
+msgid "Live capture"
+msgstr ""
+
+#: build/index.js:28
+#: build/index.js:31
+msgid "Source site preview"
+msgstr ""
+
+#. translators: 1: structure %, 2: styles %, 3: fallback %.
+#: build/index.js:29
+#, js-format
+msgid "Structure %1$d%% · Styles %2$d%% · HTML kept %3$d%%"
+msgstr ""
+
+#: build/index.js:29
+msgid "Layout only"
+msgstr ""
+
+#. translators: %d: number of warnings.
+#: build/index.js:30
+#, js-format
+msgid "%d warning"
+msgid_plural "%d warnings"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: section name.
+#: build/index.js:31
+#, js-format
+msgid "Output for %s"
+msgstr ""
+
+#: build/index.js:31
+#: build/index.js:50
+msgid "Native"
+msgstr ""
+
+#: build/index.js:31
+msgid "Suggested: HTML"
+msgstr ""
+
+#: build/index.js:31
+msgid "Detected widgets"
+msgstr ""
+
+#: build/index.js:31
+msgid "Warnings"
+msgstr ""
+
+#: build/index.js:31
+msgid "None — every block mapped to an Elementor widget."
+msgstr ""
+
+#: build/index.js:31
+msgid "Ai2Kit Pro maps tabs, carousels and popups to native Elementor widgets. In Free they are kept as static, editable content."
+msgstr ""
+
+#: build/index.js:31
+msgid "Compare mode"
+msgstr ""
+
+#: build/index.js:31
+msgid "Side by side"
+msgstr ""
+
+#: build/index.js:31
+msgid "Swipe"
+msgstr ""
+
+#: build/index.js:31
+msgid "Overlay"
+msgstr ""
+
+#: build/index.js:31
+#: build/index.js:50
+msgid "Source"
+msgstr ""
+
+#: build/index.js:31
+msgid "Breakpoint"
+msgstr ""
+
+#: build/index.js:31
+msgid "Desktop"
+msgstr ""
+
+#: build/index.js:31
+msgid "Tablet"
+msgstr ""
+
+#: build/index.js:31
+msgid "Mobile"
+msgstr ""
+
+#: build/index.js:31
+msgid "Converted Elementor page"
+msgstr ""
+
+#: build/index.js:31
+msgid "Compare slider"
+msgstr ""
+
+#: build/index.js:31
+msgid "Overall match"
+msgstr ""
+
+#: build/index.js:31
+msgid "Weighted by section size: structure, styles and HTML kept."
+msgstr ""
+
+#: build/index.js:31
+msgid "Design tokens"
+msgstr ""
+
+#: build/index.js:31
+msgid "Read from the site's shadcn/ui theme variables."
+msgstr ""
+
+#: build/index.js:31
+msgid "Clustered from the colors and fonts the page uses most."
+msgstr ""
+
+#: build/index.js:31
+msgid "Add to Elementor Global Colors & Fonts"
+msgstr ""
+
+#: build/index.js:31
+msgid "Colors"
+msgstr ""
+
+#. translators: %s: hex color.
+#: build/index.js:32
+#, js-format
+msgid "Name for %s"
+msgstr ""
+
+#: build/index.js:32
+#: build/index.js:50
+msgid "System"
+msgstr ""
+
+#: build/index.js:32
+msgid "Typography"
+msgstr ""
+
+#: build/index.js:32
+msgid "Font name"
+msgstr ""
+
+#: build/index.js:32
+msgid "No custom fonts detected; the theme fonts will be used."
+msgstr ""
+
+#: build/index.js:32
+msgid "How to add tokens"
+msgstr ""
+
+#: build/index.js:32
+msgid "Merge into existing Global Colors"
+msgstr ""
+
+#: build/index.js:32
+msgid "Replace"
+msgstr ""
+
+#: build/index.js:32
+msgid "Replacing changes the Primary, Secondary, Text and Accent globals for the whole site. The old kit is backed up, and Undo restores it."
+msgstr ""
+
+#. translators: %d: number of pages or templates.
+#: build/index.js:33
+#, js-format
+msgid "%d page"
+msgid_plural "%d pages"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of colors.
+#: build/index.js:35
+#, js-format
+msgid "%d color"
+msgid_plural "%d colors"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of fonts.
+#: build/index.js:36
+#, js-format
+msgid "%d font"
+msgid_plural "%d fonts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:36
+msgid "Your site is in Elementor."
+msgstr ""
+
+#. translators: %s: list like "1 page, 12 images, 6 colors, 2 fonts".
+#: build/index.js:37
+#, js-format
+msgid "Done — %s added."
+msgstr ""
+
+#: build/index.js:37
+msgid "Created"
+msgstr ""
+
+#: build/index.js:37
+msgid "Draft page"
+msgstr ""
+
+#: build/index.js:37
+#: build/index.js:50
+msgid "Elementor template"
+msgstr ""
+
+#: build/index.js:37
+msgid "Edit with Elementor"
+msgstr ""
+
+#: build/index.js:37
+msgid "View"
+msgstr ""
+
+#: build/index.js:37
+#: build/index.js:50
+msgid "Global Colors & Fonts"
+msgstr ""
+
+#: build/index.js:37
+msgid "System globals replaced (backed up)"
+msgstr ""
+
+#: build/index.js:37
+msgid "Added as custom globals"
+msgstr ""
+
+#: build/index.js:37
+msgid "Things to check"
+msgstr ""
+
+#: build/index.js:37
+msgid "Nothing — every section mapped to native Elementor widgets."
+msgstr ""
+
+#: build/index.js:37
+msgid "Compare with the source"
+msgstr ""
+
+#: build/index.js:37
+msgid "Convert another"
+msgstr ""
+
+#: build/index.js:37
+msgid "Undo this import"
+msgstr ""
+
+#: build/index.js:37
+msgid "Convert all pages at once with Pro."
+msgstr ""
+
+#: build/index.js:37
+msgid "Multi-route conversion, header and footer templates, menus, and native tabs and carousels."
+msgstr ""
+
+#: build/index.js:37
+msgid "See what's in Pro"
+msgstr ""
+
+#: build/index.js:37
+msgid "Fixed."
+msgstr ""
+
+#. translators: %s: URL of the uploaded page.
+#: build/index.js:39
+#, js-format
+msgid "Loaded %s"
+msgstr ""
+
+#: build/index.js:39
+msgid "Render did not settle within 15 s; capturing anyway."
+msgstr ""
+
+#. translators: %d: milliseconds.
+#: build/index.js:39
+#, js-format
+msgid "Render settled in %d ms."
+msgstr ""
+
+#: build/index.js:39
+msgid "The page rendered no visible content. If this is a React build, make sure you uploaded the built dist folder."
+msgstr ""
+
+#: build/index.js:39
+msgid "desktop"
+msgstr ""
+
+#: build/index.js:39
+msgid "tablet"
+msgstr ""
+
+#: build/index.js:39
+msgid "mobile"
+msgstr ""
+
+#. translators: 1: breakpoint name (desktop, tablet, mobile), 2: width in pixels.
+#: build/index.js:40
+#, js-format
+msgid "Capturing %1$s (%2$dpx)"
+msgstr ""
+
+#. translators: 1: number of sections, 2: their names.
+#: build/index.js:41
+#, js-format
+msgid "Found %1$d section: %2$s"
+msgid_plural "Found %1$d sections: %2$s"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: number of colors, 2: number of fonts.
+#: build/index.js:42
+#, js-format
+msgid "Design tokens: %1$d colors, %2$d fonts"
+msgstr ""
+
+#. translators: 1: number of sections, 2: output format, 3: overall match in percent.
+#: build/index.js:43
+#, js-format
+msgid "Built %1$d sections as %2$s · overall %3$d%%"
+msgstr ""
+
+#: build/index.js:43
+msgid "atomic (v4) elements"
+msgstr ""
+
+#: build/index.js:43
+msgid "containers + widgets (v3)"
+msgstr ""
+
+#: build/index.js:43
+msgid "Turn an AI-built site into an editable Elementor page."
+msgstr ""
+
+#: build/index.js:43
+msgid "Convert AI-built sites into editable Elementor pages."
+msgstr ""
+
+#: build/index.js:43
+msgid "Local & private — your code never leaves this site"
+msgstr ""
+
+#: build/index.js:43
+msgid "Native widgets, global colors and fonts"
+msgstr ""
+
+#: build/index.js:43
+msgid "Works on Elementor Free"
+msgstr ""
+
+#: build/index.js:43
+#: build/index.js:50
+msgid "Start converting"
+msgstr ""
+
+#: build/index.js:43
+msgid "Your site is ready ✓"
+msgstr ""
+
+#: build/index.js:43
+msgid "Before you start"
+msgstr ""
+
+#: build/index.js:43
+msgid "Uploading and checking your files…"
+msgstr ""
+
+#. translators: %d: number of files.
+#: build/index.js:44
+#, js-format
+msgid "%d file"
+msgid_plural "%d files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:44
+msgid "Ai2Kit converts the built output that a browser can render."
+msgstr ""
+
+#: build/index.js:44
+msgid "Output"
+msgstr ""
+
+#: build/index.js:44
+#: build/index.js:50
+msgid "Create"
+msgstr ""
+
+#: build/index.js:44
+msgid "New page"
+msgstr ""
+
+#: build/index.js:44
+msgid "Template"
+msgstr ""
+
+#: build/index.js:44
+msgid "Title"
+msgstr ""
+
+#: build/index.js:44
+#: build/index.js:50
+msgid "Elementor format"
+msgstr ""
+
+#: build/index.js:44
+msgid "Atomic elements (v4) with classes and responsive styles. Widgets without an atomic version stay classic."
+msgstr ""
+
+#: build/index.js:44
+msgid "Containers and classic widgets (v3). They also work alongside the Atomic editor."
+msgstr ""
+
+#: build/index.js:44
+msgid "Auto (v4)"
+msgstr ""
+
+#: build/index.js:44
+msgid "Auto (v3)"
+msgstr ""
+
+#: build/index.js:44
+#: build/index.js:50
+msgid "Atomic elements (v4)"
+msgstr ""
+
+#: build/index.js:44
+#: build/index.js:50
+msgid "Pages"
+msgstr ""
+
+#: build/index.js:44
+msgid "The page at \"/\" is converted."
+msgstr ""
+
+#: build/index.js:44
+msgid "Ai2Kit Pro discovers every route of your site and converts them in one job, with header, footer and menus."
+msgstr ""
+
+#: build/index.js:44
+msgid "Convert all routes"
+msgstr ""
+
+#: build/index.js:44
+msgid "Checks"
+msgstr ""
+
+#: build/index.js:44
+msgid "Checking…"
+msgstr ""
+
+#. translators: %d: number of asset paths.
+#: build/index.js:45
+#, js-format
+msgid "We fixed %d absolute asset path automatically."
+msgid_plural "We fixed %d absolute asset paths automatically."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of files.
+#: build/index.js:46
+#, js-format
+msgid "%d referenced file couldn't be found."
+msgid_plural "%d referenced files couldn't be found."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:46
+msgid "Tip: build with \"npm run build -- --base=./\" and include the whole dist folder."
+msgstr ""
+
+#. translators: %d: number of files.
+#: build/index.js:47
+#, js-format
+msgid "%d server-side file was left out for safety."
+msgid_plural "%d server-side files were left out for safety."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:47
+msgid "Converting"
+msgstr ""
+
+#: build/index.js:47
+msgid "This runs in your browser. Nothing is uploaded anywhere else."
+msgstr ""
+
+#: build/index.js:47
+msgid "The conversion stopped."
+msgstr ""
+
+#: build/index.js:47
+msgid "Check the technical log, then try again. React builds must be the built dist folder."
+msgstr ""
+
+#. translators: 1: number of sections, 2: overall score.
+#: build/index.js:48
+#, js-format
+msgid "%1$d sections · %2$d%% overall match"
+msgstr ""
+
+#: build/index.js:48
+msgid "Review view"
+msgstr ""
+
+#: build/index.js:48
+msgid "Sections"
+msgstr ""
+
+#: build/index.js:48
+msgid "Tokens"
+msgstr ""
+
+#: build/index.js:48
+msgid "Loading…"
+msgstr ""
+
+#: build/index.js:48
+msgid "Continue"
+msgstr ""
+
+#: build/index.js:48
+msgid "Back"
+msgstr ""
+
+#: build/index.js:48
+msgid "Fix the blocking checks to continue."
+msgstr ""
+
+#: build/index.js:48
+msgid "Start conversion"
+msgstr ""
+
+#: build/index.js:48
+msgid "Try again"
+msgstr ""
+
+#. translators: 1: native sections, 2: HTML sections.
+#: build/index.js:49
+#, js-format
+msgid "%1$d native · %2$d kept as HTML"
+msgstr ""
+
+#: build/index.js:49
+msgid "Import to WordPress"
+msgstr ""
+
+#: build/index.js:49
+msgid "Paste HTML"
+msgstr ""
+
+#: build/index.js:49
+msgid "Use this HTML"
+msgstr ""
+
+#: build/index.js:49
+msgid "A full page from Claude, ChatGPT or Gemini Canvas works best."
+msgstr ""
+
+#: build/index.js:49
+#: build/index.js:50
+msgid "Undo this import?"
+msgstr ""
+
+#: build/index.js:49
+#: build/index.js:50
+msgid "Keep it"
+msgstr ""
+
+#. translators: %d: number of pages moved to trash.
+#: build/index.js:50
+#, js-format
+msgid "Undone — %d page moved to trash."
+msgid_plural "Undone — %d pages moved to trash."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/index.js:50
+msgid "Undo import"
+msgstr ""
+
+#: build/index.js:50
+msgid "The page moves to the trash, the images this import added are deleted, and your Global Colors & Fonts are restored."
+msgstr ""
+
+#: build/index.js:50
+msgid "These pages have been edited since import."
+msgstr ""
+
+#: build/index.js:50
+msgid "Imported"
+msgstr ""
+
+#: build/index.js:50
+msgid "Undone"
+msgstr ""
+
+#: build/index.js:50
+msgid "Not imported"
+msgstr ""
+
+#: build/index.js:50
+msgid "Every conversion on this site."
+msgstr ""
+
+#: build/index.js:50
+msgid "We couldn't load your history."
+msgstr ""
+
+#: build/index.js:50
+msgid "Reload the page to try again."
+msgstr ""
+
+#: build/index.js:50
+msgid "No conversions yet"
+msgstr ""
+
+#: build/index.js:50
+msgid "Converted pages and templates will appear here."
+msgstr ""
+
+#: build/index.js:50
+msgid "Date"
+msgstr ""
+
+#: build/index.js:50
+msgid "Score"
+msgstr ""
+
+#: build/index.js:50
+msgid "Status"
+msgstr ""
+
+#: build/index.js:50
+msgid "Actions"
+msgstr ""
+
+#: build/index.js:50
+msgid "View report"
+msgstr ""
+
+#: build/index.js:50
+msgid "Re-run"
+msgstr ""
+
+#: build/index.js:50
+msgid "Undo"
+msgstr ""
+
+#: build/index.js:50
+msgid "Import undone."
+msgstr ""
+
+#: build/index.js:50
+msgid "Appearance"
+msgstr ""
+
+#: build/index.js:50
+msgid "Theme"
+msgstr ""
+
+#: build/index.js:50
+msgid "Light"
+msgstr ""
+
+#: build/index.js:50
+msgid "Dark"
+msgstr ""
+
+#: build/index.js:50
+msgid "Defaults"
+msgstr ""
+
+#: build/index.js:50
+msgid "New page (draft)"
+msgstr ""
+
+#: build/index.js:50
+msgid "Auto uses Atomic elements (v4) when the Atomic editor is on, otherwise classic widgets (v3)."
+msgstr ""
+
+#: build/index.js:50
+msgid "Auto"
+msgstr ""
+
+#: build/index.js:50
+msgid "Replace changes the four system globals for the whole site. A backup is always kept."
+msgstr ""
+
+#: build/index.js:50
+msgid "Merge (add as custom globals)"
+msgstr ""
+
+#: build/index.js:50
+msgid "Replace system globals"
+msgstr ""
+
+#: build/index.js:50
+msgid "Import remote images into the Media Library"
+msgstr ""
+
+#: build/index.js:50
+msgid "When off, images hosted elsewhere keep their original address."
+msgstr ""
+
+#: build/index.js:50
+msgid "Keep uploaded files for re-runs"
+msgstr ""
+
+#: build/index.js:50
+msgid "Otherwise they are deleted after import, or after 24 hours."
+msgstr ""
+
+#: build/index.js:50
+msgid "Privacy"
+msgstr ""
+
+#: build/index.js:50
+msgid "Ai2Kit converts in your browser and saves on your server. It makes no requests to Ai2Kit or any other service."
+msgstr ""
+
+#: build/index.js:50
+msgid "Settings saved."
+msgstr ""
+
+#: build/index.js:50
+msgid "Save settings"
+msgstr ""
+
+#: build/index.js:50
+msgid "My React/Vite site converts to a blank page"
+msgstr ""
+
+#: build/index.js:50
+msgid "Upload the built output (the dist folder as a ZIP), not the project source. Build with a relative base so asset paths work from any folder."
+msgstr ""
+
+#: build/index.js:50
+msgid "Images are missing"
+msgstr ""
+
+#: build/index.js:50
+msgid "The build uses absolute paths (/assets/…). Ai2Kit fixes most automatically; building with --base=./ fixes the rest."
+msgstr ""
+
+#: build/index.js:50
+msgid "Imported pages render blank"
+msgstr ""
+
+#: build/index.js:50
+msgid "Turn on Flexbox Container in Elementor → Settings → Features. The Check step can do it for you."
+msgstr ""
+
+#: build/index.js:50
+msgid "A section looks different"
+msgstr ""
+
+#: build/index.js:50
+msgid "Switch it to HTML in Review to keep it pixel-exact, or keep it Native and adjust it in Elementor."
+msgstr ""
+
+#: build/index.js:50
+msgid "Fonts don't match"
+msgstr ""
+
+#: build/index.js:50
+msgid "Ai2Kit sets the font family on each widget; Elementor loads Google Fonts automatically. Self-hosted fonts need to be added in Elementor → Custom Fonts."
+msgstr ""
+
+#: build/index.js:50
+msgid "Quick answers to the most common questions."
+msgstr ""
+
+#: build/index.js:50
+msgid "Build a Lovable, Bolt or Vite project for upload"
+msgstr ""
+
+#: build/index.js:50
+msgid "Troubleshooting"
+msgstr ""
+
+#: build/index.js:50
+msgid "Known limits"
+msgstr ""
+
+#: build/index.js:50
+msgid "Ai2Kit converts presentational pages. App logic and backends (logins, dashboards, databases), canvas/WebGL, and complex absolutely positioned layouts are kept as HTML or not converted."
+msgstr ""
+
+#: build/index.js:50
+msgid "Convert every route of a site in one job"
+msgstr ""
+
+#: build/index.js:50
+msgid "Header and footer templates, and real WordPress menus"
+msgstr ""
+
+#: build/index.js:50
+msgid "Native tabs, carousels, counters and popups"
+msgstr ""
+
+#: build/index.js:50
+msgid "Forms with email delivery and spam protection"
+msgstr ""
+
+#: build/index.js:50
+msgid "Repeated cards → custom post types with loop templates"
+msgstr ""
+
+#: build/index.js:50
+msgid "Entrance animations and Elementor v4 classes & variables"
+msgstr ""
+
+#: build/index.js:50
+msgid "Kit export, cloud builds and a Chrome companion"
+msgstr ""
+
+#: build/index.js:50
+msgid "Ai2Kit Pro"
+msgstr ""
+
+#: build/index.js:50
+msgid "Convert whole sites, not just pages."
+msgstr ""
+
+#: build/index.js:50
+msgid "Everything in Ai2Kit Free stays free and unlimited. Pro is a separate add-on."
+msgstr ""
+
+#: build/index.js:50
+msgid "Learn about Pro"
+msgstr ""

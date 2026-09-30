@@ -30,10 +30,13 @@ const PATHS: Record< string, string > = {
 
 export type IconName = keyof typeof PATHS;
 
+/** Icons that point along the reading direction: mirrored in right-to-left languages. */
+const DIRECTIONAL = new Set< string >( [ 'arrowRight', 'arrowLeft', 'chevronRight', 'undo' ] );
+
 export function Icon( { name, size = 16, label, className }: { name: IconName; size?: number; label?: string; className?: string } ) {
 	return (
 		<svg
-			className={ className }
+			className={ DIRECTIONAL.has( name ) ? [ 'a2k-dir-icon', className ].filter( Boolean ).join( ' ' ) : className }
 			width={ size }
 			height={ size }
 			viewBox="0 0 24 24"

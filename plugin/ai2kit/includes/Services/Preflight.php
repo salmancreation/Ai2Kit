@@ -81,7 +81,7 @@ final class Preflight {
 				'atomic',
 				'success',
 				$atomic ? __( 'Atomic editor (v4) is on', 'ai2kit' ) : __( 'Classic widgets (v3)', 'ai2kit' ),
-				$atomic ? __( 'Pages use classic widgets, which work alongside v4 elements. Atomic output is coming in a later version.', 'ai2kit' ) : __( 'Pages use containers and classic widgets.', 'ai2kit' )
+				$atomic ? __( 'Pages use atomic elements (v4). Widgets without an atomic version stay classic, on the same page.', 'ai2kit' ) : __( 'Pages use containers and classic widgets.', 'ai2kit' )
 			);
 			$add(
 				'pro',

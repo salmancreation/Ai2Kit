@@ -89,6 +89,9 @@ final class Menu {
 	public function render() {
 		$built = file_exists( AI2KIT_DIR . 'build/index.js' );
 		echo '<div class="wrap ai2kit-wrap">';
+		// Where core's common.js moves admin notices — outside the React root (otherwise it inserts
+		// them after the app's own <h1>). The app gathers them into its "Site notices" pill.
+		echo '<hr class="wp-header-end">';
 		echo '<div id="ai2kit-root" class="ai2kit-app" data-screen="' . esc_attr( $this->current_screen() ) . '">';
 		if ( ! $built ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'The Ai2Kit admin app has not been built yet. Run the build and reload this page.', 'ai2kit' ) . '</p></div>';
