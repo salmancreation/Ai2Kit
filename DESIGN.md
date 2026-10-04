@@ -1,5 +1,5 @@
 # DESIGN.md — Ai2Kit Design System
-Version 1.0 · Pairs with `PRD.md` · Scope: the plugin's wp-admin app, the docs/marketing site, and the Chrome companion popup.
+Version 1.0 · Pairs with the product spec (PRD, kept privately) · Scope: the plugin's wp-admin app, the docs/marketing site, and the Chrome companion popup.
 
 ---
 

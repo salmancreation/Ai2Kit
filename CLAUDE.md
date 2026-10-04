@@ -1,6 +1,6 @@
 # CLAUDE.md — Ai2Kit
 
-Source of truth: [PRD.md](PRD.md) (product + architecture) and [DESIGN.md](DESIGN.md) (UI tokens + patterns). Read the relevant section before changing behaviour.
+Source of truth: `PRD.md` (product + architecture; kept in the private sibling repo `../Ai2Kit-Pro` because it holds pricing and strategy — code comments cite it as "PRD §…") and [DESIGN.md](DESIGN.md) (UI tokens + patterns). Read the relevant section before changing behaviour.
 
 ## Layout
 ```
