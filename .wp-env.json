@@ -4,8 +4,7 @@
   "phpVersion": "8.2",
   "plugins": [
     "./.deps/elementor",
-    "./plugin/ai2kit",
-    "./plugin/ai2kit-pro"
+    "./plugin/ai2kit"
   ],
   "themes": [
     "./.deps/hello-elementor"

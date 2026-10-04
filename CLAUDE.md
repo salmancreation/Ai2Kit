@@ -6,9 +6,9 @@ Source of truth: [PRD.md](PRD.md) (product + architecture) and [DESIGN.md](DESIG
 ```
 packages/engine/     TS, zero runtime deps. capture → normalize → recognize → tokens → emit-v3 (+ score, detect)
 packages/admin-ui/   React admin app (@wordpress/element), built with @wordpress/scripts → plugin/ai2kit/build (engine.js + index.js)
-packages/pro/        Ai2Kit Pro engine extensions + UI → plugin/ai2kit-pro/build (never shipped in Free: wp.org forbids locked code)
 plugin/ai2kit/       Free WP plugin (PHP 7.4+, namespace ModinaTheme\Ai2Kit, PSR-4 in includes/)
-plugin/ai2kit-pro/   Pro add-on (namespace ModinaTheme\Ai2KitPro; Requires Plugins: ai2kit, elementor)
+../Ai2Kit-Pro/       Pro add-on — a SEPARATE PRIVATE repo (this repo is public; never add Pro code here).
+                     Local wp-env loads it via the gitignored .wp-env.override.json.
 tests/fixtures/      source/ (AI-built sites) · elementor/ (reference JSON exported from real Elementor)
 ```
 
@@ -31,9 +31,7 @@ node scripts/i18n/build-po.mjs bn_BD       # Bangla .po from scripts/i18n/bn_BD.
 node tests/e2e/screenshots.mjs --out .wordpress-org   # wp.org screenshots (--locale bn_BD for QA)
 node scripts/wporg/assets.mjs              # wp.org icon + banners
 npm run e2e:agent                          # agent tools over real MCP (STDIO): create job → browser converts → get-job → undo
-pnpm --filter @ai2kit/pro test|build       # Pro extensions (Vitest) / build → plugin/ai2kit-pro/build
-npm run e2e:site                           # Pro: whole site (lovable-site-dist.zip) → pages + header/footer + menu + form + animations, homepage, undo
-npm run lint:php:pro                       # PHPCS for the Pro add-on
+# Pro (in ../Ai2Kit-Pro): npm test | npm run build | npm run release | npm run lint:php | npm run e2e:site
 ```
 Docs: `docs/` (user docs + `docs/qa-checklist.md`, run before every release). CI: `.github/workflows/ci.yml`; tag `vX.Y.Z` → `deploy.yml` publishes to wp.org SVN.
 
