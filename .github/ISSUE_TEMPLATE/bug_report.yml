@@ -1,0 +1,38 @@
+name: Bug report
+description: A page that converts badly, an error, or something that doesn't work.
+labels: [ "bug" ]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the report! For security problems, please use **Security → Report a vulnerability** instead (see SECURITY.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead. Screenshots help.
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where does the page come from?
+      options: [ Lovable, Bolt, v0 / Next.js, "Claude / ChatGPT / Gemini HTML", HTML template, Other ]
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Conversion report
+      description: Ai2Kit → History → View report (copy the section list and any warnings).
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: Ai2Kit 0.3.0 · WordPress 7.1 · Elementor 4.3.3 · PHP 8.2 · Theme
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Source file (optional)
+      description: If you can share it, attach the .html or .zip you converted (only if you have the right to share it).
