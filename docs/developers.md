@@ -51,3 +51,13 @@ All strings use the `ai2kit` text domain.
 ## Releasing
 
 `node scripts/release.mjs` runs the tests, builds the admin app, and produces `dist/ai2kit-<version>.zip`. Pushing a `v*` tag runs the GitHub Actions deploy to WordPress.org (see `.github/workflows/deploy.yml`); listing screenshots, banner and icon live in `.wordpress-org/`.
+
+## Extension API (add-ons such as Ai2Kit Pro)
+
+Ai2Kit Free contains no locked features. Add-ons extend it through documented hooks.
+
+**Engine** (`window.ai2kit.engine`, script handle `ai2kit-engine`): `registerExtension( { name, watch, captureDesktop, captureBreakpoint, detect, emitV3, emitV4, afterEmitV3, afterEmitV4 } )`. With no extensions registered, output is unchanged. See `packages/engine/src/extend.ts`.
+
+**Admin app** (`@wordpress/hooks`): `ai2kit.check.pages` (the Check step's "Pages" row), `ai2kit.convert.morePages` (convert further pages of a job), `ai2kit.import` (import several pages).
+
+**PHP:** `ai2kit_enqueue_admin_scripts`, `ai2kit_admin_script_dependencies`, `ai2kit_admin_config`, `ai2kit_allowed_widgets`, `ai2kit_nested_widgets`, `ai2kit_import_result`, `ai2kit_undo_import`. Check `AI2KIT_EXTENSION_API` (currently `1`) before using them.

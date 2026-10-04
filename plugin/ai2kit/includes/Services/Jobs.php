@@ -22,7 +22,6 @@ final class Jobs {
 	 * @param array<string, mixed> $file Upload array.
 	 * @return array<string, mixed>
 	 * @throws IngestException On invalid input.
-	 * @throws \Throwable Rethrown after cleaning up the job folder.
 	 */
 	public static function from_upload( array $file ) {
 		if ( ! empty( $file['error'] ) ) {
@@ -41,6 +40,35 @@ final class Jobs {
 		if ( ! $tmp || ! is_file( $tmp ) || ( ! $trusted && ! is_uploaded_file( $tmp ) ) ) {
 			throw new IngestException( 'ai2kit_upload_failed', __( 'The upload didn\'t finish.', 'ai2kit' ), __( 'Try again.', 'ai2kit' ) );
 		}
+		return self::from_file( $tmp, $name, $size );
+	}
+
+	/**
+	 * From a Media Library attachment (agent tools: a file already on this site, never a remote URL).
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return array<string, mixed>
+	 * @throws IngestException On invalid input.
+	 */
+	public static function from_attachment( $attachment_id ) {
+		$path = 'attachment' === get_post_type( $attachment_id ) ? get_attached_file( $attachment_id ) : false;
+		if ( ! $path || ! is_file( $path ) ) {
+			throw new IngestException( 'ai2kit_no_attachment', __( 'That Media Library file doesn\'t exist.', 'ai2kit' ), __( 'Upload the .zip or .html file to the Media Library and use its attachment ID.', 'ai2kit' ), 404 );
+		}
+		return self::from_file( $path, sanitize_file_name( wp_basename( $path ) ), (int) filesize( $path ) );
+	}
+
+	/**
+	 * From a file on this server whose origin was already checked.
+	 *
+	 * @param string $tmp  Path.
+	 * @param string $name Original file name (sanitized).
+	 * @param int    $size Reported size in bytes.
+	 * @return array<string, mixed>
+	 * @throws IngestException On invalid input.
+	 * @throws \Throwable Rethrown after cleaning up the job folder.
+	 */
+	private static function from_file( $tmp, $name, $size ) {
 		$max = Settings::max_upload_bytes();
 		if ( $size > $max || filesize( $tmp ) > $max ) {
 			throw new IngestException(
@@ -214,6 +242,58 @@ final class Jobs {
 			'importedAt' => $job['imported_at'] ? self::iso( $job['imported_at'] ) : null,
 			'result'     => $job['result'],
 			'canRerun'   => $files_exist,
+		);
+	}
+
+	/**
+	 * An uploaded, not yet converted job as the Convert screen needs it after an
+	 * upload, rebuilt from its folder (a job created by an agent opens by link).
+	 *
+	 * @param array<string, mixed> $job Row.
+	 * @return array<string, mixed>|null Null when the job can't be converted any more.
+	 */
+	public static function upload_view( array $job ) {
+		$dir   = Paths::job_dir( $job['uuid'] );
+		$entry = $dir . '/' . $job['entry'];
+		if ( 'uploaded' !== $job['status'] || ! is_file( $entry ) ) {
+			return null;
+		}
+		$files = array();
+		$iter  = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ) );
+		foreach ( $iter as $f ) {
+			if ( $f->isFile() ) {
+				$files[] = str_replace( '\\', '/', substr( $f->getPathname(), strlen( $dir ) + 1 ) );
+			}
+		}
+		sort( $files );
+		$html = AssetRewriter::strip_sandbox( (string) file_get_contents( $entry ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+
+		$view               = self::public_view( $job );
+		$view['files']      = array_slice( $files, 0, 400 );
+		$view['fileCount']  = count( $files );
+		$view['entryHtml']  = substr( $html, 0, 200000 );
+		$view['skipped']    = array();
+		$view['rewrite']    = array(
+			'fixed'   => 0,
+			'missing' => array(),
+		);
+		$view['hasScripts'] = ZipIngest::has_scripts( $dir, $files );
+		return $view;
+	}
+
+	/**
+	 * The admin screen that converts an uploaded job.
+	 *
+	 * @param string $uuid Job UUID.
+	 * @return string
+	 */
+	public static function review_url( $uuid ) {
+		return add_query_arg(
+			array(
+				'page' => 'ai2kit',
+				'job'  => $uuid,
+			),
+			admin_url( 'admin.php' )
 		);
 	}
 

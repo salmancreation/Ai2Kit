@@ -5,8 +5,10 @@ Source of truth: `PRD.md` (product + architecture; kept in the private sibling r
 ## Layout
 ```
 packages/engine/     TS, zero runtime deps. capture → normalize → recognize → tokens → emit-v3 (+ score, detect)
-packages/admin-ui/   React admin app (@wordpress/element), built with @wordpress/scripts → plugin/ai2kit/build
+packages/admin-ui/   React admin app (@wordpress/element), built with @wordpress/scripts → plugin/ai2kit/build (engine.js + index.js)
 plugin/ai2kit/       Free WP plugin (PHP 7.4+, namespace ModinaTheme\Ai2Kit, PSR-4 in includes/)
+../Ai2Kit-Pro/       Pro add-on — a SEPARATE PRIVATE repo (this repo is public; never add Pro code here).
+                     Local wp-env loads it via the gitignored .wp-env.override.json.
 tests/fixtures/      source/ (AI-built sites) · elementor/ (reference JSON exported from real Elementor)
 ```
 
@@ -28,6 +30,8 @@ node scripts/release.mjs                   # tests + build + zip → dist/ai2kit
 node scripts/i18n/build-po.mjs bn_BD       # Bangla .po from scripts/i18n/bn_BD.json (fails on missing/stale strings or placeholder mismatch)
 node tests/e2e/screenshots.mjs --out .wordpress-org   # wp.org screenshots (--locale bn_BD for QA)
 node scripts/wporg/assets.mjs              # wp.org icon + banners
+npm run e2e:agent                          # agent tools over real MCP (STDIO): create job → browser converts → get-job → undo
+# Pro (in ../Ai2Kit-Pro): npm test | npm run build | npm run release | npm run lint:php | npm run e2e:site
 ```
 Docs: `docs/` (user docs + `docs/qa-checklist.md`, run before every release). CI: `.github/workflows/ci.yml`; tag `vX.Y.Z` → `deploy.yml` publishes to wp.org SVN.
 
@@ -59,6 +63,14 @@ Docs: `docs/` (user docs + `docs/qa-checklist.md`, run before every release). CI
 - i18n: every visible string goes through `ai2kit`. Engine text (warnings, section labels, detection evidence) stays English in the engine (it's also Elementor `_title`s) and is translated in the UI by `packages/admin-ui/src/lib/engineText.ts` — add new engine messages there. Put `/* translators: */` directly before the `__()` call or minification drops it. After changing strings: rebuild the UI, `make-pot`, update `scripts/i18n/bn_BD.json`. WordPress.org language packs deliver translations (no `load_plugin_textdomain`); test locally by compiling into `wp-content/languages/plugins`.
 - RTL: `@wordpress/scripts` builds `index-rtl.css` with rtlcss, which mirrors left/right, `transform-origin` and `translateX` automatically — never add manual `.rtl` overrides (they get flipped a second time). Direction icons use `--a2k-dir` (a variable rtlcss leaves alone). Test RTL with a `gettext_with_context` 'text direction' filter (flipping `$wp_locale` at `init` is too late for the stylesheets).
 - Admin notices: core's common.js moves notices after the first `.wrap h1` — our React `<h1>` — unless there's an `hr.wp-header-end`; `Menu::render` prints one before the app root. Elementor's notices use `.e-notice`.
+- Agent tools (`includes/Abilities.php`): WordPress Abilities (6.9+, guarded by `function_exists`) with `meta.public` + `meta.mcp.public`, so the MCP Adapter's default server exposes them via `mcp-adapter-discover-abilities` / `-execute-ability`. Elementor 4.3+ bundles the adapter (`vendor/wordpress/mcp-adapter`). The Abilities API validates input *and output* against the schemas — keep `summary()` and `job_schema()` in sync. Conversion needs a browser, so `create-job` returns `review_url` (`admin.php?page=ai2kit&job=…` → Convert loads `GET /jobs/{uuid}?upload=1` and starts at Check). Never accept remote URLs (SSRF). In integration tests the bundled adapter triggers a `WP_Abilities_Registry::get_registered` notice — `TestCase::assert_post_conditions` ignores it.
+- Pro architecture: Free exposes an extension API, Pro plugs in. Engine: `registerExtension()` (`src/extend.ts`) with hooks `watch` (from page load), `captureDesktop`/`captureBreakpoint`, `detect` (any captured node; first match wins, before core rules), `emitV3`/`emitV4` (nodes with a pattern), `afterEmitV3`/`afterEmitV4` (every element). `CapturedNode.extra` → `IRNode.extra` carries extension capture data; `NodeStats.handled` marks patterns mapped natively (no "kept static" penalty/Pro hint). The engine is its own script (`window.ai2kit.engine`, handle `ai2kit-engine`); Pro's webpack maps `@ai2kit/engine` to it. Admin: `@wordpress/hooks` filters `ai2kit.check.pages`, `ai2kit.convert.morePages`, `ai2kit.import`. PHP: `ai2kit_enqueue_admin_scripts`, `ai2kit_admin_script_dependencies`, `ai2kit_admin_config`, `ai2kit_allowed_widgets`, `ai2kit_nested_widgets`, `ai2kit_import_result`, `ai2kit_undo_import`; constant `AI2KIT_EXTENSION_API`. No `isPro` checks in Free.
+- Pro capture of on-demand content (tabs, dialogs): open it like a visitor (Radix Tabs select on mousedown, Dialog on click), `captureSubtree` with `stampSubtree` keys (document order, so re-mounted markup aligns at other widths), then restore the original state AND put the page's keys back on the re-mounted element — later core breakpoints need them.
+- Nested Tabs defaults (#f1f2f3 titles, accent active, 15/35px padding, 10px gaps, 1px content border, accordion on mobile) must be overridden; the tab list's pill → residual CSS on ` .e-n-tabs-heading`. Containers use `css_classes` (widgets `_css_classes`).
+- Multi-page: the preview shim opens SPA routes with `?a2k_route=/about`. Every page imports through Free's Importer with the same tokens (KitWriter is idempotent per job — the map is needed per page); keep the FIRST page's kit backup for Undo. Links between pages are rewritten after import (possessive path regex; URLs with a query are left alone).
+- Shared header/footer templates render on Canvas pages via `elementor/page_templates/canvas/before|after_content`; their styles (incl. atomic v4) must be registered on `elementor/frontend/after_enqueue_styles` with `do_action( 'elementor/post/render', $id )` + Post CSS enqueue, or Elementor prints atomic styles only for the page.
+- v4 entrance animations = element `interactions` `{ version: 1, items: [ interaction-item ] }` (shape from Elementor's Interactions module); Elementor sanitizes/validates them on save. v3 = `animation` (container) / `_animation` (widget) + `animation_duration`.
+- e2e login: wp-login focuses the username field after load — wait, fill, verify both values, then poll the URL (the dashboard's load event can hang).
 - Unmappable styles (gradient text, transforms, filters) go to residual CSS: structured rules from the engine, validated and scoped to `.elementor-{id}` by `ResidualCss`, printed on `elementor/frontend/before_get_builder_content`.
 
 ## Coding rules (PRD §11)

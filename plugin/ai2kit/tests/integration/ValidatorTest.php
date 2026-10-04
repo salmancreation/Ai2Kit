@@ -114,4 +114,61 @@ final class ValidatorTest extends TestCase {
 		$out = ( new Validator() )->document( $this->doc( array( $this->widget( 'image', array( 'image' => array( 'url' => 'data:text/html;base64,PHNjcmlwdD4=', 'id' => '' ) ) ) ) ) );
 		$this->assertSame( '', $out['content'][0]['settings']['image']['url'] );
 	}
+
+	public function test_add_ons_extend_the_widget_allowlist() {
+		$doc = $this->doc( array( $this->widget( 'nested-tabs', array( 'tabs' => array() ) ) ) );
+		$this->assertWPError( ( new Validator() )->document( $doc ), 'unknown widgets are rejected' );
+
+		$allow = static function ( $w ) {
+			return array_merge( $w, array( 'nested-tabs' ) );
+		};
+		add_filter( 'ai2kit_allowed_widgets', $allow );
+		add_filter( 'ai2kit_nested_widgets', $allow );
+		$tabs             = $this->widget( 'nested-tabs', array( 'tabs' => array() ) );
+		$tabs['elements'] = array(
+			array(
+				'id'       => 'bbbbbb1',
+				'elType'   => 'container',
+				'settings' => array(),
+				'elements' => array(),
+			),
+			array(
+				'id'     => 'bbbbbb2',
+				'elType' => 'widget',
+				'widgetType' => 'heading',
+				'settings' => array(),
+			),
+		);
+		$out = ( new Validator() )->document( $this->doc( array( $tabs ) ) );
+		remove_filter( 'ai2kit_allowed_widgets', $allow );
+		remove_filter( 'ai2kit_nested_widgets', $allow );
+		$this->assertIsArray( $out );
+		$this->assertSame( 'nested-tabs', $out['content'][0]['widgetType'] );
+		// Only child containers are kept in nested widgets.
+		$this->assertCount( 1, $out['content'][0]['elements'] );
+	}
+
+	public function test_keeps_atomic_interactions_as_plain_data() {
+		$item = array(
+			'$$type' => 'interaction-item',
+			'value'  => array( 'trigger' => array( '$$type' => 'string', 'value' => 'scrollIn' ) ),
+		);
+		$el   = array(
+			'id'           => 'ccccccc',
+			'elType'       => 'e-flexbox',
+			'settings'     => array(),
+			'elements'     => array(),
+			'interactions' => array( 'version' => 9, 'items' => array( $item, 'junk', $item, $item, $item, $item, $item ) ),
+		);
+		$out  = ( new Validator() )->document( $this->doc( array( $el ) ) );
+		$this->assertIsArray( $out );
+		$kept = $out['content'][0]['interactions'];
+		$this->assertSame( 1, $kept['version'] );
+		$this->assertCount( 5, $kept['items'] );
+		$this->assertSame( $item, $kept['items'][0] );
+
+		$el['interactions'] = 'not an object';
+		$out                = ( new Validator() )->document( $this->doc( array( $el ) ) );
+		$this->assertArrayNotHasKey( 'interactions', $out['content'][0] );
+	}
 }

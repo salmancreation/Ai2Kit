@@ -7,6 +7,7 @@ import { STYLE_PROPS, TEXT_PROPS, isDefault } from './styleProps';
 import { freezeElement, sanitizeInline, serializeSvg } from './freeze';
 import { captureHover } from './hover';
 import { captureCollapsed } from './collapsed';
+import { extensions, type CaptureHookContext } from '../extend';
 
 export const KEY_ATTR = 'data-a2k-key';
 
@@ -30,7 +31,7 @@ const INLINE_TAGS = new Set( [
 	'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr', 'del', 'ins', 'label',
 ] );
 
-const ATTR_ALLOW = /^(id|href|src|srcset|alt|title|role|type|target|rel|poster|name|placeholder|value|for|tabindex|aria-.*|data-state|data-orientation|data-radix-.*|data-slot|data-lov-.*|data-embla.*|data-swiper.*|data-motion.*|class)$/;
+const ATTR_ALLOW = /^(id|href|src|srcset|alt|title|role|type|target|rel|poster|name|placeholder|value|for|tabindex|required|rows|multiple|aria-.*|data-state|data-orientation|data-radix-.*|data-slot|data-lov-.*|data-embla.*|data-swiper.*|data-motion.*|class)$/;
 
 export function measureRect( el: Element ): Rect {
 	const r = el.getBoundingClientRect();
@@ -322,6 +323,30 @@ export function captureTree( env: CaptureEnv ): CapturedNode {
 	return root;
 }
 
+/**
+ * Key an element and all its descendants `{prefix}{document-order index}`.
+ * Independent of visibility, so the same markup re-mounted later (a tab panel
+ * a framework unmounts when closed) gets the same keys at any width.
+ */
+export function stampSubtree( el: Element, prefix: string ): void {
+	el.setAttribute( KEY_ATTR, `${ prefix }0` );
+	el.querySelectorAll( '*' ).forEach( ( d, i ) => d.setAttribute( KEY_ATTR, `${ prefix }${ i + 1 }` ) );
+}
+
+/**
+ * Capture one element's subtree at the current width — for content only
+ * mounted on demand (a closed tab's panel). Keys come from `stampSubtree`, so a
+ * later `stampSubtree` + `captureStyles` at another width aligns with
+ * `applyBreakpoint`.
+ */
+export function captureSubtree( env: CaptureEnv, el: Element, prefix: string ): CapturedNode | null {
+	stampSubtree( el, prefix );
+	const ctx: WalkCtx = { env, next: () => `${ prefix }x`, measure: env.measure ?? measureRect };
+	const root = walk( el, ctx );
+	if ( root ) resolveFonts( root, env.doc );
+	return root;
+}
+
 /** Style snapshot at the current width, keyed by node key. Visible nodes only. */
 export function captureStyles( env: CaptureEnv ): Map< string, { styles: StyleMap; rect: Rect; visible: boolean } > {
 	const measure = env.measure ?? measureRect;
@@ -488,14 +513,15 @@ export async function captureAll(
 	const meta = captureMeta( env, viewport );
 	applyHover( root, captureHover( env.doc, env.win, KEY_ATTR ) );
 	applyPanels( root, ( await captureCollapsed( env.doc, env.win, KEY_ATTR, readStyles ) ).panels );
+	const hookCtx: CaptureHookContext = { env, root, viewport };
+	for ( const ext of extensions() ) await ext.captureDesktop?.( hookCtx );
 
-	onStage?.( 'tablet' );
-	await resize( viewport.tablet );
-	applyBreakpoint( root, 'tablet', captureStyles( env ) );
-
-	onStage?.( 'mobile' );
-	await resize( viewport.mobile );
-	applyBreakpoint( root, 'mobile', captureStyles( env ) );
+	for ( const bp of [ 'tablet', 'mobile' ] as const ) {
+		onStage?.( bp );
+		await resize( viewport[ bp ] );
+		applyBreakpoint( root, bp, captureStyles( env ) );
+		for ( const ext of extensions() ) await ext.captureBreakpoint?.( hookCtx, bp );
+	}
 
 	await resize( viewport.desktop );
 	return { meta, root };

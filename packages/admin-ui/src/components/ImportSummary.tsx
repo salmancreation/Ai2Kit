@@ -34,12 +34,27 @@ export function ImportSummary( { result, onAnother, onUndo, onCompare, canCompar
 
 	const page = result.created[ 0 ];
 	const images = result.media.created.length + result.media.reused;
+	const pages = result.created.filter( ( c ) => c.type === 'page' ).length;
+	const templates = result.created.length - pages;
 	const summary = [
-		sprintf(
-			/* translators: %d: number of pages or templates. */
-			_n( '%d page', '%d pages', result.created.length, 'ai2kit' ),
-			result.created.length
-		),
+		...( pages
+			? [
+					sprintf(
+						/* translators: %d: number of pages. */
+						_n( '%d page', '%d pages', pages, 'ai2kit' ),
+						pages
+					),
+			  ]
+			: [] ),
+		...( templates
+			? [
+					sprintf(
+						/* translators: %d: number of templates. */
+						_n( '%d template', '%d templates', templates, 'ai2kit' ),
+						templates
+					),
+			  ]
+			: [] ),
 		sprintf(
 			/* translators: %d: number of images. */
 			_n( '%d image', '%d images', images, 'ai2kit' ),
@@ -143,7 +158,7 @@ export function ImportSummary( { result, onAnother, onUndo, onCompare, canCompar
 				</Button>
 			</div>
 
-			{ ! proHidden && (
+			{ ! proHidden && ! window.ai2kitConfig.pro && (
 				<Card className={ s.proCard }>
 					<div>
 						<strong>{ __( 'Convert all pages at once with Pro.', 'ai2kit' ) }</strong>

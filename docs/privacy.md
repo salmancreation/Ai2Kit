@@ -19,3 +19,4 @@
 - The browser's output is never trusted: the server re-validates every element and setting, sanitizes text and URLs, and cleans SVGs with an allowlist before saving.
 - Scoped CSS is rebuilt on the server from validated values only.
 - Every REST endpoint checks permissions and a WordPress nonce.
+- Agent tools ([AI agents](agents.md)) are for administrators only. They accept HTML or a Media Library file, never a web address to download.

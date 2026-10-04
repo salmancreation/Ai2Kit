@@ -31,5 +31,7 @@ interface Window {
 		userId: number;
 		isRtl: boolean;
 		logo: string;
+		/** Set by the Ai2Kit Pro add-on when it's active. */
+		pro?: { version: string };
 	};
 }

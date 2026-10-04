@@ -24,7 +24,7 @@ export function Shell( { center, children }: { center?: ReactNode; children: Rea
 					<SiteNotices />
 					<a href={ `${ admin }admin.php?page=ai2kit-help` }>{ __( 'Docs', 'ai2kit' ) }</a>
 					<a href={ `${ admin }admin.php?page=ai2kit-pro` } className={ s.pro }>
-						{ __( 'Pro', 'ai2kit' ) }
+						{ window.ai2kitConfig.pro ? __( 'Pro active', 'ai2kit' ) : __( 'Pro', 'ai2kit' ) }
 					</a>
 				</nav>
 			</header>

@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Ai2Kit – AI Website to Elementor Converter 0.3.0\n"
-"Report-Msgid-Bugs-To: https://github.com/salmancreation/Ai2Kit/issues\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ai2kit\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Bengali (Bangladesh)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-29T20:07:21+00:00\n"
+"POT-Creation-Date: 2026-09-30T21:57:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: ai2kit\n"
@@ -41,29 +41,145 @@ msgstr "ModinaTheme"
 msgid "https://modinatheme.com"
 msgstr "https://modinatheme.com"
 
+#: includes/Abilities.php:61
 #: includes/Admin/Menu.php:59
-#: build/index.js:26
+#: build/index.js:31
 msgid "Ai2Kit"
 msgstr "Ai2Kit"
 
+#: includes/Abilities.php:62
+msgid "Convert AI-built websites (Lovable, Bolt, v0, HTML) into editable Elementor pages."
+msgstr "AI দিয়ে বানানো ওয়েবসাইট (Lovable, Bolt, v0, HTML) এডিটযোগ্য Elementor পেজে কনভার্ট করুন।"
+
+#: includes/Abilities.php:87
+msgid "The conversion job ID (a UUID) from ai2kit/create-job or ai2kit/list-jobs."
+msgstr "কনভার্সন জবের ID (একটি UUID), ai2kit/create-job বা ai2kit/list-jobs থেকে পাওয়া।"
+
+#: includes/Abilities.php:93
+msgid "Create a conversion job"
+msgstr "কনভার্সন জব তৈরি করুন"
+
+#: includes/Abilities.php:94
+msgid "Prepares an AI-built website for conversion into an Elementor page. Give either the full HTML of a page (for example one you generated), or the attachment ID of a .zip or .html file in the Media Library (a built Lovable, Bolt or v0 dist folder, or an HTML template). Remote URLs are not accepted. The conversion runs in the browser: give the returned review_url to the user, who opens it in wp-admin, clicks \"Start conversion\", reviews and imports. Then use ai2kit/get-job to read the result."
+msgstr "AI দিয়ে বানানো একটি ওয়েবসাইটকে Elementor পেজে কনভার্সনের জন্য প্রস্তুত করে। একটি পেজের পুরো HTML দিন (যেমন আপনার তৈরি করা), অথবা Media Library-তে থাকা একটি .zip বা .html ফাইলের attachment ID দিন (Lovable, Bolt বা v0-এর বিল্ড করা dist ফোল্ডার, বা একটি HTML টেমপ্লেট)। রিমোট URL গ্রহণ করা হয় না। কনভার্সন ব্রাউজারে চলে: ফেরত পাওয়া review_url ব্যবহারকারীকে দিন; তিনি সেটি wp-admin-এ খুলে \"কনভার্সন শুরু করুন\" ক্লিক করবেন, রিভিউ করে ইমপোর্ট করবেন। তারপর ফলাফল পড়তে ai2kit/get-job ব্যবহার করুন।"
+
+#: includes/Abilities.php:103
+msgid "A complete HTML page (inline CSS, or Tailwind from its CDN, is fine)."
+msgstr "একটি সম্পূর্ণ HTML পেজ (ইনলাইন CSS, অথবা CDN থেকে Tailwind — দুটোই চলবে)।"
+
+#: includes/Abilities.php:108
+msgid "Media Library attachment ID of a .zip or .html file."
+msgstr "একটি .zip বা .html ফাইলের Media Library attachment ID।"
+
+#: includes/Abilities.php:113
+msgid "Optional title for the page or template. Defaults to the page's <title>."
+msgstr "পেজ বা টেমপ্লেটের ঐচ্ছিক শিরোনাম। না দিলে পেজের <title> ব্যবহার হয়।"
+
+#: includes/Abilities.php:124
+msgid "List conversions"
+msgstr "কনভার্সনের তালিকা"
+
+#: includes/Abilities.php:125
+msgid "Lists recent Ai2Kit conversions, newest first: imported pages with their edit links and scores, jobs waiting to be converted, undone and failed ones."
+msgstr "সাম্প্রতিক Ai2Kit কনভার্সনগুলোর তালিকা, নতুনগুলো আগে: এডিট লিংক ও স্কোরসহ ইমপোর্ট হওয়া পেজ, কনভার্সনের অপেক্ষায় থাকা জব, আনডু ও ব্যর্থ হওয়াগুলো।"
+
+#: includes/Abilities.php:134
+msgid "Only jobs with this status. \"uploaded\" means waiting to be converted."
+msgstr "শুধু এই স্ট্যাটাসের জব। \"uploaded\" মানে কনভার্সনের অপেক্ষায়।"
+
+#: includes/Abilities.php:160
+msgid "Get a conversion"
+msgstr "একটি কনভার্সন দেখুন"
+
+#: includes/Abilities.php:161
+msgid "Status and report of one conversion: created pages (edit and view links), overall and per-section match scores, which sections were kept as HTML, and anything to check after import (forms, images, icons)."
+msgstr "একটি কনভার্সনের স্ট্যাটাস ও রিপোর্ট: তৈরি হওয়া পেজ (এডিট ও ভিউ লিংক), সামগ্রিক ও প্রতিটি সেকশনের মিলের স্কোর, কোন সেকশন HTML হিসেবে রাখা হয়েছে, এবং ইমপোর্টের পর যা যাচাই করতে হবে (ফর্ম, ছবি, আইকন)।"
+
+#: includes/Abilities.php:175
+msgid "Undo an import"
+msgstr "একটি ইমপোর্ট আনডু করুন"
+
+#: includes/Abilities.php:176
+msgid "Undoes an imported conversion: moves its pages to the trash, deletes the images it added and restores the previous Global Colors and Fonts. Refuses when the pages were edited since import unless confirm_edited is true — ask the user first."
+msgstr "একটি ইমপোর্ট আনডু করে: এর পেজগুলো ট্র্যাশে সরায়, যোগ করা ছবিগুলো মুছে দেয় এবং আগের Global Colors ও Fonts ফিরিয়ে আনে। ইমপোর্টের পর পেজ এডিট করা হলে confirm_edited true না দেওয়া পর্যন্ত আনডু করে না — আগে ব্যবহারকারীকে জিজ্ঞেস করুন।"
+
+#: includes/Abilities.php:185
+msgid "Undo even if the pages were edited after import (those edits are lost from the page, which stays in the trash)."
+msgstr "ইমপোর্টের পর পেজ এডিট করা হলেও আনডু করুন (সেই এডিটগুলো পেজ থেকে হারিয়ে যায়; পেজটি ট্র্যাশে থাকে)।"
+
+#: includes/Abilities.php:205
+msgid "Check the site"
+msgstr "সাইট যাচাই করুন"
+
+#: includes/Abilities.php:206
+msgid "Checks that this site can import conversions: Elementor version, Flexbox Container, SVG uploads, memory, time and upload limits, and whether the current user may convert sites that run JavaScript. Blocking checks must be fixed in wp-admin → Ai2Kit first."
+msgstr "এই সাইট কনভার্সন ইমপোর্ট করতে পারবে কি না যাচাই করে: Elementor ভার্সন, Flexbox Container, SVG আপলোড, মেমরি, সময় ও আপলোড লিমিট, এবং বর্তমান ব্যবহারকারী JavaScript চালানো সাইট কনভার্ট করতে পারবেন কি না। আটকে দেওয়া চেকগুলো আগে wp-admin → Ai2Kit-এ ঠিক করতে হবে।"
+
+#: includes/Abilities.php:263
+msgid "Give either html or attachment_id (exactly one)."
+msgstr "html অথবা attachment_id দিন (ঠিক একটি)।"
+
+#: includes/Abilities.php:279
+#: includes/Services/Jobs.php:210
+msgid "We couldn't save this conversion."
+msgstr "এই কনভার্সনটি সেভ করা যায়নি।"
+
+#: includes/Abilities.php:324
+#: includes/Rest/Routes.php:282
+msgid "Only imported conversions can be undone."
+msgstr "শুধু ইমপোর্ট করা কনভার্সনই আনডু করা যায়।"
+
+#: includes/Abilities.php:327
+msgid "These pages were edited after import. Ask the user, then call again with confirm_edited: true to undo anyway."
+msgstr "ইমপোর্টের পর এই পেজগুলো এডিট করা হয়েছে। ব্যবহারকারীকে জিজ্ঞেস করুন, তারপর তবুও আনডু করতে confirm_edited: true দিয়ে আবার কল করুন।"
+
+#: includes/Abilities.php:367
+#: includes/Rest/Routes.php:206
+#: includes/Rest/Routes.php:228
+#: includes/Rest/Routes.php:243
+#: includes/Rest/Routes.php:265
+#: includes/Rest/Routes.php:279
+msgid "This conversion no longer exists."
+msgstr "এই কনভার্সনটি আর নেই।"
+
+#: includes/Abilities.php:407
+msgid "Waiting for conversion. Give the user review_url: they open it in wp-admin, click \"Start conversion\", review the sections and click \"Import to WordPress\". Then call ai2kit/get-job."
+msgstr "কনভার্সনের অপেক্ষায়। ব্যবহারকারীকে review_url দিন: তিনি সেটি wp-admin-এ খুলে \"কনভার্সন শুরু করুন\" ক্লিক করবেন, সেকশনগুলো রিভিউ করে \"WordPress-এ ইমপোর্ট করুন\" ক্লিক করবেন। তারপর ai2kit/get-job কল করুন।"
+
+#: includes/Abilities.php:408
+msgid "The uploaded files were cleaned up. Create a new job."
+msgstr "আপলোড করা ফাইলগুলো মুছে ফেলা হয়েছে। নতুন একটি জব তৈরি করুন।"
+
+#: includes/Abilities.php:411
+msgid "Imported as a draft. Share edit_url so the user can review and publish it in Elementor. ai2kit/undo-import reverts it."
+msgstr "ড্রাফট হিসেবে ইমপোর্ট হয়েছে। edit_url শেয়ার করুন, যাতে ব্যবহারকারী Elementor-এ রিভিউ করে পাবলিশ করতে পারেন। ai2kit/undo-import এটি ফিরিয়ে নেয়।"
+
+#: includes/Abilities.php:414
+msgid "This import was undone."
+msgstr "এই ইমপোর্টটি আনডু করা হয়েছে।"
+
+#: includes/Abilities.php:417
+msgid "The import failed. Ask the user to try again from wp-admin → Ai2Kit, where the error is shown."
+msgstr "ইমপোর্ট ব্যর্থ হয়েছে। ব্যবহারকারীকে wp-admin → Ai2Kit থেকে আবার চেষ্টা করতে বলুন, সেখানে ত্রুটিটি দেখানো হয়।"
+
 #: includes/Admin/Menu.php:60
-#: includes/Admin/Menu.php:158
+#: includes/Admin/Menu.php:184
 #: build/index.js:43
 msgid "Convert"
 msgstr "কনভার্ট"
 
 #: includes/Admin/Menu.php:61
-#: build/index.js:50
+#: build/index.js:51
 msgid "History"
 msgstr "হিস্ট্রি"
 
 #: includes/Admin/Menu.php:62
-#: build/index.js:50
+#: build/index.js:51
 msgid "Settings"
 msgstr "সেটিংস"
 
 #: includes/Admin/Menu.php:63
-#: build/index.js:50
+#: build/index.js:51
 msgid "Help"
 msgstr "সাহায্য"
 
@@ -83,21 +199,13 @@ msgstr "পেজ কনভার্ট করতে Ai2Kit-এর JavaScript �
 msgid "Choose a file or paste some HTML to convert."
 msgstr "কনভার্ট করতে একটি ফাইল বেছে নিন বা HTML পেস্ট করুন।"
 
-#: includes/Rest/Routes.php:206
-#: includes/Rest/Routes.php:220
-#: includes/Rest/Routes.php:235
-#: includes/Rest/Routes.php:257
-#: includes/Rest/Routes.php:271
-msgid "This conversion no longer exists."
-msgstr "এই কনভার্সনটি আর নেই।"
+#: includes/Rest/Routes.php:212
+msgid "This conversion was already imported, or its files were cleaned up. Start a new one."
+msgstr "এই কনভার্সনটি আগেই ইমপোর্ট হয়েছে, অথবা এর ফাইলগুলো মুছে ফেলা হয়েছে। নতুন একটি শুরু করুন।"
 
-#: includes/Rest/Routes.php:238
+#: includes/Rest/Routes.php:246
 msgid "This conversion was already imported. Start a new one to import again."
 msgstr "এই কনভার্সনটি আগেই ইমপোর্ট করা হয়েছে। আবার ইমপোর্ট করতে নতুন একটি শুরু করুন।"
-
-#: includes/Rest/Routes.php:274
-msgid "Only imported conversions can be undone."
-msgstr "শুধু ইমপোর্ট করা কনভার্সনই আনডু করা যায়।"
 
 #: includes/Services/ElementorWriter.php:34
 msgid "Converted page"
@@ -163,99 +271,103 @@ msgid_plural "%d images couldn't be imported and still point to their original a
 msgstr[0] "%d টি ছবি ইমপোর্ট করা যায়নি, এটি এখনো মূল ঠিকানা থেকে লোড হয়।"
 msgstr[1] "%d টি ছবি ইমপোর্ট করা যায়নি, এগুলো এখনো মূল ঠিকানা থেকে লোড হয়।"
 
-#: includes/Services/Jobs.php:29
-#: includes/Services/Jobs.php:42
+#: includes/Services/Jobs.php:28
+#: includes/Services/Jobs.php:41
 msgid "The upload didn't finish."
 msgstr "আপলোড শেষ হয়নি।"
 
-#: includes/Services/Jobs.php:29
+#: includes/Services/Jobs.php:28
 msgid "Check your connection and the server upload limit, then try again."
 msgstr "আপনার ইন্টারনেট সংযোগ ও সার্ভারের আপলোড লিমিট দেখে আবার চেষ্টা করুন।"
 
-#: includes/Services/Jobs.php:42
+#: includes/Services/Jobs.php:41
 msgid "Try again."
 msgstr "আবার চেষ্টা করুন।"
 
+#: includes/Services/Jobs.php:56
+msgid "That Media Library file doesn't exist."
+msgstr "Media Library-তে এই ফাইলটি নেই।"
+
+#: includes/Services/Jobs.php:56
+msgid "Upload the .zip or .html file to the Media Library and use its attachment ID."
+msgstr ".zip বা .html ফাইলটি Media Library-তে আপলোড করে এর attachment ID ব্যবহার করুন।"
+
 #. translators: %d: size limit in megabytes.
-#: includes/Services/Jobs.php:49
+#: includes/Services/Jobs.php:77
 #, php-format
 msgid "This file is larger than %d MB."
 msgstr "এই ফাইলটি %d MB-এর চেয়ে বড়।"
 
-#: includes/Services/Jobs.php:50
+#: includes/Services/Jobs.php:78
 msgid "Remove large videos or unused files, or raise the limit with the ai2kit_max_upload_bytes filter."
 msgstr "বড় ভিডিও বা অপ্রয়োজনীয় ফাইল সরিয়ে ফেলুন, অথবা ai2kit_max_upload_bytes ফিল্টার দিয়ে লিমিট বাড়ান।"
 
-#: includes/Services/Jobs.php:57
+#: includes/Services/Jobs.php:85
 msgid "This file type isn't supported."
 msgstr "এই ধরনের ফাইল সাপোর্ট করা হয় না।"
 
-#: includes/Services/Jobs.php:57
-#: build/index.js:28
+#: includes/Services/Jobs.php:85
+#: build/index.js:33
 msgid "Upload an .html file or a .zip of your built site."
 msgstr "একটি .html ফাইল অথবা আপনার বিল্ড করা সাইটের .zip আপলোড করুন।"
 
-#: includes/Services/Jobs.php:66
+#: includes/Services/Jobs.php:94
 msgid "This isn't a valid ZIP file."
 msgstr "এটি সঠিক ZIP ফাইল নয়।"
 
-#: includes/Services/Jobs.php:66
+#: includes/Services/Jobs.php:94
 #: includes/Services/ZipIngest.php:97
 #: includes/Services/ZipIngest.php:147
 msgid "Re-create the ZIP and try again."
 msgstr "ZIP ফাইলটি আবার তৈরি করে চেষ্টা করুন।"
 
-#: includes/Services/Jobs.php:94
+#: includes/Services/Jobs.php:122
 msgid "The pasted HTML is larger than 5 MB."
 msgstr "পেস্ট করা HTML 5 MB-এর চেয়ে বড়।"
 
-#: includes/Services/Jobs.php:94
+#: includes/Services/Jobs.php:122
 msgid "Save it as an .html file and upload that instead."
 msgstr "এটিকে একটি .html ফাইল হিসেবে সেভ করে সেটি আপলোড করুন।"
 
-#: includes/Services/Jobs.php:100
+#: includes/Services/Jobs.php:128
 msgid "Pasted HTML"
 msgstr "পেস্ট করা HTML"
 
-#: includes/Services/Jobs.php:118
+#: includes/Services/Jobs.php:146
 msgid "We couldn't create a working folder in wp-content/uploads."
 msgstr "wp-content/uploads-এ কাজের ফোল্ডার তৈরি করা যায়নি।"
 
-#: includes/Services/Jobs.php:118
+#: includes/Services/Jobs.php:146
 msgid "Check that the uploads folder is writable."
 msgstr "uploads ফোল্ডারে লেখার অনুমতি আছে কি না দেখুন।"
 
-#: includes/Services/Jobs.php:140
+#: includes/Services/Jobs.php:168
 #: build/index.js:44
 msgid "This ZIP is the project source, not the built site."
 msgstr "এই ZIP-টি প্রজেক্টের সোর্স, বিল্ড করা সাইট নয়।"
 
-#: includes/Services/Jobs.php:140
+#: includes/Services/Jobs.php:168
 msgid "This ZIP has no index.html."
 msgstr "এই ZIP-এ কোনো index.html নেই।"
 
-#: includes/Services/Jobs.php:141
+#: includes/Services/Jobs.php:169
 #: build/index.js:44
 msgid "Run \"npm run build -- --base=./\" and upload the dist folder as a ZIP."
 msgstr "\"npm run build -- --base=./\" চালান এবং dist ফোল্ডারটি ZIP করে আপলোড করুন।"
 
-#: includes/Services/Jobs.php:141
+#: includes/Services/Jobs.php:169
 msgid "Upload the built dist folder, not the source."
 msgstr "সোর্স নয়, বিল্ড করা dist ফোল্ডারটি আপলোড করুন।"
 
-#: includes/Services/Jobs.php:149
+#: includes/Services/Jobs.php:177
 msgid "This site runs JavaScript, and your account isn't allowed to run scripts on this site."
 msgstr "এই সাইটটি JavaScript চালায়, কিন্তু আপনার অ্যাকাউন্টের এই সাইটে স্ক্রিপ্ট চালানোর অনুমতি নেই।"
 
-#: includes/Services/Jobs.php:150
+#: includes/Services/Jobs.php:178
 msgid "Ask an administrator (or a network super admin on multisite) to convert it."
 msgstr "একজন অ্যাডমিনিস্ট্রেটরকে (মাল্টিসাইটে নেটওয়ার্ক সুপার অ্যাডমিনকে) এটি কনভার্ট করতে বলুন।"
 
-#: includes/Services/Jobs.php:182
-msgid "We couldn't save this conversion."
-msgstr "এই কনভার্সনটি সেভ করা যায়নি।"
-
-#: includes/Services/Jobs.php:182
+#: includes/Services/Jobs.php:210
 msgid "Deactivate and reactivate Ai2Kit to repair its database table."
 msgstr "ডাটাবেস টেবিল ঠিক করতে Ai2Kit একবার নিষ্ক্রিয় করে আবার সক্রিয় করুন।"
 
@@ -316,7 +428,7 @@ msgstr "Atomic এডিটর (v4) চালু আছে"
 
 #: includes/Services/Preflight.php:83
 #: build/index.js:44
-#: build/index.js:50
+#: build/index.js:51
 msgid "Classic widgets (v3)"
 msgstr "ক্লাসিক উইজেট (v3)"
 
@@ -393,25 +505,25 @@ msgstr "আপনি সাধারণ HTML কনভার্ট করতে 
 msgid "This check has no automatic fix."
 msgstr "এই চেকের কোনো স্বয়ংক্রিয় সমাধান নেই।"
 
-#: includes/Services/Validator.php:53
+#: includes/Services/Validator.php:67
 msgid "The converted page is empty or malformed."
 msgstr "কনভার্ট করা পেজটি ফাঁকা বা ত্রুটিপূর্ণ।"
 
-#: includes/Services/Validator.php:80
+#: includes/Services/Validator.php:125
 msgid "The converted page is nested too deeply."
 msgstr "কনভার্ট করা পেজে এলিমেন্টগুলো অনেক বেশি স্তরে সাজানো।"
 
-#: includes/Services/Validator.php:85
+#: includes/Services/Validator.php:130
 msgid "The converted page has too many elements."
 msgstr "কনভার্ট করা পেজে অনেক বেশি এলিমেন্ট আছে।"
 
-#: includes/Services/Validator.php:88
+#: includes/Services/Validator.php:133
 msgid "The converted page contains an invalid element."
 msgstr "কনভার্ট করা পেজে একটি অবৈধ এলিমেন্ট আছে।"
 
 #. translators: %s: element type.
-#: includes/Services/Validator.php:98
-#: includes/Services/Validator.php:160
+#: includes/Services/Validator.php:143
+#: includes/Services/Validator.php:209
 #, php-format
 msgid "The converted page contains an unsupported element (%s)."
 msgstr "কনভার্ট করা পেজে একটি অসমর্থিত এলিমেন্ট (%s) আছে।"
@@ -477,7 +589,7 @@ msgid "About Ai2Kit Pro"
 msgstr "Ai2Kit Pro সম্পর্কে"
 
 #: build/index.js:1
-#: build/index.js:37
+#: build/index.js:43
 msgid "Dismiss"
 msgstr "বন্ধ করুন"
 
@@ -585,7 +697,7 @@ msgstr[1] "%d টি বাটন"
 
 #. translators: %d: number of images.
 #: build/index.js:10
-#: build/index.js:34
+#: build/index.js:40
 #, js-format
 msgid "%d image"
 msgid_plural "%d images"
@@ -796,506 +908,46 @@ msgstr "কাউন্টার"
 msgid "Repeated cards"
 msgstr "পুনরাবৃত্ত কার্ড"
 
-#: build/index.js:26
-msgid "Docs"
-msgstr "ডকস"
-
-#: build/index.js:26
-msgid "Pro"
-msgstr "Pro"
-
-#. translators: %d: number of notices from WordPress and other plugins.
-#: build/index.js:27
-#, js-format
-msgid "Site notice (%d)"
-msgid_plural "Site notices (%d)"
-msgstr[0] "সাইট নোটিশ (%d)"
-msgstr[1] "সাইট নোটিশ (%d)"
-
-#: build/index.js:27
-msgid "Upload"
-msgstr "আপলোড"
-
-#: build/index.js:27
-#: build/index.js:44
-msgid "Check"
-msgstr "চেক"
-
-#: build/index.js:27
-#: build/index.js:47
-msgid "Review"
-msgstr "রিভিউ"
-
-#: build/index.js:27
-msgid "Import"
-msgstr "ইমপোর্ট"
-
-#: build/index.js:27
-msgid "Conversion steps"
-msgstr "কনভার্সনের ধাপ"
-
-#: build/index.js:27
-msgid "ZIP"
-msgstr "ZIP"
-
-#: build/index.js:27
-#: build/index.js:28
-#: build/index.js:31
-#: build/index.js:49
-#: build/index.js:50
-msgid "HTML"
-msgstr "HTML"
-
-#: build/index.js:27
-msgid "Remove file"
-msgstr "ফাইল সরান"
-
-#: build/index.js:27
-msgid "Drop your site here"
-msgstr "আপনার সাইট এখানে ছেড়ে দিন"
-
-#: build/index.js:27
-msgid "HTML file, template ZIP, or built Lovable/Bolt/v0 folder (ZIP)"
-msgstr "HTML ফাইল, টেমপ্লেট ZIP, অথবা বিল্ড করা Lovable/Bolt/v0 ফোল্ডার (ZIP)"
-
-#. translators: %d: upload limit in megabytes.
-#: build/index.js:28
-#, js-format
-msgid "Up to %d MB. Your files stay on this site."
-msgstr "সর্বোচ্চ %d MB। আপনার ফাইল এই সাইটেই থাকে।"
-
-#: build/index.js:28
-msgid "Choose file"
-msgstr "ফাইল বেছে নিন"
-
-#: build/index.js:28
-msgid "Paste HTML instead"
-msgstr "এর বদলে HTML পেস্ট করুন"
-
-#: build/index.js:28
-msgid "Project source (not built)"
-msgstr "প্রজেক্ট সোর্স (বিল্ড করা নয়)"
-
-#: build/index.js:28
-msgid "v0 (Next.js export)"
-msgstr "v0 (Next.js এক্সপোর্ট)"
-
-#: build/index.js:28
-msgid "Next.js static export"
-msgstr "Next.js স্ট্যাটিক এক্সপোর্ট"
-
-#: build/index.js:28
-msgid "Lovable (Vite + React)"
-msgstr "Lovable (Vite + React)"
-
-#: build/index.js:28
-msgid "Bolt (Vite + React)"
-msgstr "Bolt (Vite + React)"
-
-#: build/index.js:28
-msgid "Vite + React app"
-msgstr "Vite + React অ্যাপ"
-
-#: build/index.js:28
-msgid "AI-generated HTML"
-msgstr "AI দিয়ে তৈরি HTML"
-
-#: build/index.js:28
-msgid "HTML template"
-msgstr "HTML টেমপ্লেট"
-
-#: build/index.js:28
-msgid "Unknown"
-msgstr "অজানা"
-
-#: build/index.js:28
-msgid "Why we think so"
-msgstr "কেন এমন মনে হচ্ছে"
-
-#: build/index.js:28
-msgid "OK"
-msgstr "ঠিক আছে"
-
-#: build/index.js:28
-msgid "Warning"
-msgstr "সতর্কতা"
-
-#: build/index.js:28
-msgid "Blocking"
-msgstr "বাধা"
-
-#: build/index.js:28
-msgid "Fix"
-msgstr "ঠিক করুন"
-
-#: build/index.js:28
-msgid "Rendering"
-msgstr "রেন্ডার হচ্ছে"
-
-#: build/index.js:28
-msgid "Capturing tablet"
-msgstr "ট্যাবলেট ক্যাপচার হচ্ছে"
-
-#: build/index.js:28
-msgid "Capturing mobile"
-msgstr "মোবাইল ক্যাপচার হচ্ছে"
-
-#: build/index.js:28
-msgid "Capturing desktop / tablet / mobile"
-msgstr "ডেস্কটপ / ট্যাবলেট / মোবাইল ক্যাপচার হচ্ছে"
-
-#: build/index.js:28
-msgid "Detecting sections"
-msgstr "সেকশন শনাক্ত হচ্ছে"
-
-#: build/index.js:28
-msgid "Extracting design tokens"
-msgstr "ডিজাইন টোকেন বের করা হচ্ছে"
-
-#: build/index.js:28
-msgid "Building Elementor layout"
-msgstr "Elementor লেআউট তৈরি হচ্ছে"
-
-#: build/index.js:28
-msgid "Converting your site"
-msgstr "আপনার সাইট কনভার্ট হচ্ছে"
-
-#: build/index.js:28
-msgid "Conversion progress"
-msgstr "কনভার্সনের অগ্রগতি"
-
-#: build/index.js:28
-msgid "Done"
-msgstr "সম্পন্ন"
-
-#: build/index.js:28
-#: build/index.js:50
-msgid "Failed"
-msgstr "ব্যর্থ"
-
-#: build/index.js:28
-msgid "Show technical log"
-msgstr "টেকনিক্যাল লগ দেখান"
-
-#: build/index.js:28
-#: build/index.js:49
-msgid "Cancel"
-msgstr "বাতিল"
-
-#: build/index.js:28
-msgid "Live capture"
-msgstr "লাইভ ক্যাপচার"
-
-#: build/index.js:28
-#: build/index.js:31
-msgid "Source site preview"
-msgstr "সোর্স সাইটের প্রিভিউ"
-
-#. translators: 1: structure %, 2: styles %, 3: fallback %.
-#: build/index.js:29
-#, js-format
-msgid "Structure %1$d%% · Styles %2$d%% · HTML kept %3$d%%"
-msgstr "গঠন %1$d%% · স্টাইল %2$d%% · HTML রাখা হয়েছে %3$d%%"
-
-#: build/index.js:29
-msgid "Layout only"
-msgstr "শুধু লেআউট"
-
-#. translators: %d: number of warnings.
-#: build/index.js:30
-#, js-format
-msgid "%d warning"
-msgid_plural "%d warnings"
-msgstr[0] "%d টি সতর্কতা"
-msgstr[1] "%d টি সতর্কতা"
-
-#. translators: %s: section name.
-#: build/index.js:31
-#, js-format
-msgid "Output for %s"
-msgstr "%s-এর আউটপুট"
-
-#: build/index.js:31
-#: build/index.js:50
-msgid "Native"
-msgstr "নেটিভ"
-
-#: build/index.js:31
-msgid "Suggested: HTML"
-msgstr "প্রস্তাবিত: HTML"
-
-#: build/index.js:31
-msgid "Detected widgets"
-msgstr "শনাক্ত করা উইজেট"
-
-#: build/index.js:31
-msgid "Warnings"
-msgstr "সতর্কতা"
-
-#: build/index.js:31
-msgid "None — every block mapped to an Elementor widget."
-msgstr "কিছু নেই — প্রতিটি ব্লক একটি Elementor উইজেটে রূপান্তরিত হয়েছে।"
-
-#: build/index.js:31
-msgid "Ai2Kit Pro maps tabs, carousels and popups to native Elementor widgets. In Free they are kept as static, editable content."
-msgstr "Ai2Kit Pro ট্যাব, ক্যারোসেল ও পপআপকে নেটিভ Elementor উইজেটে রূপান্তর করে। ফ্রি ভার্সনে এগুলো স্থির, এডিটযোগ্য কনটেন্ট হিসেবে থাকে।"
-
-#: build/index.js:31
-msgid "Compare mode"
-msgstr "তুলনার ধরন"
-
-#: build/index.js:31
-msgid "Side by side"
-msgstr "পাশাপাশি"
-
-#: build/index.js:31
-msgid "Swipe"
-msgstr "সোয়াইপ"
-
-#: build/index.js:31
-msgid "Overlay"
-msgstr "ওভারলে"
-
-#: build/index.js:31
-#: build/index.js:50
-msgid "Source"
-msgstr "সোর্স"
-
-#: build/index.js:31
-msgid "Breakpoint"
-msgstr "ব্রেকপয়েন্ট"
-
-#: build/index.js:31
-msgid "Desktop"
-msgstr "ডেস্কটপ"
-
-#: build/index.js:31
-msgid "Tablet"
-msgstr "ট্যাবলেট"
-
-#: build/index.js:31
-msgid "Mobile"
-msgstr "মোবাইল"
-
-#: build/index.js:31
-msgid "Converted Elementor page"
-msgstr "কনভার্ট করা Elementor পেজ"
-
-#: build/index.js:31
-msgid "Compare slider"
-msgstr "তুলনার স্লাইডার"
-
-#: build/index.js:31
-msgid "Overall match"
-msgstr "সামগ্রিক মিল"
-
-#: build/index.js:31
-msgid "Weighted by section size: structure, styles and HTML kept."
-msgstr "সেকশনের আকার অনুযায়ী হিসাব: গঠন, স্টাইল ও HTML হিসেবে রাখা অংশ।"
-
-#: build/index.js:31
-msgid "Design tokens"
-msgstr "ডিজাইন টোকেন"
-
-#: build/index.js:31
-msgid "Read from the site's shadcn/ui theme variables."
-msgstr "সাইটের shadcn/ui থিম ভেরিয়েবল থেকে নেওয়া।"
-
-#: build/index.js:31
-msgid "Clustered from the colors and fonts the page uses most."
-msgstr "পেজে সবচেয়ে বেশি ব্যবহৃত রং ও ফন্ট থেকে বাছাই করা।"
-
-#: build/index.js:31
-msgid "Add to Elementor Global Colors & Fonts"
-msgstr "Elementor গ্লোবাল কালার ও ফন্টে যোগ করুন"
-
-#: build/index.js:31
-msgid "Colors"
-msgstr "রং"
-
-#. translators: %s: hex color.
-#: build/index.js:32
-#, js-format
-msgid "Name for %s"
-msgstr "%s-এর নাম"
-
-#: build/index.js:32
-#: build/index.js:50
-msgid "System"
-msgstr "সিস্টেম"
-
-#: build/index.js:32
-msgid "Typography"
-msgstr "টাইপোগ্রাফি"
-
-#: build/index.js:32
-msgid "Font name"
-msgstr "ফন্টের নাম"
-
-#: build/index.js:32
-msgid "No custom fonts detected; the theme fonts will be used."
-msgstr "কোনো কাস্টম ফন্ট পাওয়া যায়নি; থিমের ফন্ট ব্যবহার হবে।"
-
-#: build/index.js:32
-msgid "How to add tokens"
-msgstr "টোকেন কীভাবে যোগ হবে"
-
-#: build/index.js:32
-msgid "Merge into existing Global Colors"
-msgstr "বিদ্যমান গ্লোবাল কালারের সাথে যোগ করুন"
-
-#: build/index.js:32
-msgid "Replace"
-msgstr "প্রতিস্থাপন"
-
-#: build/index.js:32
-msgid "Replacing changes the Primary, Secondary, Text and Accent globals for the whole site. The old kit is backed up, and Undo restores it."
-msgstr "প্রতিস্থাপন করলে পুরো সাইটের Primary, Secondary, Text ও Accent গ্লোবাল বদলে যাবে। পুরনো কিটের ব্যাকআপ রাখা হয়, আর আনডু করলে তা ফিরে আসে।"
-
-#. translators: %d: number of pages or templates.
-#: build/index.js:33
-#, js-format
-msgid "%d page"
-msgid_plural "%d pages"
-msgstr[0] "%d টি পেজ"
-msgstr[1] "%d টি পেজ"
-
-#. translators: %d: number of colors.
-#: build/index.js:35
-#, js-format
-msgid "%d color"
-msgid_plural "%d colors"
-msgstr[0] "%d টি রং"
-msgstr[1] "%d টি রং"
-
-#. translators: %d: number of fonts.
-#: build/index.js:36
-#, js-format
-msgid "%d font"
-msgid_plural "%d fonts"
-msgstr[0] "%d টি ফন্ট"
-msgstr[1] "%d টি ফন্ট"
-
-#: build/index.js:36
-msgid "Your site is in Elementor."
-msgstr "আপনার সাইট এখন Elementor-এ।"
-
-#. translators: %s: list like "1 page, 12 images, 6 colors, 2 fonts".
-#: build/index.js:37
-#, js-format
-msgid "Done — %s added."
-msgstr "সম্পন্ন — %s যোগ হয়েছে।"
-
-#: build/index.js:37
-msgid "Created"
-msgstr "তৈরি হয়েছে"
-
-#: build/index.js:37
-msgid "Draft page"
-msgstr "খসড়া পেজ"
-
-#: build/index.js:37
-#: build/index.js:50
-msgid "Elementor template"
-msgstr "Elementor টেমপ্লেট"
-
-#: build/index.js:37
-msgid "Edit with Elementor"
-msgstr "Elementor দিয়ে এডিট করুন"
-
-#: build/index.js:37
-msgid "View"
-msgstr "দেখুন"
-
-#: build/index.js:37
-#: build/index.js:50
-msgid "Global Colors & Fonts"
-msgstr "গ্লোবাল কালার ও ফন্ট"
-
-#: build/index.js:37
-msgid "System globals replaced (backed up)"
-msgstr "সিস্টেম গ্লোবাল প্রতিস্থাপিত হয়েছে (ব্যাকআপ রাখা আছে)"
-
-#: build/index.js:37
-msgid "Added as custom globals"
-msgstr "কাস্টম গ্লোবাল হিসেবে যোগ হয়েছে"
-
-#: build/index.js:37
-msgid "Things to check"
-msgstr "যা দেখে নেবেন"
-
-#: build/index.js:37
-msgid "Nothing — every section mapped to native Elementor widgets."
-msgstr "কিছু নেই — প্রতিটি সেকশন নেটিভ Elementor উইজেটে রূপান্তরিত হয়েছে।"
-
-#: build/index.js:37
-msgid "Compare with the source"
-msgstr "সোর্সের সাথে তুলনা করুন"
-
-#: build/index.js:37
-msgid "Convert another"
-msgstr "আরেকটি কনভার্ট করুন"
-
-#: build/index.js:37
-msgid "Undo this import"
-msgstr "এই ইমপোর্ট আনডু করুন"
-
-#: build/index.js:37
-msgid "Convert all pages at once with Pro."
-msgstr "Pro দিয়ে সব পেজ একবারে কনভার্ট করুন।"
-
-#: build/index.js:37
-msgid "Multi-route conversion, header and footer templates, menus, and native tabs and carousels."
-msgstr "একাধিক পেজ একসাথে কনভার্ট, হেডার ও ফুটার টেমপ্লেট, মেনু, এবং নেটিভ ট্যাব ও ক্যারোসেল।"
-
-#: build/index.js:37
-msgid "See what's in Pro"
-msgstr "Pro-তে কী আছে দেখুন"
-
-#: build/index.js:37
-msgid "Fixed."
-msgstr "ঠিক করা হয়েছে।"
-
 #. translators: %s: URL of the uploaded page.
-#: build/index.js:39
+#: build/index.js:27
 #, js-format
 msgid "Loaded %s"
 msgstr "%s লোড হয়েছে"
 
-#: build/index.js:39
+#: build/index.js:27
 msgid "Render did not settle within 15 s; capturing anyway."
 msgstr "15 সেকেন্ডের মধ্যে রেন্ডার স্থির হয়নি; তবুও ক্যাপচার করা হচ্ছে।"
 
 #. translators: %d: milliseconds.
-#: build/index.js:39
+#: build/index.js:27
 #, js-format
 msgid "Render settled in %d ms."
 msgstr "%d মিলিসেকেন্ডে রেন্ডার স্থির হয়েছে।"
 
-#: build/index.js:39
+#: build/index.js:27
 msgid "The page rendered no visible content. If this is a React build, make sure you uploaded the built dist folder."
 msgstr "পেজে দেখার মতো কোনো কনটেন্ট রেন্ডার হয়নি। এটি React বিল্ড হলে নিশ্চিত করুন যে আপনি বিল্ড করা dist ফোল্ডার আপলোড করেছেন।"
 
-#: build/index.js:39
+#: build/index.js:27
 msgid "desktop"
 msgstr "ডেস্কটপ"
 
-#: build/index.js:39
+#: build/index.js:27
 msgid "tablet"
 msgstr "ট্যাবলেট"
 
-#: build/index.js:39
+#: build/index.js:27
 msgid "mobile"
 msgstr "মোবাইল"
 
 #. translators: 1: breakpoint name (desktop, tablet, mobile), 2: width in pixels.
-#: build/index.js:40
+#: build/index.js:28
 #, js-format
 msgid "Capturing %1$s (%2$dpx)"
 msgstr "%1$s ক্যাপচার হচ্ছে (%2$dpx)"
 
 #. translators: 1: number of sections, 2: their names.
-#: build/index.js:41
+#: build/index.js:29
 #, js-format
 msgid "Found %1$d section: %2$s"
 msgid_plural "Found %1$d sections: %2$s"
@@ -1303,24 +955,496 @@ msgstr[0] "%1$d টি সেকশন পাওয়া গেছে: %2$s"
 msgstr[1] "%1$d টি সেকশন পাওয়া গেছে: %2$s"
 
 #. translators: 1: number of colors, 2: number of fonts.
-#: build/index.js:42
+#: build/index.js:30
 #, js-format
 msgid "Design tokens: %1$d colors, %2$d fonts"
 msgstr "ডিজাইন টোকেন: %1$d টি রং, %2$d টি ফন্ট"
 
 #. translators: 1: number of sections, 2: output format, 3: overall match in percent.
-#: build/index.js:43
+#: build/index.js:31
 #, js-format
 msgid "Built %1$d sections as %2$s · overall %3$d%%"
 msgstr "%1$d টি সেকশন %2$s হিসেবে তৈরি · সামগ্রিক %3$d%%"
 
-#: build/index.js:43
+#: build/index.js:31
 msgid "atomic (v4) elements"
 msgstr "অ্যাটমিক (v4) এলিমেন্ট"
 
-#: build/index.js:43
+#: build/index.js:31
 msgid "containers + widgets (v3)"
 msgstr "কন্টেইনার + উইজেট (v3)"
+
+#: build/index.js:31
+msgid "Docs"
+msgstr "ডকস"
+
+#: build/index.js:31
+msgid "Pro active"
+msgstr "Pro চালু"
+
+#: build/index.js:31
+msgid "Pro"
+msgstr "Pro"
+
+#. translators: %d: number of notices from WordPress and other plugins.
+#: build/index.js:32
+#, js-format
+msgid "Site notice (%d)"
+msgid_plural "Site notices (%d)"
+msgstr[0] "সাইট নোটিশ (%d)"
+msgstr[1] "সাইট নোটিশ (%d)"
+
+#: build/index.js:32
+msgid "Upload"
+msgstr "আপলোড"
+
+#: build/index.js:32
+#: build/index.js:44
+msgid "Check"
+msgstr "চেক"
+
+#: build/index.js:32
+#: build/index.js:47
+msgid "Review"
+msgstr "রিভিউ"
+
+#: build/index.js:32
+msgid "Import"
+msgstr "ইমপোর্ট"
+
+#: build/index.js:32
+msgid "Conversion steps"
+msgstr "কনভার্সনের ধাপ"
+
+#: build/index.js:32
+msgid "ZIP"
+msgstr "ZIP"
+
+#: build/index.js:32
+#: build/index.js:33
+#: build/index.js:36
+#: build/index.js:50
+#: build/index.js:51
+msgid "HTML"
+msgstr "HTML"
+
+#: build/index.js:32
+msgid "Remove file"
+msgstr "ফাইল সরান"
+
+#: build/index.js:32
+msgid "Drop your site here"
+msgstr "আপনার সাইট এখানে ছেড়ে দিন"
+
+#: build/index.js:32
+msgid "HTML file, template ZIP, or built Lovable/Bolt/v0 folder (ZIP)"
+msgstr "HTML ফাইল, টেমপ্লেট ZIP, অথবা বিল্ড করা Lovable/Bolt/v0 ফোল্ডার (ZIP)"
+
+#. translators: %d: upload limit in megabytes.
+#: build/index.js:33
+#, js-format
+msgid "Up to %d MB. Your files stay on this site."
+msgstr "সর্বোচ্চ %d MB। আপনার ফাইল এই সাইটেই থাকে।"
+
+#: build/index.js:33
+msgid "Choose file"
+msgstr "ফাইল বেছে নিন"
+
+#: build/index.js:33
+msgid "Paste HTML instead"
+msgstr "এর বদলে HTML পেস্ট করুন"
+
+#: build/index.js:33
+msgid "Project source (not built)"
+msgstr "প্রজেক্ট সোর্স (বিল্ড করা নয়)"
+
+#: build/index.js:33
+msgid "v0 (Next.js export)"
+msgstr "v0 (Next.js এক্সপোর্ট)"
+
+#: build/index.js:33
+msgid "Next.js static export"
+msgstr "Next.js স্ট্যাটিক এক্সপোর্ট"
+
+#: build/index.js:33
+msgid "Lovable (Vite + React)"
+msgstr "Lovable (Vite + React)"
+
+#: build/index.js:33
+msgid "Bolt (Vite + React)"
+msgstr "Bolt (Vite + React)"
+
+#: build/index.js:33
+msgid "Vite + React app"
+msgstr "Vite + React অ্যাপ"
+
+#: build/index.js:33
+msgid "AI-generated HTML"
+msgstr "AI দিয়ে তৈরি HTML"
+
+#: build/index.js:33
+msgid "HTML template"
+msgstr "HTML টেমপ্লেট"
+
+#: build/index.js:33
+msgid "Unknown"
+msgstr "অজানা"
+
+#: build/index.js:33
+msgid "Why we think so"
+msgstr "কেন এমন মনে হচ্ছে"
+
+#: build/index.js:33
+msgid "OK"
+msgstr "ঠিক আছে"
+
+#: build/index.js:33
+msgid "Warning"
+msgstr "সতর্কতা"
+
+#: build/index.js:33
+msgid "Blocking"
+msgstr "বাধা"
+
+#: build/index.js:33
+msgid "Fix"
+msgstr "ঠিক করুন"
+
+#: build/index.js:33
+msgid "Rendering"
+msgstr "রেন্ডার হচ্ছে"
+
+#: build/index.js:33
+msgid "Capturing tablet"
+msgstr "ট্যাবলেট ক্যাপচার হচ্ছে"
+
+#: build/index.js:33
+msgid "Capturing mobile"
+msgstr "মোবাইল ক্যাপচার হচ্ছে"
+
+#: build/index.js:33
+msgid "Capturing desktop / tablet / mobile"
+msgstr "ডেস্কটপ / ট্যাবলেট / মোবাইল ক্যাপচার হচ্ছে"
+
+#: build/index.js:33
+msgid "Detecting sections"
+msgstr "সেকশন শনাক্ত হচ্ছে"
+
+#: build/index.js:33
+msgid "Extracting design tokens"
+msgstr "ডিজাইন টোকেন বের করা হচ্ছে"
+
+#: build/index.js:33
+msgid "Building Elementor layout"
+msgstr "Elementor লেআউট তৈরি হচ্ছে"
+
+#: build/index.js:33
+msgid "Converting your site"
+msgstr "আপনার সাইট কনভার্ট হচ্ছে"
+
+#: build/index.js:33
+msgid "Conversion progress"
+msgstr "কনভার্সনের অগ্রগতি"
+
+#: build/index.js:33
+msgid "Done"
+msgstr "সম্পন্ন"
+
+#: build/index.js:33
+#: build/index.js:51
+msgid "Failed"
+msgstr "ব্যর্থ"
+
+#: build/index.js:33
+msgid "Show technical log"
+msgstr "টেকনিক্যাল লগ দেখান"
+
+#: build/index.js:33
+#: build/index.js:50
+msgid "Cancel"
+msgstr "বাতিল"
+
+#: build/index.js:33
+msgid "Live capture"
+msgstr "লাইভ ক্যাপচার"
+
+#: build/index.js:33
+#: build/index.js:36
+msgid "Source site preview"
+msgstr "সোর্স সাইটের প্রিভিউ"
+
+#. translators: 1: structure %, 2: styles %, 3: fallback %.
+#: build/index.js:34
+#, js-format
+msgid "Structure %1$d%% · Styles %2$d%% · HTML kept %3$d%%"
+msgstr "গঠন %1$d%% · স্টাইল %2$d%% · HTML রাখা হয়েছে %3$d%%"
+
+#: build/index.js:34
+msgid "Layout only"
+msgstr "শুধু লেআউট"
+
+#. translators: %d: number of warnings.
+#: build/index.js:35
+#, js-format
+msgid "%d warning"
+msgid_plural "%d warnings"
+msgstr[0] "%d টি সতর্কতা"
+msgstr[1] "%d টি সতর্কতা"
+
+#. translators: %s: section name.
+#: build/index.js:36
+#, js-format
+msgid "Output for %s"
+msgstr "%s-এর আউটপুট"
+
+#: build/index.js:36
+#: build/index.js:51
+msgid "Native"
+msgstr "নেটিভ"
+
+#: build/index.js:36
+msgid "Suggested: HTML"
+msgstr "প্রস্তাবিত: HTML"
+
+#: build/index.js:36
+msgid "Detected widgets"
+msgstr "শনাক্ত করা উইজেট"
+
+#: build/index.js:36
+msgid "Warnings"
+msgstr "সতর্কতা"
+
+#: build/index.js:36
+msgid "None — every block mapped to an Elementor widget."
+msgstr "কিছু নেই — প্রতিটি ব্লক একটি Elementor উইজেটে রূপান্তরিত হয়েছে।"
+
+#: build/index.js:36
+msgid "Ai2Kit Pro maps tabs, carousels and popups to native Elementor widgets. In Free they are kept as static, editable content."
+msgstr "Ai2Kit Pro ট্যাব, ক্যারোসেল ও পপআপকে নেটিভ Elementor উইজেটে রূপান্তর করে। ফ্রি ভার্সনে এগুলো স্থির, এডিটযোগ্য কনটেন্ট হিসেবে থাকে।"
+
+#: build/index.js:36
+msgid "Compare mode"
+msgstr "তুলনার ধরন"
+
+#: build/index.js:36
+msgid "Side by side"
+msgstr "পাশাপাশি"
+
+#: build/index.js:36
+msgid "Swipe"
+msgstr "সোয়াইপ"
+
+#: build/index.js:36
+msgid "Overlay"
+msgstr "ওভারলে"
+
+#: build/index.js:36
+#: build/index.js:51
+msgid "Source"
+msgstr "সোর্স"
+
+#: build/index.js:36
+msgid "Breakpoint"
+msgstr "ব্রেকপয়েন্ট"
+
+#: build/index.js:36
+msgid "Desktop"
+msgstr "ডেস্কটপ"
+
+#: build/index.js:36
+msgid "Tablet"
+msgstr "ট্যাবলেট"
+
+#: build/index.js:36
+msgid "Mobile"
+msgstr "মোবাইল"
+
+#: build/index.js:36
+msgid "Converted Elementor page"
+msgstr "কনভার্ট করা Elementor পেজ"
+
+#: build/index.js:36
+msgid "Compare slider"
+msgstr "তুলনার স্লাইডার"
+
+#: build/index.js:36
+msgid "Overall match"
+msgstr "সামগ্রিক মিল"
+
+#: build/index.js:36
+msgid "Weighted by section size: structure, styles and HTML kept."
+msgstr "সেকশনের আকার অনুযায়ী হিসাব: গঠন, স্টাইল ও HTML হিসেবে রাখা অংশ।"
+
+#: build/index.js:36
+msgid "Design tokens"
+msgstr "ডিজাইন টোকেন"
+
+#: build/index.js:36
+msgid "Read from the site's shadcn/ui theme variables."
+msgstr "সাইটের shadcn/ui থিম ভেরিয়েবল থেকে নেওয়া।"
+
+#: build/index.js:36
+msgid "Clustered from the colors and fonts the page uses most."
+msgstr "পেজে সবচেয়ে বেশি ব্যবহৃত রং ও ফন্ট থেকে বাছাই করা।"
+
+#: build/index.js:36
+msgid "Add to Elementor Global Colors & Fonts"
+msgstr "Elementor গ্লোবাল কালার ও ফন্টে যোগ করুন"
+
+#: build/index.js:36
+msgid "Colors"
+msgstr "রং"
+
+#. translators: %s: hex color.
+#: build/index.js:37
+#, js-format
+msgid "Name for %s"
+msgstr "%s-এর নাম"
+
+#: build/index.js:37
+#: build/index.js:51
+msgid "System"
+msgstr "সিস্টেম"
+
+#: build/index.js:37
+msgid "Typography"
+msgstr "টাইপোগ্রাফি"
+
+#: build/index.js:37
+msgid "Font name"
+msgstr "ফন্টের নাম"
+
+#: build/index.js:37
+msgid "No custom fonts detected; the theme fonts will be used."
+msgstr "কোনো কাস্টম ফন্ট পাওয়া যায়নি; থিমের ফন্ট ব্যবহার হবে।"
+
+#: build/index.js:37
+msgid "How to add tokens"
+msgstr "টোকেন কীভাবে যোগ হবে"
+
+#: build/index.js:37
+msgid "Merge into existing Global Colors"
+msgstr "বিদ্যমান গ্লোবাল কালারের সাথে যোগ করুন"
+
+#: build/index.js:37
+msgid "Replace"
+msgstr "প্রতিস্থাপন"
+
+#: build/index.js:37
+msgid "Replacing changes the Primary, Secondary, Text and Accent globals for the whole site. The old kit is backed up, and Undo restores it."
+msgstr "প্রতিস্থাপন করলে পুরো সাইটের Primary, Secondary, Text ও Accent গ্লোবাল বদলে যাবে। পুরনো কিটের ব্যাকআপ রাখা হয়, আর আনডু করলে তা ফিরে আসে।"
+
+#. translators: %d: number of pages.
+#: build/index.js:38
+#, js-format
+msgid "%d page"
+msgid_plural "%d pages"
+msgstr[0] "%d টি পেজ"
+msgstr[1] "%d টি পেজ"
+
+#. translators: %d: number of templates.
+#: build/index.js:39
+#, js-format
+msgid "%d template"
+msgid_plural "%d templates"
+msgstr[0] "%d টি টেমপ্লেট"
+msgstr[1] "%d টি টেমপ্লেট"
+
+#. translators: %d: number of colors.
+#: build/index.js:41
+#, js-format
+msgid "%d color"
+msgid_plural "%d colors"
+msgstr[0] "%d টি রং"
+msgstr[1] "%d টি রং"
+
+#. translators: %d: number of fonts.
+#: build/index.js:42
+#, js-format
+msgid "%d font"
+msgid_plural "%d fonts"
+msgstr[0] "%d টি ফন্ট"
+msgstr[1] "%d টি ফন্ট"
+
+#: build/index.js:42
+msgid "Your site is in Elementor."
+msgstr "আপনার সাইট এখন Elementor-এ।"
+
+#. translators: %s: list like "1 page, 12 images, 6 colors, 2 fonts".
+#: build/index.js:43
+#, js-format
+msgid "Done — %s added."
+msgstr "সম্পন্ন — %s যোগ হয়েছে।"
+
+#: build/index.js:43
+msgid "Created"
+msgstr "তৈরি হয়েছে"
+
+#: build/index.js:43
+msgid "Draft page"
+msgstr "খসড়া পেজ"
+
+#: build/index.js:43
+#: build/index.js:51
+msgid "Elementor template"
+msgstr "Elementor টেমপ্লেট"
+
+#: build/index.js:43
+msgid "Edit with Elementor"
+msgstr "Elementor দিয়ে এডিট করুন"
+
+#: build/index.js:43
+msgid "View"
+msgstr "দেখুন"
+
+#: build/index.js:43
+#: build/index.js:51
+msgid "Global Colors & Fonts"
+msgstr "গ্লোবাল কালার ও ফন্ট"
+
+#: build/index.js:43
+msgid "System globals replaced (backed up)"
+msgstr "সিস্টেম গ্লোবাল প্রতিস্থাপিত হয়েছে (ব্যাকআপ রাখা আছে)"
+
+#: build/index.js:43
+msgid "Added as custom globals"
+msgstr "কাস্টম গ্লোবাল হিসেবে যোগ হয়েছে"
+
+#: build/index.js:43
+msgid "Things to check"
+msgstr "যা দেখে নেবেন"
+
+#: build/index.js:43
+msgid "Nothing — every section mapped to native Elementor widgets."
+msgstr "কিছু নেই — প্রতিটি সেকশন নেটিভ Elementor উইজেটে রূপান্তরিত হয়েছে।"
+
+#: build/index.js:43
+msgid "Compare with the source"
+msgstr "সোর্সের সাথে তুলনা করুন"
+
+#: build/index.js:43
+msgid "Convert another"
+msgstr "আরেকটি কনভার্ট করুন"
+
+#: build/index.js:43
+msgid "Undo this import"
+msgstr "এই ইমপোর্ট আনডু করুন"
+
+#: build/index.js:43
+msgid "Convert all pages at once with Pro."
+msgstr "Pro দিয়ে সব পেজ একবারে কনভার্ট করুন।"
+
+#: build/index.js:43
+msgid "Multi-route conversion, header and footer templates, menus, and native tabs and carousels."
+msgstr "একাধিক পেজ একসাথে কনভার্ট, হেডার ও ফুটার টেমপ্লেট, মেনু, এবং নেটিভ ট্যাব ও ক্যারোসেল।"
+
+#: build/index.js:43
+msgid "See what's in Pro"
+msgstr "Pro-তে কী আছে দেখুন"
+
+#: build/index.js:43
+msgid "Fixed."
+msgstr "ঠিক করা হয়েছে।"
 
 #: build/index.js:43
 msgid "Turn an AI-built site into an editable Elementor page."
@@ -1343,7 +1467,7 @@ msgid "Works on Elementor Free"
 msgstr "Elementor ফ্রি-তেই কাজ করে"
 
 #: build/index.js:43
-#: build/index.js:50
+#: build/index.js:51
 msgid "Start converting"
 msgstr "কনভার্ট শুরু করুন"
 
@@ -1376,7 +1500,7 @@ msgid "Output"
 msgstr "আউটপুট"
 
 #: build/index.js:44
-#: build/index.js:50
+#: build/index.js:51
 msgid "Create"
 msgstr "তৈরি করুন"
 
@@ -1393,7 +1517,7 @@ msgid "Title"
 msgstr "শিরোনাম"
 
 #: build/index.js:44
-#: build/index.js:50
+#: build/index.js:51
 msgid "Elementor format"
 msgstr "Elementor ফরম্যাট"
 
@@ -1414,12 +1538,13 @@ msgid "Auto (v3)"
 msgstr "স্বয়ংক্রিয় (v3)"
 
 #: build/index.js:44
-#: build/index.js:50
+#: build/index.js:51
 msgid "Atomic elements (v4)"
 msgstr "অ্যাটমিক এলিমেন্ট (v4)"
 
 #: build/index.js:44
-#: build/index.js:50
+#: build/index.js:48
+#: build/index.js:51
 msgid "Pages"
 msgstr "পেজ"
 
@@ -1498,6 +1623,7 @@ msgid "Review view"
 msgstr "রিভিউয়ের ধরন"
 
 #: build/index.js:48
+#: build/index.js:49
 msgid "Sections"
 msgstr "সেকশন"
 
@@ -1505,322 +1631,335 @@ msgstr "সেকশন"
 msgid "Tokens"
 msgstr "টোকেন"
 
-#: build/index.js:48
+#. translators: %s: page name.
+#: build/index.js:49
+#, js-format
+msgid "Import %s"
+msgstr "%s ইমপোর্ট করুন"
+
+#: build/index.js:49
 msgid "Loading…"
 msgstr "লোড হচ্ছে…"
 
-#: build/index.js:48
+#: build/index.js:49
 msgid "Continue"
 msgstr "চালিয়ে যান"
 
-#: build/index.js:48
+#: build/index.js:49
 msgid "Back"
 msgstr "পেছনে"
 
-#: build/index.js:48
+#: build/index.js:49
 msgid "Fix the blocking checks to continue."
 msgstr "চালিয়ে যেতে বাধা দেওয়া চেকগুলো ঠিক করুন।"
 
-#: build/index.js:48
+#: build/index.js:49
 msgid "Start conversion"
 msgstr "কনভার্সন শুরু করুন"
 
-#: build/index.js:48
+#: build/index.js:49
 msgid "Try again"
 msgstr "আবার চেষ্টা করুন"
 
 #. translators: 1: native sections, 2: HTML sections.
-#: build/index.js:49
+#: build/index.js:50
 #, js-format
 msgid "%1$d native · %2$d kept as HTML"
 msgstr "%1$d টি নেটিভ · %2$d টি HTML হিসেবে রাখা"
 
-#: build/index.js:49
+#: build/index.js:50
 msgid "Import to WordPress"
 msgstr "WordPress-এ ইমপোর্ট করুন"
 
-#: build/index.js:49
+#: build/index.js:50
 msgid "Paste HTML"
 msgstr "HTML পেস্ট করুন"
 
-#: build/index.js:49
+#: build/index.js:50
 msgid "Use this HTML"
 msgstr "এই HTML ব্যবহার করুন"
 
-#: build/index.js:49
+#: build/index.js:50
 msgid "A full page from Claude, ChatGPT or Gemini Canvas works best."
 msgstr "Claude, ChatGPT বা Gemini Canvas-এর পুরো পেজ সবচেয়ে ভালো কাজ করে।"
 
-#: build/index.js:49
 #: build/index.js:50
+#: build/index.js:51
 msgid "Undo this import?"
 msgstr "এই ইমপোর্ট আনডু করবেন?"
 
-#: build/index.js:49
 #: build/index.js:50
+#: build/index.js:51
 msgid "Keep it"
 msgstr "রেখে দিন"
 
 #. translators: %d: number of pages moved to trash.
-#: build/index.js:50
+#: build/index.js:51
 #, js-format
 msgid "Undone — %d page moved to trash."
 msgid_plural "Undone — %d pages moved to trash."
 msgstr[0] "আনডু হয়েছে — %d টি পেজ ট্র্যাশে সরানো হয়েছে।"
 msgstr[1] "আনডু হয়েছে — %d টি পেজ ট্র্যাশে সরানো হয়েছে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Undo import"
 msgstr "ইমপোর্ট আনডু করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "The page moves to the trash, the images this import added are deleted, and your Global Colors & Fonts are restored."
 msgstr "পেজটি ট্র্যাশে যাবে, এই ইমপোর্টে যোগ হওয়া ছবিগুলো মুছে যাবে, এবং আপনার গ্লোবাল কালার ও ফন্ট আগের অবস্থায় ফিরবে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "These pages have been edited since import."
 msgstr "ইমপোর্টের পর এই পেজগুলো এডিট করা হয়েছে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Imported"
 msgstr "ইমপোর্ট হয়েছে"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Undone"
 msgstr "আনডু হয়েছে"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Not imported"
 msgstr "ইমপোর্ট হয়নি"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Every conversion on this site."
 msgstr "এই সাইটের সব কনভার্সন।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "We couldn't load your history."
 msgstr "আপনার হিস্ট্রি লোড করা যায়নি।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Reload the page to try again."
 msgstr "আবার চেষ্টা করতে পেজটি রিলোড করুন।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "No conversions yet"
 msgstr "এখনো কোনো কনভার্সন নেই"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Converted pages and templates will appear here."
 msgstr "কনভার্ট করা পেজ ও টেমপ্লেট এখানে দেখা যাবে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Date"
 msgstr "তারিখ"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Score"
 msgstr "স্কোর"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Status"
 msgstr "অবস্থা"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Actions"
 msgstr "অ্যাকশন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "View report"
 msgstr "রিপোর্ট দেখুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Re-run"
 msgstr "আবার চালান"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Undo"
 msgstr "আনডু"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Import undone."
 msgstr "ইমপোর্ট আনডু হয়েছে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Appearance"
 msgstr "চেহারা"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Theme"
 msgstr "থিম"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Light"
 msgstr "লাইট"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Dark"
 msgstr "ডার্ক"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Defaults"
 msgstr "ডিফল্ট"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "New page (draft)"
 msgstr "নতুন পেজ (খসড়া)"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Auto uses Atomic elements (v4) when the Atomic editor is on, otherwise classic widgets (v3)."
 msgstr "Atomic এডিটর চালু থাকলে স্বয়ংক্রিয় অপশন অ্যাটমিক এলিমেন্ট (v4) ব্যবহার করে, না হলে ক্লাসিক উইজেট (v3)।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Auto"
 msgstr "স্বয়ংক্রিয়"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Replace changes the four system globals for the whole site. A backup is always kept."
 msgstr "প্রতিস্থাপন করলে পুরো সাইটের চারটি সিস্টেম গ্লোবাল বদলে যায়। সবসময় একটি ব্যাকআপ রাখা হয়।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Merge (add as custom globals)"
 msgstr "যোগ করুন (কাস্টম গ্লোবাল হিসেবে)"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Replace system globals"
 msgstr "সিস্টেম গ্লোবাল প্রতিস্থাপন করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Import remote images into the Media Library"
 msgstr "অন্য সাইটের ছবি মিডিয়া লাইব্রেরিতে ইমপোর্ট করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "When off, images hosted elsewhere keep their original address."
 msgstr "বন্ধ থাকলে অন্য জায়গায় রাখা ছবিগুলো তাদের মূল ঠিকানাতেই থাকে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Keep uploaded files for re-runs"
 msgstr "আবার চালানোর জন্য আপলোড করা ফাইল রেখে দিন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Otherwise they are deleted after import, or after 24 hours."
 msgstr "না হলে ইমপোর্টের পর অথবা 24 ঘণ্টা পর এগুলো মুছে যায়।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Privacy"
 msgstr "গোপনীয়তা"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Ai2Kit converts in your browser and saves on your server. It makes no requests to Ai2Kit or any other service."
 msgstr "Ai2Kit আপনার ব্রাউজারে কনভার্ট করে এবং আপনার সার্ভারে সেভ করে। এটি Ai2Kit বা অন্য কোনো সার্ভিসে কোনো রিকোয়েস্ট পাঠায় না।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Settings saved."
 msgstr "সেটিংস সেভ হয়েছে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Save settings"
 msgstr "সেটিংস সেভ করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "My React/Vite site converts to a blank page"
 msgstr "আমার React/Vite সাইট কনভার্ট করলে ফাঁকা পেজ আসে"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Upload the built output (the dist folder as a ZIP), not the project source. Build with a relative base so asset paths work from any folder."
 msgstr "প্রজেক্টের সোর্স নয়, বিল্ড আউটপুট (dist ফোল্ডার ZIP করে) আপলোড করুন। রিলেটিভ base দিয়ে বিল্ড করুন, যাতে যেকোনো ফোল্ডার থেকে অ্যাসেট পাথ কাজ করে।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Images are missing"
 msgstr "ছবি দেখা যাচ্ছে না"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "The build uses absolute paths (/assets/…). Ai2Kit fixes most automatically; building with --base=./ fixes the rest."
 msgstr "বিল্ডটি অ্যাবসোলিউট পাথ (/assets/…) ব্যবহার করছে। Ai2Kit বেশিরভাগই স্বয়ংক্রিয়ভাবে ঠিক করে; --base=./ দিয়ে বিল্ড করলে বাকিগুলোও ঠিক হয়।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Imported pages render blank"
 msgstr "ইমপোর্ট করা পেজ ফাঁকা দেখায়"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Turn on Flexbox Container in Elementor → Settings → Features. The Check step can do it for you."
 msgstr "Elementor → Settings → Features-এ Flexbox Container চালু করুন। চেক ধাপেই এটি আপনার জন্য করে দেওয়া যায়।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "A section looks different"
 msgstr "একটি সেকশন অন্যরকম দেখাচ্ছে"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Switch it to HTML in Review to keep it pixel-exact, or keep it Native and adjust it in Elementor."
 msgstr "হুবহু রাখতে রিভিউতে এটিকে HTML-এ বদলান, অথবা নেটিভ রেখে Elementor-এ ঠিক করে নিন।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Fonts don't match"
 msgstr "ফন্ট মিলছে না"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Ai2Kit sets the font family on each widget; Elementor loads Google Fonts automatically. Self-hosted fonts need to be added in Elementor → Custom Fonts."
 msgstr "Ai2Kit প্রতিটি উইজেটে ফন্ট ফ্যামিলি সেট করে; Elementor Google Fonts নিজে থেকেই লোড করে। নিজের সার্ভারে রাখা ফন্ট Elementor → Custom Fonts-এ যোগ করতে হয়।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Quick answers to the most common questions."
 msgstr "সবচেয়ে সাধারণ প্রশ্নগুলোর দ্রুত উত্তর।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Build a Lovable, Bolt or Vite project for upload"
 msgstr "আপলোডের জন্য Lovable, Bolt বা Vite প্রজেক্ট বিল্ড করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Troubleshooting"
 msgstr "সমস্যা সমাধান"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Known limits"
 msgstr "জানা সীমাবদ্ধতা"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Ai2Kit converts presentational pages. App logic and backends (logins, dashboards, databases), canvas/WebGL, and complex absolutely positioned layouts are kept as HTML or not converted."
 msgstr "Ai2Kit উপস্থাপনামূলক পেজ কনভার্ট করে। অ্যাপের লজিক ও ব্যাকএন্ড (লগইন, ড্যাশবোর্ড, ডাটাবেস), canvas/WebGL এবং জটিল অ্যাবসোলিউট পজিশনের লেআউট HTML হিসেবে রাখা হয় অথবা কনভার্ট হয় না।"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Convert every route of a site in one job"
 msgstr "একবারে সাইটের সব পেজ কনভার্ট করুন"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Header and footer templates, and real WordPress menus"
 msgstr "হেডার ও ফুটার টেমপ্লেট, এবং আসল WordPress মেনু"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Native tabs, carousels, counters and popups"
 msgstr "নেটিভ ট্যাব, ক্যারোসেল, কাউন্টার ও পপআপ"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Forms with email delivery and spam protection"
 msgstr "ইমেইল পাঠানো ও স্প্যাম সুরক্ষাসহ ফর্ম"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Repeated cards → custom post types with loop templates"
 msgstr "পুনরাবৃত্ত কার্ড → লুপ টেমপ্লেটসহ কাস্টম পোস্ট টাইপ"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Entrance animations and Elementor v4 classes & variables"
 msgstr "এন্ট্রান্স অ্যানিমেশন এবং Elementor v4 ক্লাস ও ভেরিয়েবল"
 
-#: build/index.js:50
+#: build/index.js:51
 msgid "Kit export, cloud builds and a Chrome companion"
 msgstr "কিট এক্সপোর্ট, ক্লাউড বিল্ড এবং Chrome কম্প্যানিয়ন"
 
-#: build/index.js:50
+#: build/index.js:51
+#: build/index.js:52
 msgid "Ai2Kit Pro"
 msgstr "Ai2Kit Pro"
 
-#: build/index.js:50
+#. translators: %s: Ai2Kit Pro version.
+#: build/index.js:52
+#, js-format
+msgid "Ai2Kit Pro %s is active. Its conversions run automatically."
+msgstr "Ai2Kit Pro %s চালু আছে। এর কনভার্সনগুলো স্বয়ংক্রিয়ভাবে চলে।"
+
+#: build/index.js:52
 msgid "Convert whole sites, not just pages."
 msgstr "শুধু পেজ নয়, পুরো সাইট কনভার্ট করুন।"
 
-#: build/index.js:50
+#: build/index.js:52
 msgid "Everything in Ai2Kit Free stays free and unlimited. Pro is a separate add-on."
 msgstr "Ai2Kit ফ্রি-এর সবকিছু ফ্রি ও সীমাহীনই থাকবে। Pro একটি আলাদা অ্যাড-অন।"
 
-#: build/index.js:50
+#: build/index.js:52
 msgid "Learn about Pro"
 msgstr "Pro সম্পর্কে জানুন"

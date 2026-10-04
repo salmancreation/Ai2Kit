@@ -36,6 +36,20 @@ final class Validator {
 	private $count = 0;
 
 	/**
+	 * Widget types allowed in this document (filtered once per document).
+	 *
+	 * @var string[]
+	 */
+	private $widget_types = array();
+
+	/**
+	 * Allowed nested widget types.
+	 *
+	 * @var string[]
+	 */
+	private $nested_types = array();
+
+	/**
 	 * IDs used in this document.
 	 *
 	 * @var array<string, true>
@@ -52,9 +66,11 @@ final class Validator {
 		if ( ! is_array( $doc ) || ! isset( $doc['content'] ) || ! is_array( $doc['content'] ) || ! $doc['content'] ) {
 			return new WP_Error( 'ai2kit_invalid_document', __( 'The converted page is empty or malformed.', 'ai2kit' ), array( 'status' => 400 ) );
 		}
-		$this->count = 0;
-		$this->ids   = array();
-		$content     = $this->elements( $doc['content'], 0 );
+		$this->count        = 0;
+		$this->ids          = array();
+		$this->widget_types = $this->widgets();
+		$this->nested_types = $this->nested();
+		$content            = $this->elements( $doc['content'], 0 );
 		if ( is_wp_error( $content ) ) {
 			return $content;
 		}
@@ -66,6 +82,35 @@ final class Validator {
 				'template' => in_array( $template, array( 'elementor_canvas', 'elementor_header_footer', 'default' ), true ) ? $template : 'elementor_canvas',
 			),
 		);
+	}
+
+	/**
+	 * Widget types a document may contain. Add-ons that emit more widgets add them here;
+	 * their settings go through the same key/value sanitizing as every widget.
+	 *
+	 * @return string[]
+	 */
+	private function widgets() {
+		/**
+		 * Classic (v3) widget types allowed in imported documents.
+		 *
+		 * @param string[] $widgets Widget types.
+		 */
+		return array_map( 'strval', (array) apply_filters( 'ai2kit_allowed_widgets', self::WIDGETS ) );
+	}
+
+	/**
+	 * Nested widgets: their children (one container per item) are kept and validated.
+	 *
+	 * @return string[]
+	 */
+	private function nested() {
+		/**
+		 * Allowed widget types that hold child containers (Nested Accordion, Nested Tabs …).
+		 *
+		 * @param string[] $widgets Widget types.
+		 */
+		return array_map( 'strval', (array) apply_filters( 'ai2kit_nested_widgets', self::NESTED ) );
 	}
 
 	/**
@@ -109,6 +154,10 @@ final class Validator {
 				if ( 'widget' === $type ) {
 					$clean['widgetType'] = $name;
 				}
+				$interactions = $this->interactions( $el['interactions'] ?? null );
+				if ( $interactions ) {
+					$clean['interactions'] = $interactions;
+				}
 				$children = $this->elements( (array) ( $el['elements'] ?? array() ), $depth + 1 );
 				if ( is_wp_error( $children ) ) {
 					return $children;
@@ -129,7 +178,7 @@ final class Validator {
 					return $children;
 				}
 				$clean['elements'] = $children;
-			} elseif ( 'widget' === $type && in_array( $el['widgetType'] ?? '', self::WIDGETS, true ) ) {
+			} elseif ( 'widget' === $type && in_array( $el['widgetType'] ?? '', $this->widget_types, true ) ) {
 				$clean = array(
 					'id'         => $this->id( $el['id'] ?? '' ),
 					'elType'     => 'widget',
@@ -138,7 +187,7 @@ final class Validator {
 					'elements'   => array(),
 				);
 				// Nested widgets (Accordion) hold one container per item.
-				if ( in_array( $el['widgetType'], self::NESTED, true ) ) {
+				if ( in_array( $el['widgetType'], $this->nested_types, true ) ) {
 					$children = array_values(
 						array_filter(
 							(array) ( $el['elements'] ?? array() ),
@@ -164,6 +213,30 @@ final class Validator {
 			$out[] = $clean;
 		}
 		return $out;
+	}
+
+	/**
+	 * Atomic interactions (entrance animations): kept as plain data — { version, items[] } with
+	 * at most 5 items — and deep-validated by Elementor's Interactions module when the document saves.
+	 *
+	 * @param mixed $value Interactions from the engine.
+	 * @return array<string, mixed>|null
+	 */
+	private function interactions( $value ) {
+		if ( ! is_array( $value ) || ! isset( $value['items'] ) || ! is_array( $value['items'] ) ) {
+			return null;
+		}
+		$json = wp_json_encode(
+			array(
+				'version' => 1,
+				'items'   => array_slice( array_values( array_filter( $value['items'], 'is_array' ) ), 0, 5 ),
+			)
+		);
+		if ( ! $json || strlen( $json ) > 20000 ) {
+			return null;
+		}
+		$clean = json_decode( $json, true );
+		return is_array( $clean ) && $clean['items'] ? $clean : null;
 	}
 
 	/**

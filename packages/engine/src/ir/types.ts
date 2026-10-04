@@ -46,7 +46,7 @@ export type Semantic =
 	| 'logos'
 	| 'blog';
 
-export type PatternType = 'accordion' | 'tabs' | 'carousel' | 'dialog' | 'counter' | 'repeat';
+export type PatternType = 'accordion' | 'tabs' | 'carousel' | 'dialog' | 'counter' | 'repeat' | 'form';
 
 export type Pattern = {
 	type: PatternType;
@@ -107,6 +107,8 @@ export type NodeContent = {
 	iconPos?: 'before' | 'after';
 	svg?: string;
 	items?: Array< { text: string; href?: string; iconName?: string; svg?: string } >;
+	/** An unbulleted list mapped to an Icon List without icons. */
+	noIcons?: boolean;
 	/** Icon list metrics: icon size and icon-to-text gap (px). */
 	iconSize?: number;
 	iconGap?: number;
@@ -128,7 +130,7 @@ export type Fallback ={ reason: string; html: string; css: string };
 export type ResidualRule = {
 	className: string;
 	/** Descendant selector appended after the class, from a fixed allowlist. */
-	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' .elementor-button-icon svg' | ' img';
+	target?: '' | ' .elementor-heading-title' | ' .elementor-widget-container' | ' .elementor-button' | ' .elementor-button-icon svg' | ' img' | ' .e-n-tabs-heading';
 	breakpoint: 'desktop' | 'tablet' | 'mobile';
 	/** Pseudo-state the rule applies in (`:hover`). */
 	state?: 'hover';
@@ -171,6 +173,8 @@ export type IRNode = {
 	innerMaxWidth?: number;
 	/** Parent-relative width in %, when the node is a flex/grid child with a fixed share. */
 	widthPct?: number;
+	/** Extension data recorded at capture (CapturedNode.extra), keyed by extension. */
+	extra?: Record< string, unknown >;
 	children: IRNode[];
 };
 
@@ -219,6 +223,8 @@ export type CapturedNode = {
 	panel?: PanelCapture;
 	/** ::before / ::after used as absolutely positioned paint layers (overlays). */
 	pseudoLayers?: { before?: StyleMap; after?: StyleMap };
+	/** Data engine extensions record at capture (e.g. closed tab panels), keyed by extension. */
+	extra?: Record< string, unknown >;
 	children: CapturedNode[];
 };
 

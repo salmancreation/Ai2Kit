@@ -76,3 +76,12 @@
 	.detailsGrid { grid-template-columns: 1fr; }
 	.fontRow { grid-template-columns: 1fr; }
 }
+
+/* Pages of a multi-page job (an add-on converts the site's other routes). */
+.pageBar { display: flex; flex-wrap: wrap; gap: var(--a2k-space-2); margin-bottom: var(--a2k-space-4); }
+.pageTab { display: inline-flex; align-items: center; gap: var(--a2k-space-2); padding: 0 var(--a2k-space-3) 0 var(--a2k-space-2); border: 1px solid var(--a2k-border-default); border-radius: var(--a2k-radius-md); background: var(--a2k-bg-surface); }
+.pageTab button { display: inline-flex; align-items: center; gap: var(--a2k-space-2); padding: var(--a2k-space-2) 0; border: 0; background: none; color: var(--a2k-text-secondary); font: inherit; cursor: pointer; }
+.pageTabActive { border-color: var(--a2k-border-focus); }
+.pageTabActive button { color: var(--a2k-text-primary); font-weight: var(--a2k-weight-semibold); }
+.pageName { white-space: nowrap; }
+.pageScore { font-size: var(--a2k-text-xs); color: var(--a2k-text-tertiary); font-variant-numeric: tabular-nums; }

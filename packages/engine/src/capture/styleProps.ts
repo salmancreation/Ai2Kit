@@ -80,6 +80,7 @@ export const STYLE_PROPS = [
 	'animation-duration',
 	'animation-delay',
 	'transition-duration',
+	'list-style-type',
 ] as const;
 
 export type StyleProp = ( typeof STYLE_PROPS )[ number ];
@@ -87,6 +88,7 @@ export type StyleProp = ( typeof STYLE_PROPS )[ number ];
 /** Browser default computed values; a captured value equal to its default is omitted. */
 export const DEFAULTS: Partial< Record< StyleProp, string[] > > = {
 	position: [ 'static' ],
+	'list-style-type': [ 'disc' ],
 	top: [ 'auto' ],
 	right: [ 'auto' ],
 	bottom: [ 'auto' ],

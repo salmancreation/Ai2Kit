@@ -56,6 +56,9 @@ final class ResidualCss {
 		'transition-duration',
 		'transition-property',
 		'transition-timing-function',
+		// Boxes no control covers (a tab list's pill background).
+		'padding',
+		'border-radius',
 	);
 
 	/**
@@ -66,7 +69,7 @@ final class ResidualCss {
 		'hover' => ':hover',
 	);
 
-	const TARGETS = array( '', ' .elementor-heading-title', ' .elementor-widget-container', ' .elementor-button', ' .elementor-button-icon svg', ' img' );
+	const TARGETS = array( '', ' .elementor-heading-title', ' .elementor-widget-container', ' .elementor-button', ' .elementor-button-icon svg', ' img', ' .e-n-tabs-heading' );
 
 	const MEDIA = array(
 		'desktop' => '',

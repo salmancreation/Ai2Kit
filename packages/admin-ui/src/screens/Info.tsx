@@ -1,5 +1,5 @@
 /** Help and Go Pro screens (Go Pro is a plain page; never a flashing badge — DESIGN.md §4.2). */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PageTitle, Shell } from '../components/Shell';
 import { Button, Card, CodeBlock } from '../components/ui';
 import { Icon } from '../components/Icon';
@@ -51,6 +51,21 @@ export function Pro() {
 		__( 'Entrance animations and Elementor v4 classes & variables', 'ai2kit' ),
 		__( 'Kit export, cloud builds and a Chrome companion', 'ai2kit' ),
 	];
+	const active = window.ai2kitConfig.pro;
+	if ( active ) {
+		return (
+			<Shell>
+				<PageTitle
+					title={ __( 'Ai2Kit Pro', 'ai2kit' ) }
+					lead={ sprintf(
+						/* translators: %s: Ai2Kit Pro version. */
+						__( 'Ai2Kit Pro %s is active. Its conversions run automatically.', 'ai2kit' ),
+						active.version
+					) }
+				/>
+			</Shell>
+		);
+	}
 	return (
 		<Shell>
 			<PageTitle title={ __( 'Ai2Kit Pro', 'ai2kit' ) } lead={ __( 'Convert whole sites, not just pages.', 'ai2kit' ) } />

@@ -9,7 +9,7 @@
 $plugin  = \Elementor\Plugin::$instance;
 // Style controls are only registered in editor context (optimized control loading).
 \Elementor\Core\Frontend\Performance::set_use_style_controls( true );
-$widgets = [ 'heading', 'text-editor', 'image', 'button', 'icon', 'icon-list', 'video', 'divider', 'spacer', 'html', 'accordion', 'nested-accordion', 'toggle', 'tabs', 'image-carousel', 'icon-box', 'image-box', 'counter', 'testimonial' ];
+$widgets = [ 'a2k-form', 'heading', 'text-editor', 'image', 'button', 'icon', 'icon-list', 'video', 'divider', 'spacer', 'html', 'accordion', 'nested-accordion', 'toggle', 'tabs', 'image-carousel', 'icon-box', 'image-box', 'counter', 'testimonial', 'nested-tabs', 'social-icons', 'star-rating', 'progress', 'wp-widget-nav_menu' ];
 $out     = [
 	'elementor_version' => ELEMENTOR_VERSION,
 	'experiments'       => [],

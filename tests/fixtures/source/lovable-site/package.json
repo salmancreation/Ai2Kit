@@ -1,0 +1,22 @@
+{
+  "name": "lovable-site-fixture",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Lovable-style multi-page site for Ai2Kit Pro (M6): react-router pages with a shared header/footer and nav, Radix Tabs and Dialog, an Embla carousel, counters, a contact form and Framer Motion entrance animations. Default base '/'.",
+  "scripts": { "build": "vite build" },
+  "dependencies": {
+    "@radix-ui/react-dialog": "1.1.2",
+    "@radix-ui/react-tabs": "1.1.1",
+    "embla-carousel-react": "8.5.1",
+    "framer-motion": "11.11.17",
+    "lucide-react": "0.460.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.28.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "vite": "5.4.11"
+  }
+}

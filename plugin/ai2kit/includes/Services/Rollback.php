@@ -69,6 +69,13 @@ final class Rollback {
 			KitWriter::restore( $job['kit_backup'] );
 			$kit_restored = true;
 		}
+		/**
+		 * Fires while an import is undone, after its pages, templates and media were removed.
+		 * Add-ons revert what they changed (menus, site settings).
+		 *
+		 * @param array<string, mixed> $job Job row (result as stored at import).
+		 */
+		do_action( 'ai2kit_undo_import', $job );
 		JobStore::update( $job['uuid'], array( 'status' => 'undone' ) );
 		return array(
 			'trashed'      => $trashed,

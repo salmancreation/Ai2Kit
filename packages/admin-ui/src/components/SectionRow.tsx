@@ -119,7 +119,7 @@ export function SectionRow( {
 						) }
 					</div>
 				</div>
-				{ report.proHints.length > 0 && (
+				{ report.proHints.length > 0 && ! window.ai2kitConfig.pro && (
 					<div className={ s.hints }>
 						{ report.proHints.map( ( h ) => (
 							<UpsellChip key={ h } detail={ __( 'Ai2Kit Pro maps tabs, carousels and popups to native Elementor widgets. In Free they are kept as static, editable content.', 'ai2kit' ) }>
